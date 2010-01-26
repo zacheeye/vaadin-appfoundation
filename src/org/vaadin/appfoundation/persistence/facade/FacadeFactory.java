@@ -11,34 +11,61 @@ import java.util.Map;
  */
 public class FacadeFactory {
 
-    private static Map<String, JPAFacade> facades = new HashMap<String, JPAFacade>();
+    private static Map<String, IFacade> facades = new HashMap<String, IFacade>();
 
     private static IFacade defaultFacade;
 
     /**
-     * Register a new facade to the application.
+     * Register a new JPAFacade to the application.
      * 
      * @param name
      *            The persistence-unit name in the persistence.xml file.
      * @param isDefault
      *            Should this facade be the default facade to be used in the
      *            application.
+     * @throws IllegalAccessException
+     * @throws InstantiationException
      */
-    public static void registerFacade(String name, boolean isDefault) {
+    public static void registerFacade(String name, boolean isDefault)
+            throws InstantiationException, IllegalAccessException {
+        registerFacade(JPAFacade.class, name, isDefault);
+    }
+
+    /**
+     * Register a new facade to the application.
+     * 
+     * @param facade
+     *            The class of the facade implementation
+     * @param name
+     *            The persistence-unit name in the persistence.xml file.
+     * @param isDefault
+     *            Should this facade be the default facade to be used in the
+     *            application.
+     * @throws IllegalAccessException
+     * @throws InstantiationException
+     */
+    public static void registerFacade(Class<? extends IFacade> facade,
+            String name, boolean isDefault) throws InstantiationException,
+            IllegalAccessException {
         // Check if there already exists a facade with this name.
         if (facades.containsKey(name)) {
             // If it exists, then close the facade.
             facades.get(name).close();
         }
 
-        // Create a new instance of the facade and put it in our map
-        JPAFacade facade = new JPAFacade(name);
-        facades.put(name, facade);
+        // Create a new instance of the facade
+        IFacade facadeImpl = facade.newInstance();
+
+        // Initialize the facade
+        facadeImpl.init(name);
+
+        // Put the facade in our static map
+        facades.put(name, facadeImpl);
 
         // Should this facade instance be used as the default facade in the
         // application?
         if (isDefault) {
-            defaultFacade = facade;
+            defaultFacade = facadeImpl;
         }
     }
 
@@ -58,7 +85,7 @@ public class FacadeFactory {
      *            Persistence-unit name (defined in the persistence.xml)
      * @return
      */
-    public static JPAFacade getFacade(String name) {
+    public static IFacade getFacade(String name) {
         return facades.get(name);
     }
 
@@ -70,7 +97,7 @@ public class FacadeFactory {
      */
     public static void removeFacade(String name) {
         if (facades.containsKey(name)) {
-            JPAFacade facade = facades.get(name);
+            IFacade facade = facades.get(name);
             facade.kill();
             facades.remove(name);
         }
