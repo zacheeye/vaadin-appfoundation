@@ -2,6 +2,7 @@ package org.vaadin.appfoundation.authentication.util;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Properties;
 
 import org.vaadin.appfoundation.authentication.data.User;
 
@@ -32,16 +33,27 @@ public class PasswordUtil {
     }
 
     /**
-     * Set the salt value to be used in password hashing. The salt can only be
-     * set once.
+     * Set the properties for the PasswordUtil. The properties must contain the
+     * password.salt -property.
      * 
-     * @param passwordSalt
+     * @param properties
      */
-    public static void setSalt(String passwordSalt) {
+    public static void setProperties(Properties properties) {
+        // Make sure we don't get null values
+        if (properties == null) {
+            throw new IllegalArgumentException("Properties may not be null");
+        }
+
+        // Make sure we have the needed property
+        if (!properties.containsKey("password.salt")) {
+            throw new IllegalArgumentException(
+                    "Properties must contain the password.salt -property");
+        }
+
         // Salt should only be defined once. If it is already defined, then an
         // exception should be thrown
         if (salt == null) {
-            salt = passwordSalt;
+            salt = properties.getProperty("password.salt");
         } else {
             throw new UnsupportedOperationException(
                     "Password salt is already set");
