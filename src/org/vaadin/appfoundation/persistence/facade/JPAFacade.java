@@ -29,7 +29,10 @@ import org.vaadin.appfoundation.persistence.data.AbstractPojo;
 public class JPAFacade implements IFacade {
 
     protected EntityManagerFactory emf = null;
-    protected EntityManager em = null;
+
+    // Store the EntityManager in a ThreadLocale variable to avoid multithread
+    // problems
+    protected ThreadLocal<EntityManager> em = new ThreadLocal<EntityManager>();
 
     /**
      * Default constructor which does nothing. Make sure to call init() if
@@ -285,12 +288,12 @@ public class JPAFacade implements IFacade {
      */
     protected EntityManager getEntityManager() {
         // Check if em is null or if the em has been closed.
-        if ((em == null || !em.isOpen()) && emf != null) {
+        if ((em.get() == null || !em.get().isOpen()) && emf != null) {
             // create a new em if we didn't have a usable one available.
-            em = emf.createEntityManager();
+            em.set(emf.createEntityManager());
         }
 
-        return em;
+        return em.get();
     }
 
     /**
@@ -298,9 +301,10 @@ public class JPAFacade implements IFacade {
      */
     public void close() {
         // Close the entity manager
-        if (em != null && em.isOpen()) {
-            em.clear();
-            em.close();
+        if (em.get() != null && em.get().isOpen()) {
+            em.get().clear();
+            em.get().close();
+            em.set(null);
         }
     }
 
@@ -308,8 +312,8 @@ public class JPAFacade implements IFacade {
      * Closes the entity manager and the entity manager factory.
      */
     public void kill() {
-        if (em != null && em.isOpen()) {
-            em.close();
+        if (em.get() != null && em.get().isOpen()) {
+            em.get().close();
         }
         if (emf != null) {
             emf.close();
@@ -330,7 +334,8 @@ public class JPAFacade implements IFacade {
         // refresh is done. However, if it is called from within this facade,
         // then we should have and open entity manager and the calling method
         // will take care of closing the em.
-        if (em == null || !em.isOpen()) {
+        EntityManager em = null;
+        if (this.em.get() == null || !this.em.get().isOpen()) {
             em = getEntityManager();
             closeEm = true;
         }
@@ -344,7 +349,7 @@ public class JPAFacade implements IFacade {
 
         // Close the em if necessary
         if (closeEm) {
-            em.close();
+            close();
         }
     }
 
