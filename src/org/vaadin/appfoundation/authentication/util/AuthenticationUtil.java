@@ -3,6 +3,7 @@ package org.vaadin.appfoundation.authentication.util;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.vaadin.appfoundation.authentication.AuthenticationMessage;
 import org.vaadin.appfoundation.authentication.data.User;
 import org.vaadin.appfoundation.persistence.facade.FacadeFactory;
 
@@ -21,7 +22,7 @@ public class AuthenticationUtil {
      * @author Kim
      * 
      */
-    public enum AuthenticationMessage {
+    public enum AFAuthenticationMessage implements AuthenticationMessage{
         INVALID_CREDENTIALS,
         AUTH_SUCCESSFUL,
         DATABASE_ERROR
@@ -36,10 +37,10 @@ public class AuthenticationUtil {
      *            Password of the user
      * @return Returns an integer representing the authentication message
      */
-    public static int authenticate(String username, String password) {
+    public static AuthenticationMessage authenticate(String username, String password) {
         // Login fails if either the username or password is null
         if (username == null || password == null) {
-            return AuthenticationMessage.INVALID_CREDENTIALS.ordinal();
+            return AFAuthenticationMessage.INVALID_CREDENTIALS;
         }
 
         // Create a query which searches the database for a user with the given
@@ -57,11 +58,11 @@ public class AuthenticationUtil {
                 // current user (inlogged)
                 SessionUtil.setUser(user);
 
-                return AuthenticationMessage.AUTH_SUCCESSFUL.ordinal();
+                return AFAuthenticationMessage.AUTH_SUCCESSFUL;
             }
         }
         // Either the username didn't exist or the passwords did not match
-        return AuthenticationMessage.INVALID_CREDENTIALS.ordinal();
+        return AFAuthenticationMessage.INVALID_CREDENTIALS;
     }
 
 }
