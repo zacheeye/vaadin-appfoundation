@@ -27,7 +27,7 @@ public class UserUtil {
      * @author Kim
      * 
      */
-    public static enum RegistrationError {
+    public static enum RegistrationMsg {
         TOO_SHORT_PASSWORD,
         TOO_SHORT_USERNAME,
         PASSWORDS_DO_NOT_MATCH,
@@ -42,7 +42,7 @@ public class UserUtil {
      * @author Kim
      * 
      */
-    public static enum ProfileError {
+    public static enum ProfileMsg {
         TOO_SHORT_PASSWORD,
         PASSWORDS_DO_NOT_MATCH,
         PASSWORD_CHANGED,
@@ -71,22 +71,22 @@ public class UserUtil {
      *            Verification of the desired password
      * @return
      */
-    public static RegistrationError registerUser(String username,
+    public static RegistrationMsg registerUser(String username,
             String password, String verifyPassword) {
         // Make sure that the username and password fulfill the minimum size
         // requirements.
         if (username == null || username.length() < minUsernameLength) {
-            return RegistrationError.TOO_SHORT_USERNAME;
+            return RegistrationMsg.TOO_SHORT_USERNAME;
         } else if (password == null || password.length() < minPasswordLength) {
-            return RegistrationError.TOO_SHORT_PASSWORD;
+            return RegistrationMsg.TOO_SHORT_PASSWORD;
         }
         // Make sure that the password is verified correctly
         else if (!password.equals(verifyPassword)) {
-            return RegistrationError.PASSWORDS_DO_NOT_MATCH;
+            return RegistrationMsg.PASSWORDS_DO_NOT_MATCH;
         }
         // Make sure the username is available
         else if (!checkUsernameAvailability(username)) {
-            return RegistrationError.USERNAME_TAKEN;
+            return RegistrationMsg.USERNAME_TAKEN;
         }
 
         // Everything is ok, create the user
@@ -96,7 +96,7 @@ public class UserUtil {
 
         FacadeFactory.getFacade().store(user);
 
-        return RegistrationError.REGISTRATION_COMPLETED;
+        return RegistrationMsg.REGISTRATION_COMPLETED;
     }
 
     /**
@@ -126,20 +126,20 @@ public class UserUtil {
      * @param verifiedNewPassword
      * @return
      */
-    public static ProfileError changePassword(User user,
+    public static ProfileMsg changePassword(User user,
             String currentPassword, String newPassword,
             String verifiedNewPassword) {
 
         // Verify that the current password is correct
         if (!PasswordUtil.verifyPassword(user, currentPassword)) {
-            return ProfileError.WRONG_PASSWORD;
+            return ProfileMsg.WRONG_PASSWORD;
         }
 
         // Check the new password's constraints
         if (newPassword == null || newPassword.length() < minPasswordLength) {
-            return ProfileError.TOO_SHORT_PASSWORD;
+            return ProfileMsg.TOO_SHORT_PASSWORD;
         } else if (!newPassword.equals(verifiedNewPassword)) {
-            return ProfileError.PASSWORDS_DO_NOT_MATCH;
+            return ProfileMsg.PASSWORDS_DO_NOT_MATCH;
         }
 
         // Password is ok, hash it and change it
@@ -147,7 +147,7 @@ public class UserUtil {
         // Store the user
         FacadeFactory.getFacade().store(user);
 
-        return ProfileError.PASSWORD_CHANGED;
+        return ProfileMsg.PASSWORD_CHANGED;
     }
 
     /**
