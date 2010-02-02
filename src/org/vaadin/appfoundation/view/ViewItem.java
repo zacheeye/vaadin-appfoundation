@@ -17,7 +17,7 @@ public class ViewItem {
 
     /**
      * Constructor. Takes as input the viewId. If the viewId is an instance of
-     * Class<? extends AbstractView>, then the viewId is used as the default
+     * class object of the view, then the viewId is used as the default
      * viewClass.
      * 
      * @param viewId
