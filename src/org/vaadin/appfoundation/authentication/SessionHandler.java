@@ -58,7 +58,7 @@ public class SessionHandler implements TransactionListener {
      * 
      * @param user
      */
-    protected static void setUser(User user) {
+    public static void setUser(User user) {
         currentUser.set(user);
     }
 
