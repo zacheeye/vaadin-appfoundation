@@ -1,25 +1,26 @@
 package org.vaadin.appfoundation.authentication;
 
 import org.vaadin.appfoundation.authentication.data.User;
-import org.vaadin.appfoundation.authentication.util.SessionUtil;
 
 import com.vaadin.Application;
 import com.vaadin.service.ApplicationContext.TransactionListener;
 
 /**
- * Transaction listener which makes sure the SessionUtil has the correct user
- * instance for every thread.
+ * A utility class for handling user sessions
  * 
  * @author Kim
  * 
  */
-public class UserSessionTransactionListener implements TransactionListener {
+public class SessionHandler implements TransactionListener {
 
     private static final long serialVersionUID = 4142938996955537395L;
 
     private final Application application;
 
     private User user;
+    
+    // Store the user object of the currently inlogged user
+    private static ThreadLocal<User> currentUser = new ThreadLocal<User>();
 
     /**
      * Constructor
@@ -27,7 +28,7 @@ public class UserSessionTransactionListener implements TransactionListener {
      * @param application
      *            Current application instance
      */
-    public UserSessionTransactionListener(Application application) {
+    public SessionHandler(Application application) {
         this.application = application;
     }
 
@@ -36,7 +37,7 @@ public class UserSessionTransactionListener implements TransactionListener {
         // Clear the currentApplication field
         if (this.application == application) {
             // Get the current user
-            user = SessionUtil.get();
+            user = SessionHandler.get();
         }
     }
 
@@ -47,8 +48,35 @@ public class UserSessionTransactionListener implements TransactionListener {
         // local variable for this request.
         if (this.application == application) {
             // Set the current user
-            SessionUtil.setUser(user);
+            SessionHandler.setUser(user);
         }
+    }
+
+    /**
+     * Set the User object for the currently inlogged user for this application
+     * instance
+     * 
+     * @param user
+     */
+    public static void setUser(User user) {
+        currentUser.set(user);
+    }
+
+    /**
+     * Get the User object of the currently inlogged user for this application
+     * instance.
+     * 
+     * @return
+     */
+    public static User get() {
+        return currentUser.get();
+    }
+
+    /**
+     * Method for logging out a user
+     */
+    public static void logout() {
+        setUser(null);
     }
 
 }

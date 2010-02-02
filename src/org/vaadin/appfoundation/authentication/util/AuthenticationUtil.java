@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.vaadin.appfoundation.authentication.AuthenticationMessage;
+import org.vaadin.appfoundation.authentication.SessionHandler;
 import org.vaadin.appfoundation.authentication.data.User;
 import org.vaadin.appfoundation.persistence.facade.FacadeFactory;
 
@@ -56,7 +57,7 @@ public class AuthenticationUtil {
             if (PasswordUtil.verifyPassword(user, password)) {
                 // The user's password was correct, so set the user as the
                 // current user (inlogged)
-                SessionUtil.setUser(user);
+                SessionHandler.setUser(user);
 
                 return AFAuthenticationMessage.AUTH_SUCCESSFUL;
             }
