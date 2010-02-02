@@ -334,11 +334,12 @@ public class JPAFacade implements IFacade {
         // refresh is done. However, if it is called from within this facade,
         // then we should have and open entity manager and the calling method
         // will take care of closing the em.
-        EntityManager em = null;
         if (this.em.get() == null || !this.em.get().isOpen()) {
-            em = getEntityManager();
             closeEm = true;
         }
+        // Get the EntityManager
+        EntityManager em = getEntityManager();
+        
         // Get a fresh instance of the object.
         A pojo2 = (A) em.find(pojo.getClass(), pojo.getId());
         // Make sure its state is up-to-date
