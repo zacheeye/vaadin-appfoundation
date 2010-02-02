@@ -39,7 +39,7 @@ public interface IFacade {
      * 
      * @param clazz
      *            Entity class
-     * @return
+     * @return List of A entities
      */
     public <A extends AbstractPojo> List<A> list(Class<A> clazz);
 
@@ -50,7 +50,7 @@ public interface IFacade {
      *            Database query string
      * @param parameters
      *            A map of parameters and parameter values used in the query
-     * @return
+     * @return List of A entities
      */
     public <A extends AbstractPojo> List<A> list(String queryStr,
             Map<String, Object> parameters);
@@ -62,7 +62,7 @@ public interface IFacade {
      *            Database query string
      * @param parameters
      *            A map of parameters and parameter values used in the query
-     * @return
+     * @return An instance of A
      */
     public <A extends AbstractPojo> A find(String queryStr,
             Map<String, Object> parameters);

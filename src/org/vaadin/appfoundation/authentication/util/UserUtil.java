@@ -28,12 +28,7 @@ public class UserUtil {
      * 
      */
     public static enum RegistrationMsg {
-        TOO_SHORT_PASSWORD,
-        TOO_SHORT_USERNAME,
-        PASSWORDS_DO_NOT_MATCH,
-        USERNAME_TAKEN,
-        REGISTRATION_COMPLETED,
-        ERROR
+        TOO_SHORT_PASSWORD, TOO_SHORT_USERNAME, PASSWORDS_DO_NOT_MATCH, USERNAME_TAKEN, REGISTRATION_COMPLETED, ERROR
     }
 
     /**
@@ -43,18 +38,14 @@ public class UserUtil {
      * 
      */
     public static enum ProfileMsg {
-        TOO_SHORT_PASSWORD,
-        PASSWORDS_DO_NOT_MATCH,
-        PASSWORD_CHANGED,
-        WRONG_PASSWORD,
-        ERROR
+        TOO_SHORT_PASSWORD, PASSWORDS_DO_NOT_MATCH, PASSWORD_CHANGED, WRONG_PASSWORD, ERROR
     }
 
     /**
      * Get the user object with the given primary key
      * 
      * @param id
-     * @return
+     * @return An instance of User
      */
     public static User getUser(Long id) {
         return FacadeFactory.getFacade().find(User.class, id);
@@ -69,7 +60,7 @@ public class UserUtil {
      *            Desired password
      * @param verifyPassword
      *            Verification of the desired password
-     * @return
+     * @return A RegistrationMsg defining the final state of the process
      */
     public static RegistrationMsg registerUser(String username,
             String password, String verifyPassword) {
@@ -121,14 +112,17 @@ public class UserUtil {
      * meets all the set conditions.
      * 
      * @param user
+     *            User object for which we want to change the password
      * @param currentPassword
+     *            Current password
      * @param newPassword
+     *            Desired new password
      * @param verifiedNewPassword
-     * @return
+     *            New password verification
+     * @return ProfileMsg defining the final state of the process
      */
-    public static ProfileMsg changePassword(User user,
-            String currentPassword, String newPassword,
-            String verifiedNewPassword) {
+    public static ProfileMsg changePassword(User user, String currentPassword,
+            String newPassword, String verifiedNewPassword) {
 
         // Verify that the current password is correct
         if (!PasswordUtil.verifyPassword(user, currentPassword)) {
@@ -154,6 +148,7 @@ public class UserUtil {
      * Stores to the database any changes made to the user object
      * 
      * @param user
+     *            An instance of the User object
      */
     public static void storeUser(User user) {
         FacadeFactory.getFacade().store(user);
@@ -164,6 +159,7 @@ public class UserUtil {
      * password must be defined.
      * 
      * @param properties
+     *            Configuration properties
      */
     public static void setProperties(Properties properties) {
         // Make sure properties is not null

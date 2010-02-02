@@ -30,7 +30,7 @@ public class User extends AbstractPojo {
     /**
      * Get the username of the user
      * 
-     * @return
+     * @return User's username
      */
     public String getUsername() {
         return username;
@@ -40,6 +40,7 @@ public class User extends AbstractPojo {
      * Set the username for the user
      * 
      * @param username
+     *            New username
      */
     public void setUsername(String username) {
         this.username = username;
@@ -48,7 +49,7 @@ public class User extends AbstractPojo {
     /**
      * Get the hashed password of the user
      * 
-     * @return
+     * @return Hashed password
      */
     public String getPassword() {
         return password;
@@ -58,6 +59,7 @@ public class User extends AbstractPojo {
      * Set the hashed password of the user
      * 
      * @param password
+     *            New hHashed password
      */
     public void setPassword(String password) {
         this.password = password;
@@ -67,6 +69,7 @@ public class User extends AbstractPojo {
      * Set the actual name of the user
      * 
      * @param name
+     *            New name for the user
      */
     public void setName(String name) {
         this.name = name;
@@ -75,7 +78,7 @@ public class User extends AbstractPojo {
     /**
      * Get the actual name of the user
      * 
-     * @return
+     * @return Name of the user
      */
     public String getName() {
         return name;
@@ -85,6 +88,7 @@ public class User extends AbstractPojo {
      * Set an email address for the user
      * 
      * @param email
+     *            New email address
      */
     public void setEmail(String email) {
         this.email = email;
@@ -93,7 +97,7 @@ public class User extends AbstractPojo {
     /**
      * Get the user's email address
      * 
-     * @return
+     * @return User's email address
      */
     public String getEmail() {
         return email;

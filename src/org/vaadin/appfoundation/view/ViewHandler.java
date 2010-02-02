@@ -66,7 +66,7 @@ public class ViewHandler implements TransactionListener {
      * 
      * @param viewId
      *            The view's id
-     * @return
+     * @return The resulting ViewItem object
      */
     public static ViewItem addView(Object viewId) {
         if (viewId == null) {
@@ -91,7 +91,7 @@ public class ViewHandler implements TransactionListener {
      *            The view's id
      * @param parent
      *            Parent view for the given view
-     * @return
+     * @return The resulting ViewItem object
      */
     public static ViewItem addView(Object viewId, ParentView parent) {
         ViewItem item = addView(viewId);
@@ -103,7 +103,7 @@ public class ViewHandler implements TransactionListener {
      * Add a new view. Returns the viewId. Make sure to set either the view
      * instance or the view class for the ViewItem.
      * 
-     * @return
+     * @return The viewId
      */
     public static Object addView() {
         Object viewId = UUID.randomUUID();
@@ -117,7 +117,7 @@ public class ViewHandler implements TransactionListener {
      * null is returned.
      * 
      * @param viewId
-     * @return
+     * @return The ViewItem object for the given viewId
      */
     public static ViewItem getViewItem(Object viewId) {
         // Check if the viewId exists in the map
@@ -149,7 +149,9 @@ public class ViewHandler implements TransactionListener {
      * the View's activated() method.
      * 
      * @param viewId
+     *            The view's viewId
      * @param params
+     *            Parameters used for activating the view
      */
     public static void activateView(Object viewId, Object... params) {
         if (viewId != null && instance.get().viewMap.containsKey(viewId)
@@ -187,7 +189,9 @@ public class ViewHandler implements TransactionListener {
      * Set the parent view for the given viewId.
      * 
      * @param viewId
+     *            The viewId of the ViewItem
      * @param parent
+     *            New parent for the view
      */
     public static void setParent(Object viewId, ParentView parent) {
         if (viewId != null && parent != null
@@ -200,6 +204,7 @@ public class ViewHandler implements TransactionListener {
      * Add a dispatch event listener.
      * 
      * @param listener
+     *            The new listener
      */
     public static void addListener(DispatchEventListener listener) {
         if (listener != null) {
@@ -211,6 +216,7 @@ public class ViewHandler implements TransactionListener {
      * Remove a dispatch event listener.
      * 
      * @param listener
+     *            The listener to be removed
      */
     public static void removeListener(DispatchEventListener listener) {
         if (listener != null) {

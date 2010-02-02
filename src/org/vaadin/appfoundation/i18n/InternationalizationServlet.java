@@ -101,7 +101,7 @@ public class InternationalizationServlet extends HttpServlet {
      *            Language for which we want the translation
      * @param identifier
      *            Key for the translation message
-     * @return
+     * @return Translated message string
      */
     public static String getMessage(String language, String identifier) {
         if (!translations.containsKey(language)) {

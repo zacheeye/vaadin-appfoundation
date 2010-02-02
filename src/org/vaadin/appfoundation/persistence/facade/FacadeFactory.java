@@ -72,7 +72,7 @@ public class FacadeFactory {
     /**
      * Returns the default facade of the application.
      * 
-     * @return
+     * @return The default facade instance
      */
     public static IFacade getFacade() {
         return defaultFacade;
@@ -83,7 +83,7 @@ public class FacadeFactory {
      * 
      * @param name
      *            Persistence-unit name (defined in the persistence.xml)
-     * @return
+     * @return The facade instance for the given name
      */
     public static IFacade getFacade(String name) {
         return facades.get(name);

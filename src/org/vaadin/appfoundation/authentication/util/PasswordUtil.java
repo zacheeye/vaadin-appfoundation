@@ -91,7 +91,7 @@ public class PasswordUtil {
      * 
      * @param password
      *            String which is to be hashed
-     * @return
+     * @return Hashed password
      */
     public static String generateHashedPassword(String password) {
         StringBuffer hashedPassword = new StringBuffer();

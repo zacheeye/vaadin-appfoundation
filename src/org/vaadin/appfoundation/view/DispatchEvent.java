@@ -26,7 +26,7 @@ public class DispatchEvent {
     /**
      * Get the ViewItem that is the target of the event.
      * 
-     * @return
+     * @return Target ViewItem
      */
     public ViewItem getViewItem() {
         return item;
@@ -35,7 +35,7 @@ public class DispatchEvent {
     /**
      * Get the parameters which are used for activating the view.
      * 
-     * @return
+     * @return Parameters used to activate the view
      */
     public Object[] getActivationParameters() {
         return params;

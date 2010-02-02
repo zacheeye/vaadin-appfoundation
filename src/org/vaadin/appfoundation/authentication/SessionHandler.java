@@ -66,7 +66,7 @@ public class SessionHandler implements TransactionListener {
      * Get the User object of the currently inlogged user for this application
      * instance.
      * 
-     * @return
+     * @return The currently inlogged user
      */
     public static User get() {
         return currentUser.get();

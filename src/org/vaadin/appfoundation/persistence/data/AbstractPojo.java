@@ -33,7 +33,7 @@ abstract public class AbstractPojo {
     /**
      * Get the primary key for this entity.
      * 
-     * @return
+     * @return Primary key
      */
     public Long getId() {
         return id;
@@ -44,6 +44,7 @@ abstract public class AbstractPojo {
      * called.
      * 
      * @param id
+     *            New primary key
      */
     public void setId(Long id) {
         this.id = id;
@@ -53,7 +54,7 @@ abstract public class AbstractPojo {
      * Get the concurrency version number for this entity. The concurrency
      * version is a number which is used for optimistic locking in the database.
      * 
-     * @return
+     * @return Current consistency version
      */
     public Long getConsistencyVersion() {
         return consistencyVersion;
@@ -64,6 +65,7 @@ abstract public class AbstractPojo {
      * should never be called.
      * 
      * @param consistencyVersion
+     *            New consistency version
      */
     public void setConsistencyVersion(Long consistencyVersion) {
         this.consistencyVersion = consistencyVersion;

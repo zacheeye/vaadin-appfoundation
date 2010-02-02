@@ -21,6 +21,7 @@ public class ViewItem {
      * viewClass.
      * 
      * @param viewId
+     *            The id for the ViewItem
      */
     @SuppressWarnings("unchecked")
     public ViewItem(Object viewId) {
@@ -37,6 +38,7 @@ public class ViewItem {
      * Set the view object for this ViewItem
      * 
      * @param view
+     *            The view instance
      */
     public void setView(AbstractView<?> view) {
         this.view = view;
@@ -46,7 +48,7 @@ public class ViewItem {
      * Get the view object for this item. If view isn't set and the viewClass is
      * defined, then an instance of the class is created and returned.
      * 
-     * @return
+     * @return The view instance
      */
     public AbstractView<?> getView() {
         if (view == null && viewClass != null) {
@@ -64,7 +66,7 @@ public class ViewItem {
     /**
      * Returns the view id for this ViewItem.
      * 
-     * @return
+     * @return The item's id
      */
     public Object getViewId() {
         return viewId;
@@ -76,6 +78,7 @@ public class ViewItem {
      * getView() is called in case an instance of View is not available.
      * 
      * @param viewClass
+     *            The view's class
      */
     public void setViewClass(Class<? extends AbstractView<?>> viewClass) {
         this.viewClass = viewClass;
@@ -84,7 +87,7 @@ public class ViewItem {
     /**
      * Get the current view class.
      * 
-     * @return
+     * @return The view's class
      */
     public Class<? extends AbstractView<?>> getViewClass() {
         return viewClass;
