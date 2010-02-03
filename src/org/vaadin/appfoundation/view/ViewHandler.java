@@ -23,7 +23,7 @@ public class ViewHandler implements TransactionListener {
     private final Map<Object, ViewItem> viewMap = new HashMap<Object, ViewItem>();
 
     // A map between parent ids and parent views
-    private final Map<Object, ParentView> parentMap = new HashMap<Object, ParentView>();
+    private final Map<Object, ViewContainer> parentMap = new HashMap<Object, ViewContainer>();
 
     // A list of all known dispatch event listeners.
     private final List<DispatchEventListener> listeners = new ArrayList<DispatchEventListener>();
@@ -93,7 +93,7 @@ public class ViewHandler implements TransactionListener {
      *            Parent view for the given view
      * @return The resulting ViewItem object
      */
-    public static ViewItem addView(Object viewId, ParentView parent) {
+    public static ViewItem addView(Object viewId, ViewContainer parent) {
         ViewItem item = addView(viewId);
         setParent(viewId, parent);
         return item;
@@ -158,7 +158,7 @@ public class ViewHandler implements TransactionListener {
                 && instance.get().parentMap.containsKey(viewId)) {
             // Get the ViewItem and parent for this viewId
             ViewItem item = instance.get().viewMap.get(viewId);
-            ParentView parent = instance.get().parentMap.get(viewId);
+            ViewContainer parent = instance.get().parentMap.get(viewId);
 
             // Create the dispatch event object
             DispatchEvent event = new DispatchEvent(item, params);
@@ -193,7 +193,7 @@ public class ViewHandler implements TransactionListener {
      * @param parent
      *            New parent for the view
      */
-    public static void setParent(Object viewId, ParentView parent) {
+    public static void setParent(Object viewId, ViewContainer parent) {
         if (viewId != null && parent != null
                 && instance.get().viewMap.containsKey(viewId)) {
             instance.get().parentMap.put(viewId, parent);

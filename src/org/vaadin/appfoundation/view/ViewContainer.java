@@ -6,7 +6,7 @@ package org.vaadin.appfoundation.view;
  * @author Kim
  * 
  */
-public interface ParentView {
+public interface ViewContainer {
 
     /**
      * Activates the given view.
