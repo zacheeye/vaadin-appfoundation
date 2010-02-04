@@ -101,15 +101,31 @@ public class InternationalizationServlet extends HttpServlet {
      *            Language for which we want the translation
      * @param identifier
      *            Key for the translation message
+     * @param params
+     *            Parameters for the translation message
      * @return Translated message string
      */
-    public static String getMessage(String language, String identifier) {
+    public static String getMessage(String language, String identifier,
+            Object... params) {
         if (!translations.containsKey(language)) {
             return "";
         } else {
+            // Get the raw translation message
             Map<String, String> messages = translations.get(language);
-            return messages.containsKey(identifier) ? messages.get(identifier)
-                    : "";
+            String msg = messages.containsKey(identifier) ? messages
+                    .get(identifier) : "";
+
+            // Check if any parameters are defined
+            if (params != null) {
+                // Replace the placeholders in the raw message with the given
+                // parameters
+                for (int i = 0; i < params.length; i++) {
+                    String value = String.valueOf(params[i]);
+                    msg = msg.replace("{" + i + "}", value);
+                }
+            }
+
+            return msg;
         }
     }
 }
