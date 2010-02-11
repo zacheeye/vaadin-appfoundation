@@ -1,7 +1,7 @@
 package org.vaadin.appfoundation.view;
 
+import com.vaadin.ui.ComponentContainer;
 import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.Layout;
 
 /**
  * Interface which all main views should implement
@@ -9,15 +9,16 @@ import com.vaadin.ui.Layout;
  * @author Kim
  * 
  */
-public abstract class AbstractView<A extends Layout> extends CustomComponent {
+public abstract class AbstractView<A extends ComponentContainer> extends
+        CustomComponent {
 
     private static final long serialVersionUID = -1420553541682132603L;
 
-    protected A mainLayout;
+    protected A content;
 
     protected AbstractView(A layout) {
         setCompositionRoot(layout);
-        mainLayout = layout;
+        content = layout;
         setSizeFull();
     }
 
