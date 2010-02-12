@@ -1,5 +1,7 @@
 package org.vaadin.appfoundation.view;
 
+import java.io.Serializable;
+
 /**
  * Event class which contains information about which event has been or is being
  * activated.
@@ -7,7 +9,9 @@ package org.vaadin.appfoundation.view;
  * @author Kim
  * 
  */
-public class DispatchEvent {
+public class DispatchEvent implements Serializable {
+
+    private static final long serialVersionUID = 3831823067244403530L;
 
     private final ViewItem item;
 

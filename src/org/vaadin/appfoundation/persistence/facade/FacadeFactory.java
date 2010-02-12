@@ -1,5 +1,6 @@
 package org.vaadin.appfoundation.persistence.facade;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,7 +10,9 @@ import java.util.Map;
  * @author Kim
  * 
  */
-public class FacadeFactory {
+public class FacadeFactory implements Serializable {
+
+    private static final long serialVersionUID = -7409448835737552324L;
 
     private static Map<String, IFacade> facades = new HashMap<String, IFacade>();
 

@@ -1,5 +1,6 @@
 package org.vaadin.appfoundation.authentication.util;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -13,7 +14,9 @@ import org.vaadin.appfoundation.persistence.facade.FacadeFactory;
  * @author Kim
  * 
  */
-public class UserUtil {
+public class UserUtil implements Serializable {
+
+    private static final long serialVersionUID = 6394812141386916155L;
 
     // Define the minimum length for a username
     private static int minUsernameLength = 4;

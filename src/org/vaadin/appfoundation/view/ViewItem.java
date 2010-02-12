@@ -1,5 +1,7 @@
 package org.vaadin.appfoundation.view;
 
+import java.io.Serializable;
+
 /**
  * The view item is a a wrapper class used by the ViewHandler. It contains
  * information about the views added to the ViewHandler.
@@ -7,7 +9,9 @@ package org.vaadin.appfoundation.view;
  * @author Kim
  * 
  */
-public class ViewItem {
+public class ViewItem implements Serializable {
+
+    private static final long serialVersionUID = 3400671352364794499L;
 
     private final Object viewId;
 

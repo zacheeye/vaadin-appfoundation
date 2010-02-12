@@ -1,5 +1,6 @@
 package org.vaadin.appfoundation.persistence.facade;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
@@ -27,7 +28,9 @@ import org.vaadin.appfoundation.persistence.data.AbstractPojo;
  * @author Kim
  * 
  */
-public class JPAFacade implements IFacade {
+public class JPAFacade implements IFacade, Serializable {
+
+    private static final long serialVersionUID = 2302865212748213608L;
 
     protected EntityManagerFactory emf = null;
 

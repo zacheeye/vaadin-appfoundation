@@ -1,5 +1,7 @@
 package org.vaadin.appfoundation.view;
 
+import java.io.Serializable;
+
 import com.vaadin.ui.ComponentContainer;
 import com.vaadin.ui.CustomComponent;
 
@@ -10,7 +12,7 @@ import com.vaadin.ui.CustomComponent;
  * 
  */
 public abstract class AbstractView<A extends ComponentContainer> extends
-        CustomComponent {
+        CustomComponent implements Serializable {
 
     private static final long serialVersionUID = -1420553541682132603L;
 

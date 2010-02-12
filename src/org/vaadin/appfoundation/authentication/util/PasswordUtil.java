@@ -1,5 +1,6 @@
 package org.vaadin.appfoundation.authentication.util;
 
+import java.io.Serializable;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Properties;
@@ -12,7 +13,9 @@ import org.vaadin.appfoundation.authentication.data.User;
  * @author Kim
  * 
  */
-public class PasswordUtil {
+public class PasswordUtil implements Serializable {
+
+    private static final long serialVersionUID = 7823991334001022227L;
 
     // Store the password salt in a static variable
     private static String salt = null;
