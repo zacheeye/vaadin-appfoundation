@@ -15,6 +15,8 @@ import org.vaadin.appfoundation.persistence.data.AbstractPojo;
 @Table(name = "appuser")
 public class User extends AbstractPojo {
 
+    private static final long serialVersionUID = 4417119399127203109L;
+
     protected String username;
 
     protected String password;
