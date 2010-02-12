@@ -1,5 +1,7 @@
 package org.vaadin.appfoundation.persistence.data;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -16,7 +18,9 @@ import javax.persistence.Version;
  * 
  */
 @MappedSuperclass
-abstract public class AbstractPojo {
+abstract public class AbstractPojo implements Serializable {
+
+    private static final long serialVersionUID = -7289994339186082141L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
