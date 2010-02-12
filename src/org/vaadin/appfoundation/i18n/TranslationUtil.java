@@ -18,7 +18,7 @@ public class TranslationUtil {
      *            Name of the field
      * @return
      */
-    protected static String getFieldTranslation(Class<?> c, String fieldName) {
+    public static String getFieldTranslation(Class<?> c, String fieldName) {
         Field field = getField(c, fieldName);
         if (field != null && field.isAnnotationPresent(FieldTranslation.class)) {
             FieldTranslation translation = field
