@@ -28,7 +28,12 @@ public class UserUtil {
      * 
      */
     public static enum RegistrationMsg {
-        TOO_SHORT_PASSWORD, TOO_SHORT_USERNAME, PASSWORDS_DO_NOT_MATCH, USERNAME_TAKEN, REGISTRATION_COMPLETED, ERROR
+        TOO_SHORT_PASSWORD,
+        TOO_SHORT_USERNAME,
+        PASSWORDS_DO_NOT_MATCH,
+        USERNAME_TAKEN,
+        REGISTRATION_COMPLETED,
+        ERROR
     }
 
     /**
@@ -38,7 +43,11 @@ public class UserUtil {
      * 
      */
     public static enum ProfileMsg {
-        TOO_SHORT_PASSWORD, PASSWORDS_DO_NOT_MATCH, PASSWORD_CHANGED, WRONG_PASSWORD, ERROR
+        TOO_SHORT_PASSWORD,
+        PASSWORDS_DO_NOT_MATCH,
+        PASSWORD_CHANGED,
+        WRONG_PASSWORD,
+        ERROR
     }
 
     /**
@@ -211,4 +220,23 @@ public class UserUtil {
         minPasswordLength = newPasswordLength;
 
     }
+
+    /**
+     * Returns the minimum length of a username
+     * 
+     * @return Minimum username length
+     */
+    public static int getMinUsernameLength() {
+        return minUsernameLength;
+    }
+
+    /**
+     * Returns the minimum length of a password
+     * 
+     * @return Minimum password length
+     */
+    public static int getMinPasswordLength() {
+        return minPasswordLength;
+    }
+
 }
