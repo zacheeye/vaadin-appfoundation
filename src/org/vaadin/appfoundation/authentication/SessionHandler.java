@@ -18,7 +18,7 @@ public class SessionHandler implements TransactionListener {
     private final Application application;
 
     private User user;
-    
+
     // Store the user object of the currently inlogged user
     private static ThreadLocal<User> currentUser = new ThreadLocal<User>();
 
@@ -38,6 +38,7 @@ public class SessionHandler implements TransactionListener {
         if (this.application == application) {
             // Get the current user
             user = SessionHandler.get();
+            SessionHandler.setUser(null);
         }
     }
 
