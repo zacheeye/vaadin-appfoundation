@@ -1,6 +1,7 @@
 package org.vaadin.appfoundation.persistence.facade;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -334,12 +335,12 @@ public class JPAFacade implements IFacade {
         // refresh is done. However, if it is called from within this facade,
         // then we should have and open entity manager and the calling method
         // will take care of closing the em.
-        if (this.em.get() == null || !this.em.get().isOpen()) {
+        if (em.get() == null || !em.get().isOpen()) {
             closeEm = true;
         }
         // Get the EntityManager
         EntityManager em = getEntityManager();
-        
+
         // Get a fresh instance of the object.
         A pojo2 = (A) em.find(pojo.getClass(), pojo.getId());
         // Make sure its state is up-to-date
@@ -378,9 +379,12 @@ public class JPAFacade implements IFacade {
 
             // Loop through all fields
             for (Field field : fields) {
-                // If the field is transient, then we do not want to copy its
-                // value
-                if (!field.isAnnotationPresent(Transient.class)) {
+                // If the field is transient, static or final, then we do not
+                // want to copy its value
+                if (!field.isAnnotationPresent(Transient.class)
+                        && !Modifier.isStatic(field.getModifiers())
+                        && !Modifier.isFinal(field.getModifiers())) {
+
                     // The field might be inaccessible, so let's force it to be
                     // accessible.
                     field.setAccessible(true);
