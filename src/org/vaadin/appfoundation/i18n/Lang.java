@@ -52,6 +52,20 @@ public class Lang implements TransactionListener {
         instance.get().locale = locale;
     }
 
+    /**
+     * Get the translated message for the locale set in Lang
+     * 
+     * @param identifier
+     *            Key for the translation message
+     * @param params
+     *            Parameters for the translation message
+     * @return Translated message string
+     */
+    public static String getMessage(String identifier, Object... params) {
+        return InternationalizationServlet.getMessage(
+                getLocale().getLanguage(), identifier, params);
+    }
+
     @Override
     public void transactionEnd(Application application, Object transactionData) {
         // Clear thread local instance at the end of the transaction
