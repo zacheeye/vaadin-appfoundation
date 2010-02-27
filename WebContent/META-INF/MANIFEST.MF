@@ -2,8 +2,8 @@ Manifest-Version: 1.0
 Vaadin-License-Title: Apache 2.0
 Implementation-Vendor: Kim Leppänen
 Implementation-Title: VaadinAppFoundation
-Implementation-Version: 1.0.1
+Implementation-Version: 1.0.2
 Vaadin-Package-Version: 1
-Class-Path: 
 Vaadin-Widgetsets: 
+Class-Path: 
 
