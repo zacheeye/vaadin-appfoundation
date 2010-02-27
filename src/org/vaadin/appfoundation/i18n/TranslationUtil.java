@@ -1,7 +1,6 @@
 package org.vaadin.appfoundation.i18n;
 
 import java.lang.reflect.Field;
-import java.util.Locale;
 
 import com.vaadin.ui.DefaultFieldFactory;
 
@@ -23,7 +22,7 @@ public class TranslationUtil {
         if (field != null && field.isAnnotationPresent(FieldTranslation.class)) {
             FieldTranslation translation = field
                     .getAnnotation(FieldTranslation.class);
-            return InternationalizationServlet.getMessage(Locale.getDefault()
+            return InternationalizationServlet.getMessage(Lang.getLocale()
                     .getLanguage(), translation.tuid());
         }
 
