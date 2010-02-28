@@ -19,7 +19,6 @@ public abstract class AbstractView<A extends ComponentContainer> extends
     private A content;
 
     protected AbstractView(A layout) {
-        setCompositionRoot(layout);
         setContent(layout);
         setSizeFull();
     }
@@ -37,6 +36,7 @@ public abstract class AbstractView<A extends ComponentContainer> extends
      */
     protected void setContent(A content) {
         this.content = content;
+        setCompositionRoot(content);
     }
 
     /**
