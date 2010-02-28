@@ -32,7 +32,9 @@ public class SessionHandler implements TransactionListener {
         this.application = application;
     }
 
-    @Override
+    /**
+     * {@inheritDoc}
+     */
     public void transactionEnd(Application application, Object transactionData) {
         // Clear the currentApplication field
         if (this.application == application) {
@@ -42,7 +44,9 @@ public class SessionHandler implements TransactionListener {
         }
     }
 
-    @Override
+    /**
+     * {@inheritDoc}
+     */
     public void transactionStart(Application application, Object transactionData) {
         // Check if the application instance we got as parameter is actually
         // this application instance. If it is, then we should define the thread

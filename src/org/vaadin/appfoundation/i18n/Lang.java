@@ -66,7 +66,9 @@ public class Lang implements TransactionListener {
                 getLocale().getLanguage(), identifier, params);
     }
 
-    @Override
+    /**
+     * {@inheritDoc}
+     */
     public void transactionEnd(Application application, Object transactionData) {
         // Clear thread local instance at the end of the transaction
         if (this.application == application) {
@@ -74,7 +76,9 @@ public class Lang implements TransactionListener {
         }
     }
 
-    @Override
+    /**
+     * {@inheritDoc}
+     */
     public void transactionStart(Application application, Object transactionData) {
         // Set the thread local instance
         if (this.application == application) {
