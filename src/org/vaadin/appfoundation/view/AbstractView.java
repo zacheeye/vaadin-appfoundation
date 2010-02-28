@@ -16,11 +16,11 @@ public abstract class AbstractView<A extends ComponentContainer> extends
 
     private static final long serialVersionUID = -1420553541682132603L;
 
-    protected A content;
+    private A content;
 
     protected AbstractView(A layout) {
         setCompositionRoot(layout);
-        content = layout;
+        setContent(layout);
         setSizeFull();
     }
 
@@ -28,5 +28,25 @@ public abstract class AbstractView<A extends ComponentContainer> extends
      * This method is called when the view is activated.
      */
     public abstract void activated(Object... params);
+
+    /**
+     * Set a new content container. Default value is the object provided as
+     * parameter to the constructor.
+     * 
+     * @param content
+     */
+    protected void setContent(A content) {
+        this.content = content;
+    }
+
+    /**
+     * Get the content container. Default value is the object provided as
+     * parameter to the constructor.
+     * 
+     * @param content
+     */
+    protected A getContent() {
+        return content;
+    }
 
 }
