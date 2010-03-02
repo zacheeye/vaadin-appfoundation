@@ -12,7 +12,6 @@ public class RoleMock implements Role {
         id = UUID.randomUUID().toString();
     }
 
-    @Override
     public Object getIdentifier() {
         return id;
     }

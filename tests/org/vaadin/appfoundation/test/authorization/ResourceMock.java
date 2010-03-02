@@ -12,7 +12,6 @@ public class ResourceMock implements Resource {
         id = UUID.randomUUID().toString();
     }
 
-    @Override
     public Object getIdentifier() {
         return id;
     }
