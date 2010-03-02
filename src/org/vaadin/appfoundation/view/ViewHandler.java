@@ -33,6 +33,8 @@ public class ViewHandler implements TransactionListener {
 
     private final Application application;
 
+    private ViewFactory defaultViewFactory = null;
+
     /**
      * 
      * @param application
@@ -85,6 +87,12 @@ public class ViewHandler implements TransactionListener {
         // Create a new ViewItem and add it to the map.
         ViewItem item = new ViewItem(viewId);
         instance.get().viewMap.put(viewId, item);
+
+        // Check if we have a default ViewFactory defined. If one is defined,
+        // then set it to the item.
+        if (instance.get().defaultViewFactory != null) {
+            item.setFactory(instance.get().defaultViewFactory);
+        }
         return item;
     }
 
@@ -226,5 +234,25 @@ public class ViewHandler implements TransactionListener {
         if (listener != null) {
             instance.get().listeners.remove(listener);
         }
+    }
+
+    /**
+     * Set the default ViewFactory which is to be used in all <b>newly</b> added
+     * views.
+     * 
+     * @param defaultViewFactory
+     *            Default ViewFactory to be used in all new views.
+     */
+    public static void setDefaultViewFactory(ViewFactory defaultViewFactory) {
+        instance.get().defaultViewFactory = defaultViewFactory;
+    }
+
+    /**
+     * Get the current default ViewFactory.
+     * 
+     * @return Default ViewFactory
+     */
+    public static ViewFactory getDefaultViewFactory() {
+        return instance.get().defaultViewFactory;
     }
 }

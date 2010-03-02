@@ -19,6 +19,8 @@ public class ViewItem implements Serializable {
 
     private Class<? extends AbstractView<?>> viewClass = null;
 
+    private ViewFactory factory = null;
+
     /**
      * Constructor. Takes as input the viewId. If the viewId is an instance of
      * class object of the view, then the viewId is used as the default
@@ -31,6 +33,7 @@ public class ViewItem implements Serializable {
     public ViewItem(Object viewId) {
         if (viewId instanceof Class) {
             if (AbstractView.class.isAssignableFrom((Class<?>) viewId)) {
+                setFactory(new DefaultViewFactory());
                 viewClass = (Class<? extends AbstractView<?>>) viewId;
             }
 
@@ -55,14 +58,8 @@ public class ViewItem implements Serializable {
      * @return The view instance
      */
     public AbstractView<?> getView() {
-        if (view == null && viewClass != null) {
-            try {
-                view = viewClass.newInstance();
-            } catch (InstantiationException e) {
-                // TODO
-            } catch (IllegalAccessException e) {
-                // TODO
-            }
+        if (view == null && factory != null) {
+            view = factory.initView(getViewId());
         }
         return view;
     }
@@ -77,24 +74,30 @@ public class ViewItem implements Serializable {
     }
 
     /**
-     * Set the viewClass. This is only required if a view instance is not
-     * provided. The viewClass is used for creating an instance of View when
-     * getView() is called in case an instance of View is not available.
-     * 
-     * @param viewClass
-     *            The view's class
-     */
-    public void setViewClass(Class<? extends AbstractView<?>> viewClass) {
-        this.viewClass = viewClass;
-    }
-
-    /**
      * Get the current view class.
      * 
      * @return The view's class
      */
     public Class<? extends AbstractView<?>> getViewClass() {
         return viewClass;
+    }
+
+    /**
+     * Set the ViewFactory for this ViewItem.
+     * 
+     * @param factory
+     */
+    public void setFactory(ViewFactory factory) {
+        this.factory = factory;
+    }
+
+    /**
+     * Get the ViewFactory of this ViewItem.
+     * 
+     * @return
+     */
+    public ViewFactory getFactory() {
+        return factory;
     }
 
 }
