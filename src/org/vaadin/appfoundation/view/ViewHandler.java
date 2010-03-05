@@ -2,12 +2,16 @@ package org.vaadin.appfoundation.view;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import com.vaadin.Application;
 import com.vaadin.service.ApplicationContext.TransactionListener;
+import com.vaadin.ui.UriFragmentUtility;
+import com.vaadin.ui.UriFragmentUtility.FragmentChangedEvent;
+import com.vaadin.ui.UriFragmentUtility.FragmentChangedListener;
 
 /**
  * Utility class for handling and chaning views in an application.
@@ -15,7 +19,8 @@ import com.vaadin.service.ApplicationContext.TransactionListener;
  * @author Kim
  * 
  */
-public class ViewHandler implements TransactionListener {
+public class ViewHandler implements TransactionListener,
+        FragmentChangedListener {
 
     private static final long serialVersionUID = -3548570790687380424L;
 
@@ -31,9 +36,14 @@ public class ViewHandler implements TransactionListener {
     // Store this instance of the view handler in this thread local variable
     private static final ThreadLocal<ViewHandler> instance = new ThreadLocal<ViewHandler>();
 
+    // A map between URIs and view ids
+    private final Map<String, Object> uriMap = new HashMap<String, Object>();
+
     private final Application application;
 
     private ViewFactory defaultViewFactory = null;
+
+    private UriFragmentUtility uriFragmentUtil = null;
 
     /**
      * 
@@ -149,10 +159,36 @@ public class ViewHandler implements TransactionListener {
     public static boolean removeView(Object viewId) {
         if (viewId != null && instance.get().viewMap.containsKey(viewId)) {
             instance.get().viewMap.remove(viewId);
+
+            // Check if the view has an uri defined
+            String uri = getUriForViewId(viewId);
+            if (uri != null) {
+                // An uri definition was found, remove it
+                instance.get().uriMap.remove(uri);
+            }
             return true;
         }
 
         return false;
+    }
+
+    /**
+     * Search and return the uri for the given view id
+     * 
+     * @param viewId
+     *            View id we want to get the uri for
+     * @return Returns the uri if one is found, otherwise returns null
+     */
+    private static String getUriForViewId(Object viewId) {
+        Iterator<String> it = instance.get().uriMap.keySet().iterator();
+        while (it.hasNext()) {
+            String uri = it.next();
+            if (instance.get().uriMap.get(uri).equals(viewId)) {
+                return uri;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -166,6 +202,24 @@ public class ViewHandler implements TransactionListener {
      *            Parameters used for activating the view
      */
     public static void activateView(Object viewId, Object... params) {
+        activateView(viewId, false, params);
+    }
+
+    /**
+     * Activate the view with the given viewId. You can specify any given amount
+     * of parameters for the activation request. Each parameter is forwarded to
+     * the View's activated() method.
+     * 
+     * @param viewId
+     *            The view's viewId
+     * @param changeUriFramgent
+     *            Should the uri fragment be changed if the view has one set
+     * 
+     * @param params
+     *            Parameters used for activating the view
+     */
+    public static void activateView(Object viewId, boolean changeUriFramgent,
+            Object... params) {
         if (viewId != null && instance.get().viewMap.containsKey(viewId)
                 && instance.get().parentMap.containsKey(viewId)) {
             // Get the ViewItem and parent for this viewId
@@ -189,6 +243,11 @@ public class ViewHandler implements TransactionListener {
 
             // Tell the view that it has been activated
             item.getView().activated(params);
+
+            String uri = getUriForViewId(viewId);
+            if (uri != null && instance.get().uriFragmentUtil != null) {
+                instance.get().uriFragmentUtil.setFragment(uri, false);
+            }
 
             // View has been dispatched, send event
             for (DispatchEventListener listener : instance.get().listeners) {
@@ -254,5 +313,75 @@ public class ViewHandler implements TransactionListener {
      */
     public static ViewFactory getDefaultViewFactory() {
         return instance.get().defaultViewFactory;
+    }
+
+    /**
+     * Maps an uri to the given view id
+     * 
+     * @param uri
+     * @param viewId
+     */
+    public static void addUri(String uri, Object viewId) {
+        // Make sure the uri is valid
+        if (uri == null || uri.isEmpty()) {
+            throw new IllegalArgumentException("Uri must be defined");
+        }
+
+        // Make sure the view id is set
+        if (viewId == null) {
+            throw new IllegalArgumentException("View id must be defined");
+        }
+
+        // Make sure that a view has been added for the given view id
+        if (!instance.get().viewMap.containsKey(viewId)) {
+            throw new IllegalArgumentException(
+                    "View id not found - a valid view id must be provided");
+        }
+
+        // Add the uri to the map
+        instance.get().uriMap.put(uri, viewId);
+    }
+
+    /**
+     * Remove an uri which have been mapped to a specific view id
+     * 
+     * @param uri
+     */
+    public static void removeUri(String uri) {
+        // Make sure the uri is valid
+        if (uri == null || uri.isEmpty()) {
+            throw new IllegalArgumentException("Uri must be defined");
+        }
+
+        instance.get().uriMap.remove(uri);
+    }
+
+    public static UriFragmentUtility getUriFragmentUtil() {
+        // Check if an UriFragmentUtil is defined, if not, create a new one
+        if (instance.get().uriFragmentUtil == null) {
+            instance.get().uriFragmentUtil = new UriFragmentUtility();
+            // Register this instance of the view handler as the uri fragment
+            // change listener
+            instance.get().uriFragmentUtil.addListener(instance.get());
+        }
+
+        return instance.get().uriFragmentUtil;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void fragmentChanged(FragmentChangedEvent source) {
+        // Make sure we don't get a null for some reason
+        if (source != null) {
+            // Get the uri fragment
+            String fragment = source.getUriFragmentUtility().getFragment();
+            // Check if the fragment exists in the map
+            if (instance.get().uriMap.containsKey(fragment)) {
+                // The view was found, activate it
+                Object viewId = instance.get().uriMap.get(fragment);
+                activateView(viewId);
+            }
+        }
     }
 }
