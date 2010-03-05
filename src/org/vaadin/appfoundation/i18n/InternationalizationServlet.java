@@ -38,6 +38,13 @@ public class InternationalizationServlet extends HttpServlet {
     }
 
     /**
+     * Clear all translations from the memory
+     */
+    public static void clear() {
+        translations.clear();
+    }
+
+    /**
      * Load a translation file into memory.
      * 
      * @param file
