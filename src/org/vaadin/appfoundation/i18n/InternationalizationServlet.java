@@ -1,10 +1,10 @@
 package org.vaadin.appfoundation.i18n;
 
-import java.net.URL;
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 
 import nu.xom.Builder;
@@ -26,17 +26,37 @@ public class InternationalizationServlet extends HttpServlet {
     // <lang, <id, message>>
     private static Map<String, Map<String, String>> translations = new HashMap<String, Map<String, String>>();
 
-    @Override
-    public void init() throws ServletException {
-        super.init();
-        // Create the URL to the translations.xml -file
-        URL translationsXml = InternationalizationServlet.class
-                .getClassLoader().getResource("translations.xml");
+    /**
+     * Load a translation file into memory. Any duplicated translations will be
+     * discarded.
+     * 
+     * @param file
+     *            The File object of the translation file
+     */
+    public static void loadTranslations(File file) {
+        loadTranslations(file, false);
+    }
+
+    /**
+     * Load a translation file into memory.
+     * 
+     * @param file
+     *            The File object of the translation file
+     * @param force
+     *            If a translation already exists in-memory, should the new
+     *            translation override the existing translation
+     */
+    public static void loadTranslations(File file, boolean force) {
+        // Make sure the input parameter is valid
+        if (file == null || !file.exists() || !file.isFile()) {
+            throw new IllegalArgumentException("Translation did not exist");
+        }
+
         // Create an XML builder
         Builder builder = new Builder();
         try {
             // Read the translations.xml file to the Document
-            Document document = builder.build(translationsXml.openStream());
+            Document document = builder.build(new FileInputStream(file));
             Element root = document.getRootElement();
             // Search for all "tu"-elements
             Elements tu = root.getChildElements("body").get(0)
@@ -58,7 +78,7 @@ public class InternationalizationServlet extends HttpServlet {
                     String message = tuv.get(j).getChildElements("seg").get(0)
                             .getValue();
                     // Add the translation to our map
-                    addMessage(language, identifier, message);
+                    addMessage(language, identifier, message, force);
                 }
             }
 
@@ -76,9 +96,12 @@ public class InternationalizationServlet extends HttpServlet {
      *            Key string for the translation message
      * @param message
      *            The translated message
+     * @param force
+     *            If a translation already exists in-memory, should the new
+     *            translation override the existing translation
      */
     private static void addMessage(String language, String identifier,
-            String message) {
+            String message, boolean force) {
         Map<String, String> messages = null;
         // Check if there are any existing translations for this language
         if (!translations.containsKey(language)) {
@@ -90,8 +113,11 @@ public class InternationalizationServlet extends HttpServlet {
             // Use the existing map for this language's translations
             messages = translations.get(language);
         }
-        // Add the translation message to this language's translation map
-        messages.put(identifier, message);
+        // Add the translation message to this language's translation map. If
+        // force is true, then override any previous translations.
+        if (!messages.containsKey(identifier) || force) {
+            messages.put(identifier, message);
+        }
     }
 
     /**
