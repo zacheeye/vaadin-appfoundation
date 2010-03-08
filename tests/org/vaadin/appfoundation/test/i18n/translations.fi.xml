@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <tmx version="1.4">
 	<body>
-		<tu tuid="GENERIC_USERNAME">
+		<tu tuid="GENERIC_NAME">
 			<tuv lang="fi">
-				<seg>Käyttäjätunnus</seg>
+				<seg>Nimi</seg>
 			</tuv>
 		</tu>
 		<tu tuid="GENERIC_PASSWORD">

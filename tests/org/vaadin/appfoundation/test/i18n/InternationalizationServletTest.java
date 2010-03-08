@@ -26,9 +26,9 @@ public class InternationalizationServletTest {
         InternationalizationServlet.loadTranslations(all);
 
         assertEquals("test1", InternationalizationServlet.getMessage("en",
-                "GENERIC_USERNAME"));
+                "GENERIC_NAME"));
         assertEquals("testi1", InternationalizationServlet.getMessage("fi",
-                "GENERIC_USERNAME"));
+                "GENERIC_NAME"));
     }
 
     @Test
@@ -48,10 +48,10 @@ public class InternationalizationServletTest {
         InternationalizationServlet.loadTranslations(fi);
         InternationalizationServlet.loadTranslations(en);
 
-        assertEquals("Username", InternationalizationServlet.getMessage("en",
-                "GENERIC_USERNAME"));
-        assertEquals("Käyttäjätunnus", InternationalizationServlet.getMessage(
-                "fi", "GENERIC_USERNAME"));
+        assertEquals("Name", InternationalizationServlet.getMessage("en",
+                "GENERIC_NAME"));
+        assertEquals("Nimi", InternationalizationServlet.getMessage(
+                "fi", "GENERIC_NAME"));
     }
 
     @Test
@@ -72,15 +72,15 @@ public class InternationalizationServletTest {
         InternationalizationServlet.loadTranslations(en, false);
 
         assertEquals("test1", InternationalizationServlet.getMessage("en",
-                "GENERIC_USERNAME"));
+                "GENERIC_NAME"));
         assertEquals("testi1", InternationalizationServlet.getMessage("fi",
-                "GENERIC_USERNAME"));
+                "GENERIC_NAME"));
 
         InternationalizationServlet.loadTranslations(en, true);
-        assertEquals("Username", InternationalizationServlet.getMessage("en",
-                "GENERIC_USERNAME"));
+        assertEquals("Name", InternationalizationServlet.getMessage("en",
+                "GENERIC_NAME"));
         assertEquals("testi1", InternationalizationServlet.getMessage("fi",
-                "GENERIC_USERNAME"));
+                "GENERIC_NAME"));
     }
 
     @Test
