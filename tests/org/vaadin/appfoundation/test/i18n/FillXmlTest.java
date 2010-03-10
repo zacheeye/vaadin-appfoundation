@@ -1,15 +1,26 @@
 package org.vaadin.appfoundation.test.i18n;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+
+import nu.xom.ParsingException;
+import nu.xom.ValidityException;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.vaadin.appfoundation.i18n.FillXml;
+import org.vaadin.appfoundation.i18n.InternationalizationServlet;
 
 public class FillXmlTest {
 
@@ -17,6 +28,9 @@ public class FillXmlTest {
 
     @Before
     public void setUp() {
+        // Clear the servlet's memory
+        InternationalizationServlet.clear();
+
         // create a random file
         file = new File(UUID.randomUUID().toString());
         try {
@@ -40,8 +54,97 @@ public class FillXmlTest {
     }
 
     @Test
-    public void updateFile1() {
+    public void updateFile() {
+        try {
+            // Create a list of identifiers
+            List<String> identifiers = new ArrayList<String>();
+            // Only add one identifier to the list
+            identifiers.add("TEST");
 
+            // Update the file with the given identifiers and languages
+            FillXml.updateTranslations(file, new String[] { "en", "fi" },
+                    identifiers);
+            // Load the newly created file into the servlet
+            InternationalizationServlet.loadTranslations(file);
+
+            // Check that the TODO messages were added for both the "en" and
+            // "fi" languages.
+            assertEquals("TODO", InternationalizationServlet.getMessage("en",
+                    "TEST"));
+            assertEquals("TODO", InternationalizationServlet.getMessage("fi",
+                    "TEST"));
+
+            // Check that the "ANOTHER" identifier doesn't exist yet in the file
+            assertEquals("", InternationalizationServlet.getMessage("en",
+                    "ANOTHER"));
+
+            // Add a new identifier
+            identifiers.add("ANOTHER");
+
+            // Update the file with the new list of identifiers
+            FillXml.updateTranslations(file, new String[] { "en", "fi" },
+                    identifiers);
+            // Load the new file
+            InternationalizationServlet.loadTranslations(file);
+
+            // Check that old values exist
+            assertEquals("TODO", InternationalizationServlet.getMessage("en",
+                    "TEST"));
+
+            // Check that the new value was added
+            assertEquals("TODO", InternationalizationServlet.getMessage("en",
+                    "ANOTHER"));
+
+        } catch (ValidityException e) {
+            fail(e.getMessage());
+        } catch (ParsingException e) {
+            fail(e.getMessage());
+        } catch (IOException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Ignore("Feature not implemented")
+    @Test
+    public void addNewLanguages() {
+        try {
+            // Create a list of identifiers
+            List<String> identifiers = new ArrayList<String>();
+            // Only add one identifier to the list
+            identifiers.add("TEST");
+
+            // Update the file with the new list of identifiers
+            FillXml
+                    .updateTranslations(file, new String[] { "en" },
+                            identifiers);
+            // Load the new file
+            InternationalizationServlet.loadTranslations(file);
+
+            // Check that the new value was added
+            assertEquals("TODO", InternationalizationServlet.getMessage("en",
+                    "TEST"));
+
+            // The "fi" language shouldn't be added, as it was not in the list
+            // of available languages
+            assertEquals("", InternationalizationServlet.getMessage("fi",
+                    "TEST"));
+
+            // Now run the same update, but including the "fi" language
+            FillXml.updateTranslations(file, new String[] { "en", "fi" },
+                    identifiers);
+            // Load the new file
+            InternationalizationServlet.loadTranslations(file);
+
+            // Check that the finnish translation was added to the file
+            assertEquals("TODO", InternationalizationServlet.getMessage("fi",
+                    "TEST"));
+        } catch (ValidityException e) {
+            fail(e.getMessage());
+        } catch (ParsingException e) {
+            fail(e.getMessage());
+        } catch (IOException e) {
+            fail(e.getMessage());
+        }
     }
 
 }
