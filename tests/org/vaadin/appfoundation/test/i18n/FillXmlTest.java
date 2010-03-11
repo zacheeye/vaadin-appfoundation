@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -138,6 +139,67 @@ public class FillXmlTest {
             // Check that the finnish translation was added to the file
             assertEquals("TODO", InternationalizationServlet.getMessage("fi",
                     "TEST"));
+        } catch (ValidityException e) {
+            fail(e.getMessage());
+        } catch (ParsingException e) {
+            fail(e.getMessage());
+        } catch (IOException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test(expected = FileNotFoundException.class)
+    public void nonExistingFile() {
+        File file = new File(UUID.randomUUID().toString());
+        List<String> identifiers = new ArrayList<String>();
+        try {
+            FillXml.updateTranslations(file, new String[] { "en", "fi" },
+                    identifiers);
+        } catch (ValidityException e) {
+            fail(e.getMessage());
+        } catch (ParsingException e) {
+            fail(e.getMessage());
+        } catch (IOException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void nullFile() {
+        List<String> identifiers = new ArrayList<String>();
+        try {
+            FillXml.updateTranslations(null, new String[] { "en", "fi" },
+                    identifiers);
+        } catch (ValidityException e) {
+            fail(e.getMessage());
+        } catch (ParsingException e) {
+            fail(e.getMessage());
+        } catch (IOException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void nullLanguage() {
+        List<String> identifiers = new ArrayList<String>();
+        try {
+            FillXml.updateTranslations(new File(UUID.randomUUID().toString()),
+                    null, identifiers);
+        } catch (ValidityException e) {
+            fail(e.getMessage());
+        } catch (ParsingException e) {
+            fail(e.getMessage());
+        } catch (IOException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void nullIdentifiers() {
+        List<String> identifiers = null;
+        try {
+            FillXml.updateTranslations(new File(UUID.randomUUID().toString()),
+                    new String[] { "en", "fi" }, identifiers);
         } catch (ValidityException e) {
             fail(e.getMessage());
         } catch (ParsingException e) {
