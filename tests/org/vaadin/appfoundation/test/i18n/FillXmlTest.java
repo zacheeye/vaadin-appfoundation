@@ -1,7 +1,6 @@
 package org.vaadin.appfoundation.test.i18n;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -55,158 +54,113 @@ public class FillXmlTest {
     }
 
     @Test
-    public void updateFile() {
-        try {
-            // Create a list of identifiers
-            List<String> identifiers = new ArrayList<String>();
-            // Only add one identifier to the list
-            identifiers.add("TEST");
+    public void updateFile() throws ValidityException, ParsingException,
+            IOException {
+        // Create a list of identifiers
+        List<String> identifiers = new ArrayList<String>();
+        // Only add one identifier to the list
+        identifiers.add("TEST");
 
-            // Update the file with the given identifiers and languages
-            FillXml.updateTranslations(file, new String[] { "en", "fi" },
-                    identifiers);
-            // Load the newly created file into the servlet
-            InternationalizationServlet.loadTranslations(file);
+        // Update the file with the given identifiers and languages
+        FillXml.updateTranslations(file, new String[] { "en", "fi" },
+                identifiers);
+        // Load the newly created file into the servlet
+        InternationalizationServlet.loadTranslations(file);
 
-            // Check that the TODO messages were added for both the "en" and
-            // "fi" languages.
-            assertEquals("TODO", InternationalizationServlet.getMessage("en",
-                    "TEST"));
-            assertEquals("TODO", InternationalizationServlet.getMessage("fi",
-                    "TEST"));
+        // Check that the TODO messages were added for both the "en" and
+        // "fi" languages.
+        assertEquals("TODO", InternationalizationServlet.getMessage("en",
+                "TEST"));
+        assertEquals("TODO", InternationalizationServlet.getMessage("fi",
+                "TEST"));
 
-            // Check that the "ANOTHER" identifier doesn't exist yet in the file
-            assertEquals("", InternationalizationServlet.getMessage("en",
-                    "ANOTHER"));
+        // Check that the "ANOTHER" identifier doesn't exist yet in the file
+        assertEquals("", InternationalizationServlet
+                .getMessage("en", "ANOTHER"));
 
-            // Add a new identifier
-            identifiers.add("ANOTHER");
+        // Add a new identifier
+        identifiers.add("ANOTHER");
 
-            // Update the file with the new list of identifiers
-            FillXml.updateTranslations(file, new String[] { "en", "fi" },
-                    identifiers);
-            // Load the new file
-            InternationalizationServlet.loadTranslations(file);
+        // Update the file with the new list of identifiers
+        FillXml.updateTranslations(file, new String[] { "en", "fi" },
+                identifiers);
+        // Load the new file
+        InternationalizationServlet.loadTranslations(file);
 
-            // Check that old values exist
-            assertEquals("TODO", InternationalizationServlet.getMessage("en",
-                    "TEST"));
+        // Check that old values exist
+        assertEquals("TODO", InternationalizationServlet.getMessage("en",
+                "TEST"));
 
-            // Check that the new value was added
-            assertEquals("TODO", InternationalizationServlet.getMessage("en",
-                    "ANOTHER"));
+        // Check that the new value was added
+        assertEquals("TODO", InternationalizationServlet.getMessage("en",
+                "ANOTHER"));
 
-        } catch (ValidityException e) {
-            fail(e.getMessage());
-        } catch (ParsingException e) {
-            fail(e.getMessage());
-        } catch (IOException e) {
-            fail(e.getMessage());
-        }
     }
 
     @Ignore("Feature not implemented")
     @Test
-    public void addNewLanguages() {
-        try {
-            // Create a list of identifiers
-            List<String> identifiers = new ArrayList<String>();
-            // Only add one identifier to the list
-            identifiers.add("TEST");
+    public void addNewLanguages() throws ValidityException, ParsingException,
+            IOException {
+        // Create a list of identifiers
+        List<String> identifiers = new ArrayList<String>();
+        // Only add one identifier to the list
+        identifiers.add("TEST");
 
-            // Update the file with the new list of identifiers
-            FillXml
-                    .updateTranslations(file, new String[] { "en" },
-                            identifiers);
-            // Load the new file
-            InternationalizationServlet.loadTranslations(file);
+        // Update the file with the new list of identifiers
+        FillXml.updateTranslations(file, new String[] { "en" }, identifiers);
+        // Load the new file
+        InternationalizationServlet.loadTranslations(file);
 
-            // Check that the new value was added
-            assertEquals("TODO", InternationalizationServlet.getMessage("en",
-                    "TEST"));
+        // Check that the new value was added
+        assertEquals("TODO", InternationalizationServlet.getMessage("en",
+                "TEST"));
 
-            // The "fi" language shouldn't be added, as it was not in the list
-            // of available languages
-            assertEquals("", InternationalizationServlet.getMessage("fi",
-                    "TEST"));
+        // The "fi" language shouldn't be added, as it was not in the list
+        // of available languages
+        assertEquals("", InternationalizationServlet.getMessage("fi", "TEST"));
 
-            // Now run the same update, but including the "fi" language
-            FillXml.updateTranslations(file, new String[] { "en", "fi" },
-                    identifiers);
-            // Load the new file
-            InternationalizationServlet.loadTranslations(file);
+        // Now run the same update, but including the "fi" language
+        FillXml.updateTranslations(file, new String[] { "en", "fi" },
+                identifiers);
+        // Load the new file
+        InternationalizationServlet.loadTranslations(file);
 
-            // Check that the finnish translation was added to the file
-            assertEquals("TODO", InternationalizationServlet.getMessage("fi",
-                    "TEST"));
-        } catch (ValidityException e) {
-            fail(e.getMessage());
-        } catch (ParsingException e) {
-            fail(e.getMessage());
-        } catch (IOException e) {
-            fail(e.getMessage());
-        }
+        // Check that the finnish translation was added to the file
+        assertEquals("TODO", InternationalizationServlet.getMessage("fi",
+                "TEST"));
     }
 
     @Test(expected = FileNotFoundException.class)
-    public void nonExistingFile() {
+    public void nonExistingFile() throws IOException, ValidityException,
+            ParsingException {
         File file = new File(UUID.randomUUID().toString());
         List<String> identifiers = new ArrayList<String>();
-        try {
-            FillXml.updateTranslations(file, new String[] { "en", "fi" },
-                    identifiers);
-        } catch (ValidityException e) {
-            fail(e.getMessage());
-        } catch (ParsingException e) {
-            fail(e.getMessage());
-        } catch (IOException e) {
-            fail(e.getMessage());
-        }
+        FillXml.updateTranslations(file, new String[] { "en", "fi" },
+                identifiers);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void nullFile() {
+    public void nullFile() throws ValidityException, ParsingException,
+            IOException {
         List<String> identifiers = new ArrayList<String>();
-        try {
-            FillXml.updateTranslations(null, new String[] { "en", "fi" },
-                    identifiers);
-        } catch (ValidityException e) {
-            fail(e.getMessage());
-        } catch (ParsingException e) {
-            fail(e.getMessage());
-        } catch (IOException e) {
-            fail(e.getMessage());
-        }
+        FillXml.updateTranslations(null, new String[] { "en", "fi" },
+                identifiers);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void nullLanguage() {
+    public void nullLanguage() throws ValidityException, ParsingException,
+            IOException {
         List<String> identifiers = new ArrayList<String>();
-        try {
-            FillXml.updateTranslations(new File(UUID.randomUUID().toString()),
-                    null, identifiers);
-        } catch (ValidityException e) {
-            fail(e.getMessage());
-        } catch (ParsingException e) {
-            fail(e.getMessage());
-        } catch (IOException e) {
-            fail(e.getMessage());
-        }
+        FillXml.updateTranslations(new File(UUID.randomUUID().toString()),
+                null, identifiers);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void nullIdentifiers() {
+    public void nullIdentifiers() throws ValidityException, ParsingException,
+            IOException {
         List<String> identifiers = null;
-        try {
-            FillXml.updateTranslations(new File(UUID.randomUUID().toString()),
-                    new String[] { "en", "fi" }, identifiers);
-        } catch (ValidityException e) {
-            fail(e.getMessage());
-        } catch (ParsingException e) {
-            fail(e.getMessage());
-        } catch (IOException e) {
-            fail(e.getMessage());
-        }
+        FillXml.updateTranslations(new File(UUID.randomUUID().toString()),
+                new String[] { "en", "fi" }, identifiers);
     }
 
 }
