@@ -1,6 +1,7 @@
 package org.vaadin.appfoundation.i18n;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -44,6 +45,15 @@ public class FillXml {
     public static void updateTranslations(File file, String[] languages,
             List<String> identifiers) throws ValidityException,
             ParsingException, IOException {
+        // Check that we are not getting any null parameters
+        if (file == null || languages == null || identifiers == null) {
+            throw new IllegalArgumentException("All parameters must be set");
+        }
+
+        // Make sure the file exists
+        if (file != null && !file.exists()) {
+            throw new FileNotFoundException();
+        }
         Builder builder = new Builder();
         // A list of all identifiers already existing in the file
         List<String> ids = new ArrayList<String>();
@@ -97,14 +107,9 @@ public class FillXml {
         String xml = root.toXML().replaceAll("<seg value=\"TODO\" />",
                 "<seg>TODO</seg>");
 
-        if (file.exists()) {
-            FileOutputStream fileoutstream = new FileOutputStream(file);
-            Writer writer = new OutputStreamWriter(fileoutstream, "UTF-8");
-            writer.write(xml);
-            writer.close();
-
-        } else {
-            System.out.println("file did not exist");
-        }
+        FileOutputStream fileoutstream = new FileOutputStream(file);
+        Writer writer = new OutputStreamWriter(fileoutstream, "UTF-8");
+        writer.write(xml);
+        writer.close();
     }
 }
