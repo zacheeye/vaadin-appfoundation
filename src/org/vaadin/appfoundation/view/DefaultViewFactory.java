@@ -14,7 +14,7 @@ public class DefaultViewFactory implements ViewFactory {
      * {@inheritDoc}
      */
     public AbstractView<?> initView(Object viewId) {
-        if (viewId instanceof Class) {
+        if (viewId instanceof Class<?>) {
             if (AbstractView.class.isAssignableFrom((Class<?>) viewId))
                 try {
                     return (AbstractView<?>) ((Class<?>) viewId).newInstance();
