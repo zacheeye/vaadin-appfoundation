@@ -245,7 +245,8 @@ public class ViewHandler implements TransactionListener,
             item.getView().activated(params);
 
             String uri = getUriForViewId(viewId);
-            if (uri != null && instance.get().uriFragmentUtil != null) {
+            if (changeUriFramgent && uri != null
+                    && instance.get().uriFragmentUtil != null) {
                 instance.get().uriFragmentUtil.setFragment(uri, false);
             }
 
