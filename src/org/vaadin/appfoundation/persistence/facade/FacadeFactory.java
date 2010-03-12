@@ -52,8 +52,8 @@ public class FacadeFactory implements Serializable {
             IllegalAccessException {
         // Check if there already exists a facade with this name.
         if (facades.containsKey(name)) {
-            // If it exists, then close the facade.
-            facades.get(name).close();
+            throw new IllegalArgumentException("A facade with the name '"
+                    + name + "' exists already!");
         }
 
         // Create a new instance of the facade
@@ -90,6 +90,30 @@ public class FacadeFactory implements Serializable {
      */
     public static IFacade getFacade(String name) {
         return facades.get(name);
+    }
+
+    /**
+     * Define a new default facade for the factory.
+     * 
+     * @param name
+     *            Name of the facade
+     */
+    public static void setDefaultFacade(String name) {
+        // Check that parameters are set correctly
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("Name must be set!");
+        }
+
+        // Get the facade
+        IFacade facade = getFacade(name);
+
+        // Throw an exception if the facade was not found
+        if (facade == null) {
+            throw new IllegalArgumentException("Facade not found");
+        }
+
+        // Everything is ok, change the default facade
+        defaultFacade = facade;
     }
 
     /**
