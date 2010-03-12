@@ -11,10 +11,16 @@ import org.junit.Test;
 import org.vaadin.appfoundation.test.MockApplication;
 import org.vaadin.appfoundation.view.AbstractView;
 import org.vaadin.appfoundation.view.DefaultViewFactory;
+import org.vaadin.appfoundation.view.DispatchEvent;
+import org.vaadin.appfoundation.view.DispatchEventListener;
+import org.vaadin.appfoundation.view.DispatchException;
 import org.vaadin.appfoundation.view.ViewContainer;
 import org.vaadin.appfoundation.view.ViewFactory;
 import org.vaadin.appfoundation.view.ViewHandler;
 import org.vaadin.appfoundation.view.ViewItem;
+
+import com.vaadin.ui.ComponentContainer;
+import com.vaadin.ui.VerticalLayout;
 
 public class ViewHandlerTest {
 
@@ -146,11 +152,228 @@ public class ViewHandlerTest {
         ViewHandler.addUri("test", "test2");
     }
 
+    @Test
+    public void activateView() {
+        final ValueContainer viewActivated = new ValueContainer();
+        final ValueContainer parentCalled = new ValueContainer();
+        viewActivated.setValue(false);
+        parentCalled.setValue(false);
+
+        AbstractView<ComponentContainer> view = new AbstractView<ComponentContainer>(
+                new VerticalLayout()) {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public void activated(Object... params) {
+                viewActivated.setValue(true);
+            }
+        };
+
+        ViewItem item = ViewHandler.addView("test");
+        item.setView(view);
+
+        ViewHandler.activateView("test");
+        // Parent not set
+        assertFalse((Boolean) viewActivated.getValue());
+
+        ViewContainer container = new ViewContainer() {
+            public void activate(AbstractView<?> view) {
+                parentCalled.setValue(true);
+            }
+        };
+
+        ViewHandler.setParent("test", container);
+
+        ViewHandler.activateView("test");
+        // Parent is now set
+        assertTrue((Boolean) viewActivated.getValue());
+        assertTrue((Boolean) parentCalled.getValue());
+    }
+
+    @Test
+    public void activateViewParamsPassed() {
+        final ValueContainer parameters = new ValueContainer();
+
+        AbstractView<ComponentContainer> view = new AbstractView<ComponentContainer>(
+                new VerticalLayout()) {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public void activated(Object... params) {
+                parameters.setValue(params);
+            }
+        };
+
+        ViewItem item = ViewHandler.addView("test");
+        item.setView(view);
+        ViewContainer container = new ViewContainer() {
+            public void activate(AbstractView<?> view) {
+            }
+        };
+
+        ViewHandler.setParent("test", container);
+
+        ViewHandler.activateView("test", "foo", "bar");
+        assertEquals(2, ((Object[]) parameters.getValue()).length);
+        assertEquals("foo", ((Object[]) parameters.getValue())[0]);
+        assertEquals("bar", ((Object[]) parameters.getValue())[1]);
+    }
+
+    @Test
+    public void dispatchEventListeners() {
+        final ValueContainer preCalls = new ValueContainer(0);
+        final ValueContainer postCalls = new ValueContainer(0);
+
+        DispatchEventListener listener = new DispatchEventListener() {
+            private boolean preCall = false;
+            private boolean postCall = false;
+
+            public void preDispatch(DispatchEvent event)
+                    throws DispatchException {
+                if (!preCall) {
+                    preCall = true;
+                    preCalls.setValue(((Integer) preCalls.getValue()) + 1);
+                    throw new DispatchException();
+                }
+            }
+
+            public void postDispatch(DispatchEvent event) {
+                if (!postCall) {
+                    postCall = true;
+                    postCalls.setValue(((Integer) postCalls.getValue()) + 1);
+                }
+
+            }
+        };
+
+        DispatchEventListener listener2 = new DispatchEventListener() {
+            private boolean preCall = false;
+            private boolean postCall = false;
+
+            public void preDispatch(DispatchEvent event)
+                    throws DispatchException {
+                if (!preCall) {
+                    preCall = true;
+                    preCalls.setValue(((Integer) preCalls.getValue()) + 1);
+                }
+            }
+
+            public void postDispatch(DispatchEvent event) {
+                if (!postCall) {
+                    postCall = true;
+                    postCalls.setValue(((Integer) postCalls.getValue()) + 1);
+                }
+            }
+        };
+
+        ViewHandler.addListener(listener);
+        ViewHandler.addListener(listener2);
+
+        final ValueContainer viewActivated = new ValueContainer();
+        final ValueContainer parentCalled = new ValueContainer();
+        viewActivated.setValue(false);
+        parentCalled.setValue(false);
+
+        AbstractView<ComponentContainer> view = new AbstractView<ComponentContainer>(
+                new VerticalLayout()) {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public void activated(Object... params) {
+                viewActivated.setValue(true);
+            }
+        };
+
+        ViewItem item = ViewHandler.addView("test");
+        item.setView(view);
+
+        ViewHandler.activateView("test");
+        // Parent not set
+
+        ViewContainer container = new ViewContainer() {
+            public void activate(AbstractView<?> view) {
+                parentCalled.setValue(true);
+            }
+        };
+        ViewHandler.setParent("test", container);
+        ViewHandler.activateView("test");
+
+        assertEquals(1, ((Integer) preCalls.getValue()).intValue());
+        assertEquals(0, ((Integer) postCalls.getValue()).intValue());
+        assertFalse((Boolean) viewActivated.getValue());
+        assertFalse((Boolean) parentCalled.getValue());
+    }
+
+    @Test
+    public void cancelDispatch() {
+        final ValueContainer preCalls = new ValueContainer(0);
+        final ValueContainer postCalls = new ValueContainer(0);
+
+        DispatchEventListener listener = new DispatchEventListener() {
+            private boolean preCall = false;
+            private boolean postCall = false;
+
+            public void preDispatch(DispatchEvent event)
+                    throws DispatchException {
+                if (!preCall) {
+                    preCall = true;
+                    preCalls.setValue(((Integer) preCalls.getValue()) + 1);
+                }
+            }
+
+            public void postDispatch(DispatchEvent event) {
+                if (!postCall) {
+                    postCall = true;
+                    postCalls.setValue(((Integer) postCalls.getValue()) + 1);
+                }
+
+            }
+        };
+
+        DispatchEventListener listener2 = new DispatchEventListener() {
+            private boolean preCall = false;
+            private boolean postCall = false;
+
+            public void preDispatch(DispatchEvent event)
+                    throws DispatchException {
+                if (!preCall) {
+                    preCall = true;
+                    preCalls.setValue(((Integer) preCalls.getValue()) + 1);
+                }
+            }
+
+            public void postDispatch(DispatchEvent event) {
+                if (!postCall) {
+                    postCall = true;
+                    postCalls.setValue(((Integer) postCalls.getValue()) + 1);
+                }
+            }
+        };
+
+        ViewHandler.addListener(listener);
+        ViewHandler.addListener(listener2);
+
+        MockViewContainer parent = new MockViewContainer();
+        ViewHandler.addView(MockView.class, parent);
+
+        assertEquals(0, ((Integer) preCalls.getValue()).intValue());
+        assertEquals(0, ((Integer) postCalls.getValue()).intValue());
+
+        ViewHandler.activateView(MockView.class);
+
+        assertEquals(2, ((Integer) preCalls.getValue()).intValue());
+        assertEquals(2, ((Integer) postCalls.getValue()).intValue());
+    }
+
     private class ValueContainer {
 
         private Object value;
 
         public ValueContainer() {
+        }
+
+        public ValueContainer(Object value) {
+            this.value = value;
         }
 
         public void setValue(Object value) {
