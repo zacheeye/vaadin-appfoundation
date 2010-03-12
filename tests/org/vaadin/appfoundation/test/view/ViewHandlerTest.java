@@ -20,6 +20,7 @@ import org.vaadin.appfoundation.view.ViewHandler;
 import org.vaadin.appfoundation.view.ViewItem;
 
 import com.vaadin.ui.ComponentContainer;
+import com.vaadin.ui.UriFragmentUtility;
 import com.vaadin.ui.VerticalLayout;
 
 public class ViewHandlerTest {
@@ -363,6 +364,66 @@ public class ViewHandlerTest {
 
         assertEquals(2, ((Integer) preCalls.getValue()).intValue());
         assertEquals(2, ((Integer) postCalls.getValue()).intValue());
+    }
+
+    @Test
+    public void uriChangedOnActivation() {
+        MockViewContainer parent = new MockViewContainer();
+        ViewHandler.addView(MockView.class, parent);
+        ViewHandler.addUri("test", MockView.class);
+        UriFragmentUtility util = ViewHandler.getUriFragmentUtil();
+
+        assertNull(util.getFragment());
+        ViewHandler.activateView(MockView.class, true);
+        assertEquals("test", util.getFragment());
+    }
+
+    @Test
+    public void uriNotChangedOnActivation() {
+        MockViewContainer parent = new MockViewContainer();
+        ViewHandler.addView(MockView.class, parent);
+        ViewHandler.addUri("test", MockView.class);
+        UriFragmentUtility util = ViewHandler.getUriFragmentUtil();
+
+        assertNull(util.getFragment());
+        ViewHandler.activateView(MockView.class, false);
+        assertNull(util.getFragment());
+    }
+
+    @Test
+    public void viewActivatedOnUriChange() {
+        final ValueContainer viewActivated = new ValueContainer(false);
+
+        AbstractView<ComponentContainer> view = new AbstractView<ComponentContainer>(
+                new VerticalLayout()) {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public void activated(Object... params) {
+                viewActivated.setValue(true);
+            }
+        };
+
+        ViewItem item = ViewHandler.addView("test", new MockViewContainer());
+        item.setView(view);
+
+        // Add two uris for the same view
+        ViewHandler.addUri("test", "test");
+        ViewHandler.addUri("test2", "test");
+
+        UriFragmentUtility util = ViewHandler.getUriFragmentUtil();
+        util.setFragment("test", false);
+        assertFalse((Boolean) viewActivated.getValue());
+        // Clear the fragment so that a change will happen
+        util.setFragment("clear", false);
+
+        util.setFragment("test", true);
+        assertTrue((Boolean) viewActivated.getValue());
+
+        viewActivated.setValue(false);
+        util.setFragment("test2", true);
+        assertTrue((Boolean) viewActivated.getValue());
+
     }
 
     private class ValueContainer {
