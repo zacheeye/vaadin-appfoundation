@@ -306,6 +306,37 @@ public class ViewHandlerTest {
     }
 
     @Test
+    public void removeListener() {
+        final ValueContainer preCalls = new ValueContainer(0);
+
+        DispatchEventListener listener = new DispatchEventListener() {
+            private boolean preCall = false;
+
+            public void preDispatch(DispatchEvent event)
+                    throws DispatchException {
+                if (!preCall) {
+                    preCall = true;
+                    preCalls.setValue(((Integer) preCalls.getValue()) + 1);
+                }
+            }
+
+            public void postDispatch(DispatchEvent event) {
+            }
+        };
+
+        // Add view
+        ViewHandler.addListener(listener);
+
+        // Remove it immediately
+        ViewHandler.removeListener(listener);
+
+        ViewHandler.addView(MockView.class, new MockViewContainer());
+        ViewHandler.activateView(MockView.class);
+
+        assertEquals(0, ((Integer) preCalls.getValue()).intValue());
+    }
+
+    @Test
     public void cancelDispatch() {
         final ValueContainer preCalls = new ValueContainer(0);
         final ValueContainer postCalls = new ValueContainer(0);
@@ -424,6 +455,34 @@ public class ViewHandlerTest {
         util.setFragment("test2", true);
         assertTrue((Boolean) viewActivated.getValue());
 
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void addNullUri() {
+        ViewHandler.addUri(null, "test");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void addEmptyUri() {
+        ViewHandler.addUri("", "test");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void addUriNullView() {
+        ViewHandler.addUri("test", null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void addExistingUri() {
+        ViewHandler.addView("viewId");
+        ViewHandler.addView("viewId2");
+        ViewHandler.addUri("test", "viewId");
+        ViewHandler.addUri("test", "viewId2");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void addUriNonExistingViewId() {
+        ViewHandler.addUri("test", "viewId");
     }
 
     private class ValueContainer {
