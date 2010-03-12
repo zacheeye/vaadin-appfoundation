@@ -222,6 +222,22 @@ public class ViewHandlerTest {
 
     @Test
     public void dispatchEventListeners() {
+        final ValueContainer viewActivated = new ValueContainer(false);
+        final ValueContainer parentCalled = new ValueContainer(false);
+
+        final AbstractView<ComponentContainer> view = new AbstractView<ComponentContainer>(
+                new VerticalLayout()) {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public void activated(Object... params) {
+                viewActivated.setValue(true);
+            }
+        };
+
+        final ViewItem item = ViewHandler.addView("test");
+        item.setView(view);
+
         final ValueContainer preCalls = new ValueContainer(0);
         final ValueContainer postCalls = new ValueContainer(0);
 
@@ -231,6 +247,10 @@ public class ViewHandlerTest {
 
             public void preDispatch(DispatchEvent event)
                     throws DispatchException {
+                assertEquals(item, event.getViewItem());
+                assertEquals(1, (event.getActivationParameters()).length);
+                assertEquals("testParam", (event.getActivationParameters())[0]);
+
                 if (!preCall) {
                     preCall = true;
                     preCalls.setValue(((Integer) preCalls.getValue()) + 1);
@@ -270,26 +290,7 @@ public class ViewHandlerTest {
         ViewHandler.addListener(listener);
         ViewHandler.addListener(listener2);
 
-        final ValueContainer viewActivated = new ValueContainer();
-        final ValueContainer parentCalled = new ValueContainer();
-        viewActivated.setValue(false);
-        parentCalled.setValue(false);
-
-        AbstractView<ComponentContainer> view = new AbstractView<ComponentContainer>(
-                new VerticalLayout()) {
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public void activated(Object... params) {
-                viewActivated.setValue(true);
-            }
-        };
-
-        ViewItem item = ViewHandler.addView("test");
-        item.setView(view);
-
         ViewHandler.activateView("test");
-        // Parent not set
 
         ViewContainer container = new ViewContainer() {
             public void activate(AbstractView<?> view) {
@@ -297,7 +298,7 @@ public class ViewHandlerTest {
             }
         };
         ViewHandler.setParent("test", container);
-        ViewHandler.activateView("test");
+        ViewHandler.activateView("test", "testParam");
 
         assertEquals(1, ((Integer) preCalls.getValue()).intValue());
         assertEquals(0, ((Integer) postCalls.getValue()).intValue());
