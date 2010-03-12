@@ -2,7 +2,9 @@ package org.vaadin.appfoundation.persistence.facade;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Factory class for creating and managing facades in the application.
@@ -141,7 +143,10 @@ public class FacadeFactory implements Serializable {
      * Removes all facade references from the factory.
      */
     public static void clear() {
-        for (String name : facades.keySet()) {
+        // Store the names to a temporary set to avoid
+        // ConcurrentModificationException
+        Set<String> names = new HashSet<String>(facades.keySet());
+        for (String name : names) {
             removeFacade(name);
         }
     }
