@@ -332,6 +332,11 @@ public class ViewHandler implements TransactionListener,
             throw new IllegalArgumentException("View id must be defined");
         }
 
+        if (instance.get().uriMap.containsKey(uri)) {
+            throw new IllegalArgumentException(
+                    "A view is already defined for this uri");
+        }
+
         // Make sure that a view has been added for the given view id
         if (!instance.get().viewMap.containsKey(viewId)) {
             throw new IllegalArgumentException(
