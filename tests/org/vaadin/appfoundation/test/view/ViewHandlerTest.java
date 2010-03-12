@@ -475,14 +475,32 @@ public class ViewHandlerTest {
     @Test(expected = IllegalArgumentException.class)
     public void addExistingUri() {
         ViewHandler.addView("viewId");
-        ViewHandler.addView("viewId2");
         ViewHandler.addUri("test", "viewId");
-        ViewHandler.addUri("test", "viewId2");
+        ViewHandler.addUri("test", "viewId");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void addUriNonExistingViewId() {
         ViewHandler.addUri("test", "viewId");
+    }
+
+    @Test
+    public void removeUri() {
+        ViewHandler.addView("viewId");
+        ViewHandler.addUri("test", "viewId");
+        ViewHandler.removeUri("test");
+        // This should cause an exception if this test fails
+        ViewHandler.addUri("test", "viewId");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void removeNullUri() {
+        ViewHandler.removeUri(null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void removeEmptyUri() {
+        ViewHandler.removeUri("");
     }
 
     private class ValueContainer {
