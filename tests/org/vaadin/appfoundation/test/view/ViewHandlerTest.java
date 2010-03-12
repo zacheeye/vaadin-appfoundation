@@ -1,6 +1,7 @@
 package org.vaadin.appfoundation.test.view;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -113,6 +114,36 @@ public class ViewHandlerTest {
         ViewItem item = ViewHandler.addView(MockView.class);
         assertNotNull(item.getFactory());
         assertEquals(factory, item.getFactory());
+    }
+
+    @Test
+    public void removeViewNonExisting() {
+        assertFalse(ViewHandler.removeView("test"));
+    }
+
+    @Test
+    public void removeView() {
+        ViewHandler.addView("test");
+        assertTrue(ViewHandler.removeView("test"));
+        assertNull(ViewHandler.getViewItem("test"));
+        assertFalse(ViewHandler.removeView("test"));
+    }
+
+    @Test
+    /**
+     * Tests that the uri is removed for a view when the view is removed.
+     */
+    public void removeViewUriIsRemoved() {
+        // Add two views
+        ViewHandler.addView("test");
+        ViewHandler.addView("test2");
+        // Add an uri to the first view
+        ViewHandler.addUri("test", "test");
+
+        ViewHandler.removeView("test");
+        // The "test" uri should have been removed when the view was removed.
+        // Hence we should now be able to define a new view for the same uri
+        ViewHandler.addUri("test", "test2");
     }
 
     private class ValueContainer {
