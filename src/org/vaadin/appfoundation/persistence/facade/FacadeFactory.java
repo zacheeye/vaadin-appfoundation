@@ -101,8 +101,24 @@ public class FacadeFactory implements Serializable {
     public static void removeFacade(String name) {
         if (facades.containsKey(name)) {
             IFacade facade = facades.get(name);
+
+            // If the facade is same instance as the default facade, then remove
+            // the default facade reference.
+            if (facade == defaultFacade) {
+                defaultFacade = null;
+            }
+
             facade.kill();
             facades.remove(name);
+        }
+    }
+
+    /**
+     * Removes all facade references from the factory.
+     */
+    public static void clear() {
+        for (String name : facades.keySet()) {
+            removeFacade(name);
         }
     }
 
