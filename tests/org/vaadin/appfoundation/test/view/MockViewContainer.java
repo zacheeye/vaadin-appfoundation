@@ -7,7 +7,6 @@ public class MockViewContainer implements ViewContainer {
 
     private AbstractView<?> previouslyActivatedView = null;
 
-    @Override
     public void activate(AbstractView<?> view) {
         setPreviouslyActivatedView(null);
     }
