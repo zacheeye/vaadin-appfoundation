@@ -1,6 +1,7 @@
 package org.vaadin.appfoundation.test.view;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -30,6 +31,19 @@ public class ViewHandlerTest {
         assertEquals(item2, ViewHandler.getViewItem("test2"));
 
         assertNull(ViewHandler.getViewItem("nonExistingId"));
+    }
+
+    @Test
+    public void addView() {
+        // With no parameters
+        Object id1 = ViewHandler.addView();
+        assertNotNull(id1);
+        assertNotNull(ViewHandler.getViewItem(id1));
+
+        // With a view id param
+        String id2 = "id2";
+        ViewHandler.addView(id2);
+        ViewItem item = ViewHandler.getViewItem(id2);
     }
 
 }
