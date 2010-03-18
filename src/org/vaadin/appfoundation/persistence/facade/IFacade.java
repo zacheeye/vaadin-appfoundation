@@ -120,4 +120,13 @@ public interface IFacade {
      * Kill the facade, closes the facade and removes all possible references.
      */
     public void kill();
+
+    /**
+     * Gives the total number of records for the given entity type.
+     * 
+     * @param c
+     *            Class object of the entity
+     * @return Total number of records or -1 if an exception occurred.
+     */
+    public Long count(Class<? extends AbstractPojo> c);
 }
