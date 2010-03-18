@@ -24,7 +24,7 @@ public class PasswordUtilTest {
     @Test
     public void setProperties() {
         Properties properties = new Properties();
-        properties.setProperty("password.salt", "foobar");
+        properties.setProperty("password.salt", "test");
         PasswordUtil.setProperties(properties);
     }
 
@@ -32,7 +32,7 @@ public class PasswordUtilTest {
     public void setPropertiesTwice() {
         // Properties is already set
         Properties properties = new Properties();
-        properties.setProperty("password.salt", "test");
+        properties.setProperty("password.salt", "foobar");
         PasswordUtil.setProperties(properties);
     }
 
@@ -58,7 +58,7 @@ public class PasswordUtilTest {
     public void verifyPassword() {
         User user = new User();
         // Hashed value of "foobar"+"test" (the salt value)
-        user.setPassword("9ece4bad2286c854da3a6797cc251181aeaa94a");
+        user.setPassword("61e38e2b77827e10777ee8f1a138b7cfb1eb895");
         assertTrue(PasswordUtil.verifyPassword(user, "foobar"));
     }
 
