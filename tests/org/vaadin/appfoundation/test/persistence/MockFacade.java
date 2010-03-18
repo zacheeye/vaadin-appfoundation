@@ -58,4 +58,8 @@ public class MockFacade implements IFacade {
 
     }
 
+    public Long count(Class<? extends AbstractPojo> c) {
+        return 0L;
+    }
+
 }
