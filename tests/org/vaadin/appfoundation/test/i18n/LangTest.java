@@ -6,6 +6,7 @@ import java.io.File;
 import java.net.URL;
 import java.util.Locale;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.vaadin.appfoundation.i18n.InternationalizationServlet;
@@ -15,13 +16,21 @@ import org.vaadin.appfoundation.test.MockApplication;
 public class LangTest {
 
     private MockApplication application;
+    private Lang lang = null;
 
     @Before
     public void setUp() {
         // Create a new instance of the MockApplication
         application = new MockApplication();
         // Initialize the Lang class with the MockApplication
-        new Lang(application);
+        lang = new Lang(application);
+        lang.transactionStart(application, null);
+    }
+
+    @After
+    public void tearDown() {
+        lang.transactionEnd(application, null);
+        lang = null;
     }
 
     @Test
