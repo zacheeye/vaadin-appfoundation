@@ -231,6 +231,10 @@ public class JPAFacade implements IFacade, Serializable {
      * {@inheritDoc}
      */
     public void delete(AbstractPojo pojo) {
+        if (pojo == null) {
+            throw new IllegalArgumentException("Null values are not accepted");
+        }
+
         // If it isn't stored, it can't be removed
         if (pojo.getId() == null) {
             return;
@@ -258,7 +262,7 @@ public class JPAFacade implements IFacade, Serializable {
      */
     public <A extends AbstractPojo> void deleteAll(Collection<A> pojos) {
         if (pojos == null) {
-            return;
+            throw new IllegalArgumentException("Null values are not accepted");
         }
         // This method follows the same principles as the delete() method. Read
         // delete()'s comments for more detailed explanations.
