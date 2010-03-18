@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.vaadin.appfoundation.test.MockApplication;
@@ -25,10 +26,20 @@ import com.vaadin.ui.VerticalLayout;
 
 public class ViewHandlerTest {
 
+    private MockApplication application = new MockApplication();
+    private ViewHandler handler = null;
+
     @Before
     public void setUp() {
         // Initialize the Lang class with the MockApplication
-        new ViewHandler(new MockApplication());
+        handler = new ViewHandler(application);
+        handler.transactionStart(application, null);
+    }
+
+    @After
+    public void tearDown() {
+        handler.transactionEnd(application, null);
+        handler = null;
     }
 
     @Test
