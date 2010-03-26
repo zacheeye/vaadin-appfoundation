@@ -65,30 +65,6 @@ public abstract class AbstractPermissionHandlerTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void denyDefaultNullRole() {
-        PermissionHandler pm = getPermissionHandler();
-        pm.denyDefault(null, createResource());
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void denyDefaultNullResource() {
-        PermissionHandler pm = getPermissionHandler();
-        pm.denyDefault(createRole(), null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void allowDefaultNullRole() {
-        PermissionHandler pm = getPermissionHandler();
-        pm.allowDefault(null, createResource());
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void allowDefaultNullResource() {
-        PermissionHandler pm = getPermissionHandler();
-        pm.allowDefault(createRole(), null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
     public void hasAccessNullRole() {
         PermissionHandler pm = getPermissionHandler();
         pm.hasAccess(null, "test", createResource());
@@ -125,28 +101,13 @@ public abstract class AbstractPermissionHandlerTest {
     }
 
     @Test
-    public void allowDefault() {
-        Role role = createRole();
-        Role role2 = createRole();
-        Resource resource = createResource();
-
-        PermissionHandler pm = getPermissionHandler();
-        pm.allowDefault(role, resource);
-        pm.allow(role2, "write", resource);
-
-        assertTrue(pm.hasAccess(role, "read", resource));
-        assertTrue(pm.hasAccess(role, "test", resource));
-        assertFalse(pm.hasAccess(role, "write", resource));
-    }
-
-    @Test
     public void allowAll() {
         Role role = createRole();
         Role role2 = createRole();
         Resource resource = createResource();
 
         PermissionHandler pm = getPermissionHandler();
-        pm.allowDefault(role, resource);
+        pm.allowAll(role, resource);
         pm.allow(role2, "write", resource);
 
         assertTrue(pm.hasAccess(role, "read", resource));
@@ -154,21 +115,6 @@ public abstract class AbstractPermissionHandlerTest {
         assertTrue(pm.hasAccess(role, "write", resource));
         pm.deny(role, "write", resource);
         assertFalse(pm.hasAccess(role, "write", resource));
-    }
-
-    @Test
-    public void denyDefault() {
-        Role role = createRole();
-        Role role2 = createRole();
-        Resource resource = createResource();
-
-        PermissionHandler pm = getPermissionHandler();
-        pm.denyDefault(role, resource);
-        pm.deny(role2, "write", resource);
-
-        assertFalse(pm.hasAccess(role, "read", resource));
-        assertFalse(pm.hasAccess(role, "test", resource));
-        assertTrue(pm.hasAccess(role, "write", resource));
     }
 
     @Test
@@ -178,13 +124,37 @@ public abstract class AbstractPermissionHandlerTest {
         Resource resource = createResource();
 
         PermissionHandler pm = getPermissionHandler();
-        pm.denyDefault(role, resource);
+        pm.denyAll(role, resource);
         pm.deny(role2, "write", resource);
 
         assertFalse(pm.hasAccess(role, "read", resource));
         assertFalse(pm.hasAccess(role, "test", resource));
         assertFalse(pm.hasAccess(role, "write", resource));
-        pm.deny(role, "write", resource);
+        pm.allow(role, "write", resource);
         assertTrue(pm.hasAccess(role, "write", resource));
+    }
+
+    @Test
+    public void combinationAllowed() {
+        // If one is denied, then others are allowed
+        Role role = createRole();
+        Role role2 = createRole();
+        Resource resource = createResource();
+
+        PermissionHandler pm = getPermissionHandler();
+        pm.deny(role2, "test", resource);
+        assertTrue(pm.hasAccess(role, "test", resource));
+    }
+
+    @Test
+    public void combinationDenied() {
+        // If one is allowed, then others are denied
+        Role role = createRole();
+        Role role2 = createRole();
+        Resource resource = createResource();
+
+        PermissionHandler pm = getPermissionHandler();
+        pm.allow(role2, "test", resource);
+        assertFalse(pm.hasAccess(role, "test", resource));
     }
 }
