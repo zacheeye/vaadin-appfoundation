@@ -58,6 +58,19 @@ public class PermissionMap {
     }
 
     /**
+     * Removes all permissions set for the given role in the given resource.
+     * 
+     * @param role
+     *            The role of whom we are removing the permission
+     * @param resource
+     *            The resource whose permissions are being removed
+     */
+    public void removeAll(Role role, Resource resource) {
+        Map<String, List<String>> rolesPermissions = getRolesPermissions(role);
+        rolesPermissions.remove(resource.getIdentifier());
+    }
+
+    /**
      * Checks if a permission has been assigned for the given role, in the given
      * resource, for the given action.
      * 
