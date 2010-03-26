@@ -73,16 +73,6 @@ public interface PermissionHandler {
     public void allowAll(Role role, Resource resource);
 
     /**
-     * Grants the given role the permission to perform
-     * 
-     * @param role
-     *            The role which is being assigned the permission
-     * @param resource
-     *            The resource to which the permission applies
-     */
-    public void allow(Role role, Resource resource);
-
-    /**
      * Denies the given role the permission to perform the given action for the
      * given resource.
      * 
