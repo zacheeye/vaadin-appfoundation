@@ -13,7 +13,7 @@ public interface PermissionHandler {
      * @param resource
      *            The resource to which the permission applies
      */
-    public void allow(Role role, Object action, Resource resource);
+    public void allow(Role role, String action, Resource resource);
 
     /**
      * <p>
@@ -86,7 +86,7 @@ public interface PermissionHandler {
      * @param resource
      *            The resource to which the permission applies
      */
-    public void deny(Role role, Object action, Resource resource);
+    public void deny(Role role, String action, Resource resource);
 
     /**
      * <p>
@@ -153,6 +153,6 @@ public interface PermissionHandler {
      *            The resource for which the permission is being requested
      * @return
      */
-    public boolean hasAccess(Role role, Object action, Resource resource);
+    public boolean hasAccess(Role role, String action, Resource resource);
 
 }
