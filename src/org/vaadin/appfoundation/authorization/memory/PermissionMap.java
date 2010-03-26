@@ -66,7 +66,7 @@ public class PermissionMap {
     public boolean hasPermissions(Resource resource) {
         Collection<Map<String, List<String>>> allPermissions = permissions
                 .values();
-        if (allPermissions == null) {
+        if (allPermissions == null || allPermissions.size() == 0) {
             return false;
         }
 
