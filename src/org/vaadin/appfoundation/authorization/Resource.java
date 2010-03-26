@@ -13,6 +13,6 @@ public interface Resource {
      * 
      * @return
      */
-    public Object getIdentifier();
+    public String getIdentifier();
 
 }
