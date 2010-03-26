@@ -6,13 +6,13 @@ import org.vaadin.appfoundation.authorization.Resource;
 
 public class ResourceMock implements Resource {
 
-    private String id;
+    private final String id;
 
     public ResourceMock() {
         id = UUID.randomUUID().toString();
     }
 
-    public Object getIdentifier() {
+    public String getIdentifier() {
         return id;
     }
 

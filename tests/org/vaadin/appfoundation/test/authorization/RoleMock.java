@@ -7,13 +7,13 @@ import org.vaadin.appfoundation.authorization.Role;
 
 public class RoleMock implements Role {
 
-    private String id;
+    private final String id;
 
     public RoleMock() {
         id = UUID.randomUUID().toString();
     }
 
-    public Object getIdentifier() {
+    public String getIdentifier() {
         return id;
     }
 
