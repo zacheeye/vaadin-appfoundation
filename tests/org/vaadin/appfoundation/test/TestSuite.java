@@ -9,6 +9,7 @@ import org.vaadin.appfoundation.test.authentication.PasswordUtilTest;
 import org.vaadin.appfoundation.test.authentication.SessionHandlerTest;
 import org.vaadin.appfoundation.test.authentication.UserTest;
 import org.vaadin.appfoundation.test.authentication.UserUtilTest;
+import org.vaadin.appfoundation.test.authorization.memory.MemoryPermissionHandlerTest;
 import org.vaadin.appfoundation.test.i18n.FillXmlTest;
 import org.vaadin.appfoundation.test.i18n.InternationalizationServletTest;
 import org.vaadin.appfoundation.test.i18n.LangTest;
@@ -28,7 +29,8 @@ import org.vaadin.appfoundation.test.view.ViewItemTest;
         DefaultViewFactoryTest.class, ViewHandlerTest.class,
         AbstractViewTest.class, FacadeFactoryTest.class, JPAFacadeTest.class,
         AbstractPojoTest.class, UserTest.class, AuthenticationUtilTest.class,
-        SessionHandlerTest.class, UserUtilTest.class, PermissionMap.class })
+        SessionHandlerTest.class, UserUtilTest.class, PermissionMap.class,
+        MemoryPermissionHandlerTest.class })
 public class TestSuite {
 
 }
