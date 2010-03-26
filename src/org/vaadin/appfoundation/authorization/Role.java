@@ -15,7 +15,7 @@ public interface Role {
      * 
      * @return
      */
-    public Object getIdentifier();
+    public String getIdentifier();
 
     /**
      * Roles are hierarchical, this method returns other roles that have been
