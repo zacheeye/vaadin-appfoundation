@@ -20,32 +20,6 @@ public interface PermissionHandler {
 
     /**
      * <p>
-     * Grants the given role to perform <b>any action</b> for the given resource
-     * if and only if no permissions have been explicitly set for the requested
-     * action.
-     * </p>
-     * 
-     * <p>
-     * Example:<br />
-     * allowDefault(role, resource);<br />
-     * allow(anotherRole, "write", resource);
-     * 
-     * hasAccess(role, "read", resource) - returns true<br />
-     * hasAccess(role, "close", resource) - returns true<br />
-     * hasAccess(role, "write", resource) - returns false
-     * </p>
-     * 
-     * @param role
-     *            The role which is being assigned the permission
-     * @param resource
-     *            The resource to which the permission applies
-     * @throws IllegalArgumentException
-     *             If either role or resource is null
-     */
-    public void allowDefault(Role role, Resource resource);
-
-    /**
-     * <p>
      * Grants the given role to perform <b>any action</b> for the given
      * resource.
      * </p>
@@ -86,32 +60,6 @@ public interface PermissionHandler {
      *             If either role or resource is null
      */
     public void deny(Role role, String action, Resource resource);
-
-    /**
-     * <p>
-     * Denies the given role to perform <b>any action</b> for the given resource
-     * if and only if no permissions have been explicitly set for the requested
-     * action.
-     * </p>
-     * 
-     * <p>
-     * Example:<br />
-     * denyDefault(role, resource);<br />
-     * deny(anotherRole, "write", resource);
-     * 
-     * hasAccess(role, "read", resource) - returns false<br />
-     * hasAccess(role, "close", resource) - returns false<br />
-     * hasAccess(role, "write", resource) - returns true
-     * </p>
-     * 
-     * @param role
-     *            The role which is being assigned the permission
-     * @param resource
-     *            The resource to which the permission applies
-     * @throws IllegalArgumentException
-     *             If either role or resource is null
-     */
-    public void denyDefault(Role role, Resource resource);
 
     /**
      * <p>
