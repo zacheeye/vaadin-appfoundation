@@ -94,4 +94,17 @@ public class PermissionMapTest {
         assertTrue(map.hasPermissions(resource));
         assertTrue(map.contains(role, null, resource));
     }
+
+    @Test
+    public void remove() {
+        Role role = new RoleMock();
+        Resource resource = new ResourceMock();
+        map.put(role, "test", resource);
+        assertTrue(map.hasPermissions(resource));
+        assertTrue(map.contains(role, "test", resource));
+
+        map.remove(role, "test", resource);
+        assertFalse(map.hasPermissions(resource));
+        assertFalse(map.contains(role, "test", resource));
+    }
 }
