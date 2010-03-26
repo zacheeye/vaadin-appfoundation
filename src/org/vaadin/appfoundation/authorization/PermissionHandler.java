@@ -12,6 +12,9 @@ public interface PermissionHandler {
      *            The identifier for the action
      * @param resource
      *            The resource to which the permission applies
+     * 
+     * @throws IllegalArgumentException
+     *             If either role or resource is null
      */
     public void allow(Role role, String action, Resource resource);
 
@@ -36,6 +39,8 @@ public interface PermissionHandler {
      *            The role which is being assigned the permission
      * @param resource
      *            The resource to which the permission applies
+     * @throws IllegalArgumentException
+     *             If either role or resource is null
      */
     public void allowDefault(Role role, Resource resource);
 
@@ -62,6 +67,8 @@ public interface PermissionHandler {
      *            The role which is being assigned the permission
      * @param resource
      *            The resource to which the permission applies
+     * @throws IllegalArgumentException
+     *             If either role or resource is null
      */
     public void allowAll(Role role, Resource resource);
 
@@ -85,6 +92,8 @@ public interface PermissionHandler {
      *            The identifier for the action
      * @param resource
      *            The resource to which the permission applies
+     * @throws IllegalArgumentException
+     *             If either role or resource is null
      */
     public void deny(Role role, String action, Resource resource);
 
@@ -109,6 +118,8 @@ public interface PermissionHandler {
      *            The role which is being assigned the permission
      * @param resource
      *            The resource to which the permission applies
+     * @throws IllegalArgumentException
+     *             If either role or resource is null
      */
     public void denyDefault(Role role, Resource resource);
 
@@ -135,6 +146,8 @@ public interface PermissionHandler {
      *            The role which is being assigned the permission
      * @param resource
      *            The resource to which the permission applies
+     * @throws IllegalArgumentException
+     *             If either role or resource is null
      */
     public void denyAll(Role role, Resource resource);
 
@@ -151,7 +164,9 @@ public interface PermissionHandler {
      *            default permissions.
      * @param resource
      *            The resource for which the permission is being requested
-     * @return
+     * @return True if role has access to the given action in the given resource
+     * @throws IllegalArgumentException
+     *             If either role or resource is null
      */
     public boolean hasAccess(Role role, String action, Resource resource);
 
