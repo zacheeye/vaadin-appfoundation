@@ -16,6 +16,90 @@ public abstract class AbstractPermissionHandlerTest {
 
     public abstract PermissionHandler getPermissionHandler();
 
+    @Test(expected = IllegalArgumentException.class)
+    public void denyNullRole() {
+        PermissionHandler pm = getPermissionHandler();
+        pm.deny(null, "test", createResource());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void denyNullResource() {
+        PermissionHandler pm = getPermissionHandler();
+        pm.deny(createRole(), "test", null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void allowNullRole() {
+        PermissionHandler pm = getPermissionHandler();
+        pm.allow(null, "test", createResource());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void allowNullResource() {
+        PermissionHandler pm = getPermissionHandler();
+        pm.allow(createRole(), "test", null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void denyAllNullRole() {
+        PermissionHandler pm = getPermissionHandler();
+        pm.denyAll(null, createResource());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void denyAllNullResource() {
+        PermissionHandler pm = getPermissionHandler();
+        pm.denyAll(createRole(), null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void allowAllNullRole() {
+        PermissionHandler pm = getPermissionHandler();
+        pm.allowAll(null, createResource());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void allowAllNullResource() {
+        PermissionHandler pm = getPermissionHandler();
+        pm.allowAll(createRole(), null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void denyDefaultNullRole() {
+        PermissionHandler pm = getPermissionHandler();
+        pm.denyDefault(null, createResource());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void denyDefaultNullResource() {
+        PermissionHandler pm = getPermissionHandler();
+        pm.denyDefault(createRole(), null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void allowDefaultNullRole() {
+        PermissionHandler pm = getPermissionHandler();
+        pm.allowDefault(null, createResource());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void allowDefaultNullResource() {
+        PermissionHandler pm = getPermissionHandler();
+        pm.allowDefault(createRole(), null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void hasAccessNullRole() {
+        PermissionHandler pm = getPermissionHandler();
+        pm.hasAccess(null, "test", createResource());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void hasAccessNullResource() {
+        PermissionHandler pm = getPermissionHandler();
+        pm.hasAccess(createRole(), "test", null);
+    }
+
     @Test
     public void deny() {
         Role role = createRole();
