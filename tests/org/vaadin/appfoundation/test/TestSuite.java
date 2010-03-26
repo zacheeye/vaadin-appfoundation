@@ -3,6 +3,7 @@ package org.vaadin.appfoundation.test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
+import org.vaadin.appfoundation.authorization.memory.PermissionMap;
 import org.vaadin.appfoundation.test.authentication.AuthenticationUtilTest;
 import org.vaadin.appfoundation.test.authentication.PasswordUtilTest;
 import org.vaadin.appfoundation.test.authentication.SessionHandlerTest;
@@ -27,7 +28,7 @@ import org.vaadin.appfoundation.test.view.ViewItemTest;
         DefaultViewFactoryTest.class, ViewHandlerTest.class,
         AbstractViewTest.class, FacadeFactoryTest.class, JPAFacadeTest.class,
         AbstractPojoTest.class, UserTest.class, AuthenticationUtilTest.class,
-        SessionHandlerTest.class, UserUtilTest.class })
+        SessionHandlerTest.class, UserUtilTest.class, PermissionMap.class })
 public class TestSuite {
 
 }
