@@ -4,75 +4,75 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
-import org.vaadin.appfoundation.authorization.PermissionHandler;
+import org.vaadin.appfoundation.authorization.PermissionManager;
 import org.vaadin.appfoundation.authorization.Resource;
 import org.vaadin.appfoundation.authorization.Role;
 
-public abstract class AbstractPermissionHandlerTest {
+public abstract class AbstractPermissionManagerTest {
 
     public abstract Role createRole();
 
     public abstract Resource createResource();
 
-    public abstract PermissionHandler getPermissionHandler();
+    public abstract PermissionManager getPermissionHandler();
 
     @Test(expected = IllegalArgumentException.class)
     public void denyNullRole() {
-        PermissionHandler pm = getPermissionHandler();
+        PermissionManager pm = getPermissionHandler();
         pm.deny(null, "test", createResource());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void denyNullResource() {
-        PermissionHandler pm = getPermissionHandler();
+        PermissionManager pm = getPermissionHandler();
         pm.deny(createRole(), "test", null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void allowNullRole() {
-        PermissionHandler pm = getPermissionHandler();
+        PermissionManager pm = getPermissionHandler();
         pm.allow(null, "test", createResource());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void allowNullResource() {
-        PermissionHandler pm = getPermissionHandler();
+        PermissionManager pm = getPermissionHandler();
         pm.allow(createRole(), "test", null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void denyAllNullRole() {
-        PermissionHandler pm = getPermissionHandler();
+        PermissionManager pm = getPermissionHandler();
         pm.denyAll(null, createResource());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void denyAllNullResource() {
-        PermissionHandler pm = getPermissionHandler();
+        PermissionManager pm = getPermissionHandler();
         pm.denyAll(createRole(), null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void allowAllNullRole() {
-        PermissionHandler pm = getPermissionHandler();
+        PermissionManager pm = getPermissionHandler();
         pm.allowAll(null, createResource());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void allowAllNullResource() {
-        PermissionHandler pm = getPermissionHandler();
+        PermissionManager pm = getPermissionHandler();
         pm.allowAll(createRole(), null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void hasAccessNullRole() {
-        PermissionHandler pm = getPermissionHandler();
+        PermissionManager pm = getPermissionHandler();
         pm.hasAccess(null, "test", createResource());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void hasAccessNullResource() {
-        PermissionHandler pm = getPermissionHandler();
+        PermissionManager pm = getPermissionHandler();
         pm.hasAccess(createRole(), "test", null);
     }
 
@@ -82,7 +82,7 @@ public abstract class AbstractPermissionHandlerTest {
         Role role2 = createRole();
         Resource resource = createResource();
 
-        PermissionHandler pm = getPermissionHandler();
+        PermissionManager pm = getPermissionHandler();
         assertTrue(pm.hasAccess(role, "test", resource));
 
         pm.deny(role, "test", resource);
@@ -96,7 +96,7 @@ public abstract class AbstractPermissionHandlerTest {
         Role role2 = createRole();
         Resource resource = createResource();
 
-        PermissionHandler pm = getPermissionHandler();
+        PermissionManager pm = getPermissionHandler();
         pm.allow(role, "test", resource);
         assertTrue(pm.hasAccess(role, "test", resource));
         assertFalse(pm.hasAccess(role2, "test", resource));
@@ -109,7 +109,7 @@ public abstract class AbstractPermissionHandlerTest {
         Role role3 = createRole();
         Resource resource = createResource();
 
-        PermissionHandler pm = getPermissionHandler();
+        PermissionManager pm = getPermissionHandler();
         pm.allowAll(role, resource);
         assertFalse(pm.hasAccess(role3, "write", resource));
 
@@ -129,7 +129,7 @@ public abstract class AbstractPermissionHandlerTest {
         Role role3 = createRole();
         Resource resource = createResource();
 
-        PermissionHandler pm = getPermissionHandler();
+        PermissionManager pm = getPermissionHandler();
         pm.denyAll(role, resource);
         assertTrue(pm.hasAccess(role3, "test", resource));
 
@@ -149,7 +149,7 @@ public abstract class AbstractPermissionHandlerTest {
         Role role2 = createRole();
         Resource resource = createResource();
 
-        PermissionHandler pm = getPermissionHandler();
+        PermissionManager pm = getPermissionHandler();
         pm.deny(role2, "test", resource);
         assertTrue(pm.hasAccess(role, "test", resource));
     }
@@ -161,7 +161,7 @@ public abstract class AbstractPermissionHandlerTest {
         Role role2 = createRole();
         Resource resource = createResource();
 
-        PermissionHandler pm = getPermissionHandler();
+        PermissionManager pm = getPermissionHandler();
         pm.allow(role2, "test", resource);
         assertFalse(pm.hasAccess(role, "test", resource));
     }

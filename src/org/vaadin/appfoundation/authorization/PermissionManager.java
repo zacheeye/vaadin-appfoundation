@@ -9,7 +9,7 @@ package org.vaadin.appfoundation.authorization;
  * @author Kim
  * 
  */
-public interface PermissionHandler {
+public interface PermissionManager {
 
     /**
      * Grants the given role the permission to perform the given action for the
