@@ -29,8 +29,6 @@ public class PermissionEntity extends AbstractPojo {
 
     private String action;
 
-    private boolean defaultPermission = false;
-
     private boolean allPermissions = false;
 
     /**
@@ -126,29 +124,6 @@ public class PermissionEntity extends AbstractPojo {
      */
     public void setAction(String action) {
         this.action = action;
-    }
-
-    /**
-     * Is this permission the default permission for all actions for the given
-     * role in the given resource, if no other permissions are set for the
-     * action.
-     * 
-     * @return Returns true if this is the default permission, false if not
-     */
-    public boolean isDefaultPermission() {
-        return defaultPermission;
-    }
-
-    /**
-     * Defines if this permission the default permission for all actions for the
-     * given role in the given resource, if no other permissions are set for the
-     * action.
-     * 
-     * @param defaultPermission
-     *            True if this is the default permission, false if not
-     */
-    public void setDefaultPermission(boolean defaultPermission) {
-        this.defaultPermission = defaultPermission;
     }
 
     /**
