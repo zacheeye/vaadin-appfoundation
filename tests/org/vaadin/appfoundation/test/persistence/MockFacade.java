@@ -62,4 +62,9 @@ public class MockFacade implements IFacade {
         return 0L;
     }
 
+    public Long count(Class<? extends AbstractPojo> c, String whereClause,
+            Map<String, Object> parameters) {
+        return 0L;
+    }
+
 }
