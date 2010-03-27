@@ -1,17 +1,17 @@
 package org.vaadin.appfoundation.authorization.memory;
 
-import org.vaadin.appfoundation.authorization.PermissionHandler;
+import org.vaadin.appfoundation.authorization.PermissionManager;
 import org.vaadin.appfoundation.authorization.Resource;
 import org.vaadin.appfoundation.authorization.Role;
 
 /**
- * An implementation of the PermissionHandler which keeps all the permission
- * details in memory. No permission are persisted.
+ * An implementation of the {@link PermissionManager} interface in which all the
+ * permission details are kept in memory. No permission are persisted.
  * 
  * @author Kim
  * 
  */
-public class MemoryPermissionHandler implements PermissionHandler {
+public class MemoryPermissionManager implements PermissionManager {
 
     /**
      * Contains the "allowed" permissions for those permission where an explicit
@@ -37,7 +37,7 @@ public class MemoryPermissionHandler implements PermissionHandler {
      */
     private final PermissionMap globalDenied;
 
-    public MemoryPermissionHandler() {
+    public MemoryPermissionManager() {
         allowed = new PermissionMap();
         denied = new PermissionMap();
         globalAllowed = new PermissionMap();

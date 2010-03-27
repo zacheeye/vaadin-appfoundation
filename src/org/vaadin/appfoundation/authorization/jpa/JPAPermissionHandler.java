@@ -1,6 +1,6 @@
 package org.vaadin.appfoundation.authorization.jpa;
 
-import org.vaadin.appfoundation.authorization.PermissionHandler;
+import org.vaadin.appfoundation.authorization.PermissionManager;
 import org.vaadin.appfoundation.authorization.Resource;
 import org.vaadin.appfoundation.authorization.Role;
 
@@ -12,7 +12,7 @@ import org.vaadin.appfoundation.authorization.Role;
  * @author Kim
  * 
  */
-public class JPAPermissionHandler implements PermissionHandler {
+public class JPAPermissionHandler implements PermissionManager {
 
     /**
      * {@inheritDoc}
