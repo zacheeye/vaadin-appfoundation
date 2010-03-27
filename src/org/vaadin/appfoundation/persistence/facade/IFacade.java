@@ -129,4 +129,19 @@ public interface IFacade {
      * @return Total number of records or -1 if an exception occurred.
      */
     public Long count(Class<? extends AbstractPojo> c);
+
+    /**
+     * Gives the total number of records for the given entity type which
+     * fulfills the where clause.
+     * 
+     * @param c
+     *            Class object of the entity
+     * @param whereClause
+     *            The query's WHERE clause with desired restraints.
+     * @param parameters
+     *            A map of parameters and parameter values used in the query
+     * @return Total number of records or -1 if an exception occurred.
+     */
+    public Long count(Class<? extends AbstractPojo> c, String whereClause,
+            Map<String, Object> parameters);
 }

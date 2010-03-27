@@ -232,4 +232,29 @@ public class JPAFacadeTest {
         facade.deleteAll(null);
     }
 
+    @Test
+    public void countQuery() {
+        for (int i = 0; i < 7; i++) {
+            MockPojo pojo = new MockPojo();
+            pojo.setFoo(i % 2 == 0 ? "foo" : "bar");
+            facade.store(pojo);
+        }
+
+        String whereClause = "p.foo = :foo";
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("foo", "foo");
+        assertEquals(new Long(4), facade.count(MockPojo.class, whereClause,
+                parameters));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void countQueryClassIsNull() {
+        facade.count(null, "", null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void countQueryWhereIsNull() {
+        facade.count(MockPojo.class, null, null);
+    }
+
 }

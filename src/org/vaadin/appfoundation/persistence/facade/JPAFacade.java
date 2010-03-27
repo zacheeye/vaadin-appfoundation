@@ -391,6 +391,46 @@ public class JPAFacade implements IFacade, Serializable {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public Long count(Class<? extends AbstractPojo> c, String whereClause,
+            Map<String, Object> parameters) {
+        if (c == null) {
+            throw new IllegalArgumentException("Class may not be null");
+        }
+
+        if (whereClause == null) {
+            throw new IllegalArgumentException("Where clause may not be null");
+        }
+
+        EntityManager em = getEntityManager();
+        try {
+            String queryStr = "SELECT COUNT(p.id) FROM " + c.getSimpleName()
+                    + " p WHERE " + whereClause;
+            // Create a query object from the query string given as the
+            // parameter
+            Query query = em.createQuery(queryStr);
+            // Check if we have some parameters defined
+            if (parameters != null) {
+                for (String key : parameters.keySet()) {
+                    // Inject the parameter to the query
+                    query.setParameter(key, parameters.get(key));
+                }
+            }
+
+            // Execute query and return result
+            return (Long) query.getSingleResult();
+        } catch (NoResultException e) {
+            // This exception will occur if no results were found with the given
+            // query. If this occurs, return null.
+            return -1L;
+        } finally {
+            // Once we've done the query, close the EntityManager
+            em.close();
+        }
+    }
+
+    /**
      * Copies all field values recursively from pojo2 to pojo
      * 
      * @param pojo
