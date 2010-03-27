@@ -79,6 +79,7 @@ public abstract class AbstractPermissionHandlerTest {
     @Test
     public void deny() {
         Role role = createRole();
+        Role role2 = createRole();
         Resource resource = createResource();
 
         PermissionHandler pm = getPermissionHandler();
@@ -86,28 +87,32 @@ public abstract class AbstractPermissionHandlerTest {
 
         pm.deny(role, "test", resource);
         assertFalse(pm.hasAccess(role, "test", resource));
+        assertTrue(pm.hasAccess(role2, "test", resource));
     }
 
     @Test
     public void allow() {
         Role role = createRole();
+        Role role2 = createRole();
         Resource resource = createResource();
 
         PermissionHandler pm = getPermissionHandler();
-        pm.deny(role, "test", resource);
-        assertFalse(pm.hasAccess(role, "test", resource));
         pm.allow(role, "test", resource);
         assertTrue(pm.hasAccess(role, "test", resource));
+        assertFalse(pm.hasAccess(role2, "test", resource));
     }
 
     @Test
     public void allowAll() {
         Role role = createRole();
         Role role2 = createRole();
+        Role role3 = createRole();
         Resource resource = createResource();
 
         PermissionHandler pm = getPermissionHandler();
         pm.allowAll(role, resource);
+        assertFalse(pm.hasAccess(role3, "write", resource));
+
         pm.allow(role2, "write", resource);
 
         assertTrue(pm.hasAccess(role, "read", resource));
@@ -121,10 +126,13 @@ public abstract class AbstractPermissionHandlerTest {
     public void denyAll() {
         Role role = createRole();
         Role role2 = createRole();
+        Role role3 = createRole();
         Resource resource = createResource();
 
         PermissionHandler pm = getPermissionHandler();
         pm.denyAll(role, resource);
+        assertTrue(pm.hasAccess(role3, "test", resource));
+
         pm.deny(role2, "write", resource);
 
         assertFalse(pm.hasAccess(role, "read", resource));
