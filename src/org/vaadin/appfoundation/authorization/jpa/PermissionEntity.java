@@ -8,7 +8,7 @@ import org.vaadin.appfoundation.persistence.data.AbstractPojo;
 
 /**
  * This entity class is used for persisting permissions used by the
- * JPAPermissionHandler.
+ * {@link JPAPermissionManager}.
  * 
  * @author Kim
  * 
