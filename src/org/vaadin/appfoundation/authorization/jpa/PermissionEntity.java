@@ -5,7 +5,6 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.ManyToOne;
 
-import org.vaadin.appfoundation.authorization.Role;
 import org.vaadin.appfoundation.persistence.data.AbstractPojo;
 
 /**
@@ -24,7 +23,7 @@ public class PermissionEntity extends AbstractPojo {
     private PermissionType type;
 
     @ManyToOne
-    private Role role;
+    private RoleEntity role;
 
     private String resource;
 
@@ -75,7 +74,7 @@ public class PermissionEntity extends AbstractPojo {
      * 
      * @return The role for which the permission is being set
      */
-    public Role getRole() {
+    public RoleEntity getRole() {
         return role;
     }
 
@@ -85,7 +84,7 @@ public class PermissionEntity extends AbstractPojo {
      * @param role
      *            The role for which the permission is being set
      */
-    public void setRole(Role role) {
+    public void setRole(RoleEntity role) {
         this.role = role;
     }
 
