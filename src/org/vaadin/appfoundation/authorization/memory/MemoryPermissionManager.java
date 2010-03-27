@@ -114,8 +114,8 @@ public class MemoryPermissionManager implements PermissionManager {
             return false;
         }
 
-        if (globalAllowed.hasPermissions(resource)
-                || allowed.hasPermissions(resource)) {
+        if (globalAllowed.hasPermissions(resource, "all")
+                || allowed.hasPermissions(resource, action)) {
             return false;
         }
 
