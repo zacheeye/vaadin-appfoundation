@@ -27,8 +27,6 @@ public class PermissionEntity extends AbstractPojo {
 
     private String action;
 
-    private boolean allPermissions = false;
-
     /**
      * Default constructor.
      */
@@ -47,7 +45,7 @@ public class PermissionEntity extends AbstractPojo {
     }
 
     /**
-     * Sets the type of the permission (allow/deny)
+     * Sets the type of the permission
      * 
      * @param type
      *            The permission's type
@@ -57,7 +55,7 @@ public class PermissionEntity extends AbstractPojo {
     }
 
     /**
-     * Returns the type of the permission (allow/deny)
+     * Returns the type of the permission
      * 
      * @return The permission's type
      */
@@ -125,28 +123,4 @@ public class PermissionEntity extends AbstractPojo {
     public void setAction(String action) {
         this.action = action;
     }
-
-    /**
-     * Should this permission be applied for all the actions in the given
-     * resource for the given role.
-     * 
-     * @return True if this permission is being applied for all action, false if
-     *         not
-     */
-    public boolean isAllPermissions() {
-        return allPermissions;
-    }
-
-    /**
-     * Defines if this permission should be applied for all the actions in the
-     * given resource for the given role.
-     * 
-     * @param allPermissions
-     *            True if this permission is being applied for all action, false
-     *            if not
-     */
-    public void setAllPermissions(boolean allPermissions) {
-        this.allPermissions = allPermissions;
-    }
-
 }

@@ -8,5 +8,8 @@ package org.vaadin.appfoundation.authorization.jpa;
  */
 public enum PermissionType {
     ALLOW,
-    DENY;
+    ALLOW_ALL,
+    DENY,
+    DENY_ALL
+    ;
 }
