@@ -89,14 +89,17 @@ public class PermissionMap {
     }
 
     /**
-     * Checks if the given resource have any permissions set for any role.
+     * Checks if the given resource have any permissions set for any role for
+     * the given action.
      * 
      * @param resouce
      *            Resource whose permissions we are checking
+     * @param action
+     *            Action whose permissions we are checking
      * @return True if at least one permission is set for any action in the
      *         resource, else false
      */
-    public boolean hasPermissions(Resource resource) {
+    public boolean hasPermissions(Resource resource, String action) {
         Collection<Map<String, List<String>>> allPermissions = permissions
                 .values();
         if (allPermissions == null) {
@@ -104,7 +107,8 @@ public class PermissionMap {
         }
 
         for (Map<String, List<String>> rolePermissions : allPermissions) {
-            if (roleHasPermissionsSetForResource(rolePermissions, resource)) {
+            if (roleHasPermissionsSetForResourceAndAction(rolePermissions,
+                    resource, action)) {
                 return true;
             }
         }
@@ -120,10 +124,13 @@ public class PermissionMap {
      *            A role's all permissions
      * @param resource
      *            The resource whose permissions we are checking
+     * @param action
+     *            The action whose permissions we are checking
      * @return True if the resource has permissions set, else false
      */
-    private boolean roleHasPermissionsSetForResource(
-            Map<String, List<String>> rolePermissions, Resource resource) {
+    private boolean roleHasPermissionsSetForResourceAndAction(
+            Map<String, List<String>> rolePermissions, Resource resource,
+            String action) {
         if (rolePermissions == null) {
             return false;
         }
@@ -133,6 +140,10 @@ public class PermissionMap {
         }
 
         if (rolePermissions.get(resource.getIdentifier()).size() == 0) {
+            return false;
+        }
+
+        if (!rolePermissions.get(resource.getIdentifier()).contains(action)) {
             return false;
         }
 
