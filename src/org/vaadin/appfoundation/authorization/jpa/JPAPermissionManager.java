@@ -5,14 +5,14 @@ import org.vaadin.appfoundation.authorization.Resource;
 import org.vaadin.appfoundation.authorization.Role;
 
 /**
- * JPA based implementation for the PermissionHandler interface. This class will
- * communicate directly with the database, where it will store all defined
- * permissions.
+ * JPA based implementation for the {@link PermissionManager} interface. This
+ * class will communicate directly with the database, where it will store all
+ * defined permissions.
  * 
  * @author Kim
  * 
  */
-public class JPAPermissionHandler implements PermissionManager {
+public class JPAPermissionManager implements PermissionManager {
 
     /**
      * {@inheritDoc}
