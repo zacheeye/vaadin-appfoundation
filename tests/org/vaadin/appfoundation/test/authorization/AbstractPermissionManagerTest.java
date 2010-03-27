@@ -143,6 +143,74 @@ public abstract class AbstractPermissionManagerTest {
     }
 
     @Test
+    public void denyOverride() {
+        Role role = createRole();
+        Role role2 = createRole();
+        Resource resource = createResource();
+
+        PermissionManager pm = getPermissionHandler();
+        pm.allow(role, "test", resource);
+        pm.deny(role, "test", resource);
+        assertFalse(pm.hasAccess(role, "test", resource));
+        assertTrue(pm.hasAccess(role2, "test", resource));
+    }
+
+    @Test
+    public void allowOverride() {
+        Role role = createRole();
+        Role role2 = createRole();
+        Resource resource = createResource();
+
+        PermissionManager pm = getPermissionHandler();
+        pm.deny(role, "test", resource);
+        pm.allow(role, "test", resource);
+        assertTrue(pm.hasAccess(role, "test", resource));
+        assertFalse(pm.hasAccess(role2, "test", resource));
+    }
+
+    @Test
+    public void allowAllOverride() {
+        Role role = createRole();
+        Role role2 = createRole();
+        Role role3 = createRole();
+        Resource resource = createResource();
+
+        PermissionManager pm = getPermissionHandler();
+        pm.denyAll(role, resource);
+        pm.allowAll(role, resource);
+        assertFalse(pm.hasAccess(role3, "write", resource));
+
+        pm.allow(role2, "write", resource);
+
+        assertTrue(pm.hasAccess(role, "read", resource));
+        assertTrue(pm.hasAccess(role, "test", resource));
+        assertTrue(pm.hasAccess(role, "write", resource));
+        pm.deny(role, "write", resource);
+        assertFalse(pm.hasAccess(role, "write", resource));
+    }
+
+    @Test
+    public void denyAllOverride() {
+        Role role = createRole();
+        Role role2 = createRole();
+        Role role3 = createRole();
+        Resource resource = createResource();
+
+        PermissionManager pm = getPermissionHandler();
+        pm.allowAll(role, resource);
+        pm.denyAll(role, resource);
+        assertTrue(pm.hasAccess(role3, "test", resource));
+
+        pm.deny(role2, "write", resource);
+
+        assertFalse(pm.hasAccess(role, "read", resource));
+        assertFalse(pm.hasAccess(role, "test", resource));
+        assertFalse(pm.hasAccess(role, "write", resource));
+        pm.allow(role, "write", resource);
+        assertTrue(pm.hasAccess(role, "write", resource));
+    }
+
+    @Test
     public void combinationAllowed() {
         // If one is denied, then others are allowed
         Role role = createRole();
@@ -165,4 +233,39 @@ public abstract class AbstractPermissionManagerTest {
         pm.allow(role2, "test", resource);
         assertFalse(pm.hasAccess(role, "test", resource));
     }
+
+    @Test
+    public void denyOthersWhenAllowAllIsSet() {
+        Role role = createRole();
+        Role role2 = createRole();
+        Resource resource = createResource();
+
+        PermissionManager pm = getPermissionHandler();
+        pm.allowAll(role, resource);
+        assertFalse(pm.hasAccess(role2, "test", resource));
+    }
+
+    @Test
+    public void allowOthersWhenDenyAllIsSet() {
+        Role role = createRole();
+        Role role2 = createRole();
+        Resource resource = createResource();
+
+        PermissionManager pm = getPermissionHandler();
+        pm.denyAll(role, resource);
+        assertTrue(pm.hasAccess(role2, "test", resource));
+    }
+
+    @Test
+    public void allowActionEvenIfOtherActionsHasPermissions() {
+        Role role = createRole();
+        Role role2 = createRole();
+        Resource resource = createResource();
+
+        PermissionManager pm = getPermissionHandler();
+        pm.allow(role2, "test", resource);
+        assertFalse(pm.hasAccess(role, "test", resource));
+        assertTrue(pm.hasAccess(role, "test2", resource));
+    }
+
 }
