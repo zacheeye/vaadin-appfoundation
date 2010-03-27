@@ -1,5 +1,14 @@
 package org.vaadin.appfoundation.authorization;
 
+/**
+ * This interface defines a set of methods for permission managers, which are
+ * used by the application foundation's authorization module. Each
+ * implementation of the different permission managers needs to implement this
+ * interface.
+ * 
+ * @author Kim
+ * 
+ */
 public interface PermissionHandler {
 
     /**
