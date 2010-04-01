@@ -8,6 +8,7 @@ import org.vaadin.appfoundation.test.authentication.PasswordUtilTest;
 import org.vaadin.appfoundation.test.authentication.SessionHandlerTest;
 import org.vaadin.appfoundation.test.authentication.UserTest;
 import org.vaadin.appfoundation.test.authentication.UserUtilTest;
+import org.vaadin.appfoundation.test.authorization.PermissionsTest;
 import org.vaadin.appfoundation.test.authorization.jpa.JPAPermissionManagerTest;
 import org.vaadin.appfoundation.test.authorization.jpa.PermissionEntityTest;
 import org.vaadin.appfoundation.test.authorization.memory.MemoryPermissionManagerTest;
@@ -33,7 +34,7 @@ import org.vaadin.appfoundation.test.view.ViewItemTest;
         AbstractPojoTest.class, UserTest.class, AuthenticationUtilTest.class,
         SessionHandlerTest.class, UserUtilTest.class, PermissionMapTest.class,
         MemoryPermissionManagerTest.class, JPAPermissionManagerTest.class,
-        PermissionEntityTest.class })
+        PermissionEntityTest.class, PermissionsTest.class })
 public class TestSuite {
 
 }
