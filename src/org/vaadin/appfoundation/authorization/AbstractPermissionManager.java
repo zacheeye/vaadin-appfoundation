@@ -88,7 +88,9 @@ public abstract class AbstractPermissionManager implements PermissionManager {
                 }
 
                 checkedRoles.add(role.getIdentifier());
-                subRoles.add(role);
+                if (role.getRoles() != null) {
+                    subRoles.addAll(role.getRoles());
+                }
                 results.add(getPermissionResultType(role, action, resource));
             }
 

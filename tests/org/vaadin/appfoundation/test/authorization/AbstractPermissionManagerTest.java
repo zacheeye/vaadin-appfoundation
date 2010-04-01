@@ -3,6 +3,10 @@ package org.vaadin.appfoundation.test.authorization;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.junit.Test;
 import org.vaadin.appfoundation.authorization.PermissionManager;
 import org.vaadin.appfoundation.authorization.Resource;
@@ -71,9 +75,21 @@ public abstract class AbstractPermissionManagerTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
+    public void hasAccessNullRole2() {
+        PermissionManager pm = getPermissionHandler();
+        pm.hasAccess((Set<Role>) null, "test", createResource());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
     public void hasAccessNullResource() {
         PermissionManager pm = getPermissionHandler();
         pm.hasAccess(createRole(), "test", null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void hasAccessNullResource2() {
+        PermissionManager pm = getPermissionHandler();
+        pm.hasAccess(Collections.singleton(createRole()), "test", null);
     }
 
     @Test
@@ -266,6 +282,166 @@ public abstract class AbstractPermissionManagerTest {
         pm.allow(role2, "test", resource);
         assertFalse(pm.hasAccess(role, "test", resource));
         assertTrue(pm.hasAccess(role, "test2", resource));
+    }
+
+    @Test
+    public void conflictionRule1() {
+        Role role1 = createRole();
+        Role role2 = createRole();
+        Role role3 = createRole();
+        Role role4 = createRole();
+
+        Resource resource = createResource();
+        PermissionManager pm = getPermissionHandler();
+        pm.allow(role1, "test", resource);
+        pm.allow(role3, "test", resource);
+        pm.deny(role2, "test", resource);
+        pm.deny(role4, "test", resource);
+
+        Set<Role> roles = new HashSet<Role>();
+        roles.add(role1);
+        roles.add(role2);
+
+        assertTrue(pm.hasAccess(roles, "test", resource));
+    }
+
+    @Test
+    public void conflictionRule2() {
+        Role role1 = createRole();
+        Role role2 = createRole();
+        Role role3 = createRole();
+        Role role4 = createRole();
+
+        Resource resource = createResource();
+        PermissionManager pm = getPermissionHandler();
+        pm.allow(role3, "test", resource);
+        pm.deny(role2, "test", resource);
+        pm.deny(role4, "test", resource);
+
+        Set<Role> roles = new HashSet<Role>();
+        roles.add(role1);
+        roles.add(role2);
+
+        assertFalse(pm.hasAccess(roles, "test", resource));
+    }
+
+    @Test
+    public void conflictionRule3() {
+        Role role1 = createRole();
+        Role role2 = createRole();
+        Role role3 = createRole();
+        Role role4 = createRole();
+
+        Resource resource = createResource();
+        PermissionManager pm = getPermissionHandler();
+        pm.allow(role3, "test", resource);
+        pm.deny(role4, "test", resource);
+
+        Set<Role> roles = new HashSet<Role>();
+        roles.add(role1);
+        roles.add(role2);
+
+        assertFalse(pm.hasAccess(roles, "test", resource));
+    }
+
+    @Test
+    public void conflictionRule4() {
+        Role role1 = createRole();
+        Role role2 = createRole();
+
+        Resource resource = createResource();
+        PermissionManager pm = getPermissionHandler();
+
+        Set<Role> roles = new HashSet<Role>();
+        roles.add(role1);
+        roles.add(role2);
+
+        assertTrue(pm.hasAccess(roles, "test", resource));
+    }
+
+    @Test
+    public void hierarchyRule1And2() {
+        Role role1 = createRole();
+        Role role2 = createRole();
+        Role role3 = createRole();
+        Role role4 = createRole();
+        Role role5 = createRole();
+        Role role6 = createRole();
+
+        role1.addRole(role2);
+        role2.addRole(role3);
+        role3.addRole(role4);
+
+        Resource resource = createResource();
+        PermissionManager pm = getPermissionHandler();
+        pm.deny(role3, "test", resource);
+        pm.allow(role4, "test", resource);
+        pm.deny(role5, "test", resource);
+        pm.allow(role6, "test", resource);
+
+        Set<Role> roles = new HashSet<Role>();
+        roles.add(role1);
+
+        assertFalse(pm.hasAccess(roles, "test", resource));
+    }
+
+    @Test
+    public void hierarchyRule3() {
+        Role role1 = createRole();
+        Role role2 = createRole();
+        Role role3 = createRole();
+        Role role4 = createRole();
+
+        role1.addRole(role2);
+        role2.addRole(role3);
+        role2.addRole(role4);
+
+        Resource resource = createResource();
+        PermissionManager pm = getPermissionHandler();
+        pm.allow(role3, "test", resource);
+        pm.deny(role4, "test", resource);
+
+        Set<Role> roles = new HashSet<Role>();
+        roles.add(role1);
+
+        assertTrue(pm.hasAccess(roles, "test", resource));
+    }
+
+    @Test
+    public void hierarchyRule4() {
+        Role role1 = createRole();
+        Role role2 = createRole();
+        Role role3 = createRole();
+
+        role1.addRole(role2);
+
+        Resource resource = createResource();
+        PermissionManager pm = getPermissionHandler();
+        pm.deny(role3, "test", resource);
+
+        Set<Role> roles = new HashSet<Role>();
+        roles.add(role1);
+
+        assertTrue(pm.hasAccess(roles, "test", resource));
+    }
+
+    @Test
+    public void hierarchyRule5() {
+        Role role1 = createRole();
+        Role role2 = createRole();
+        Role role3 = createRole();
+
+        role1.addRole(role2);
+
+        Resource resource = createResource();
+        PermissionManager pm = getPermissionHandler();
+        pm.allow(role3, "test", resource);
+
+        Set<Role> roles = new HashSet<Role>();
+        roles.add(role1);
+        roles.add(null);
+
+        assertFalse(pm.hasAccess(roles, "test", resource));
     }
 
 }
