@@ -1,5 +1,6 @@
 package org.vaadin.appfoundation.test.authorization;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -8,6 +9,7 @@ import org.vaadin.appfoundation.authorization.Role;
 public class RoleMock implements Role {
 
     private final String id;
+    private final Set<Role> roles = new HashSet<Role>();
 
     public RoleMock() {
         id = UUID.randomUUID().toString();
@@ -18,23 +20,20 @@ public class RoleMock implements Role {
     }
 
     public void addRole(Role role) {
-        // TODO Auto-generated method stub
-
+        roles.add(role);
     }
 
     public Set<Role> getRoles() {
-        // TODO Auto-generated method stub
-        return null;
+        return new HashSet<Role>(roles);
     }
 
     public void removeRole(Role role) {
-        // TODO Auto-generated method stub
-
+        roles.remove(role);
     }
 
     public void setRoles(Set<Role> roles) {
-        // TODO Auto-generated method stub
-
+        roles.clear();
+        roles.addAll(roles);
     }
 
 }
