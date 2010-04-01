@@ -6,6 +6,11 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.vaadin.appfoundation.authentication.data.User;
+import org.vaadin.appfoundation.authentication.exceptions.InvalidCredentialsException;
+import org.vaadin.appfoundation.authentication.exceptions.PasswordsDoNotMatchException;
+import org.vaadin.appfoundation.authentication.exceptions.TooShortPasswordException;
+import org.vaadin.appfoundation.authentication.exceptions.TooShortUsernameException;
+import org.vaadin.appfoundation.authentication.exceptions.UsernameExistsException;
 import org.vaadin.appfoundation.persistence.facade.FacadeFactory;
 
 /**
@@ -23,35 +28,6 @@ public class UserUtil implements Serializable {
 
     // Define the minimum length for a password
     private static int minPasswordLength = 8;
-
-    /**
-     * List of all possible error that can occur during registration
-     * 
-     * @author Kim
-     * 
-     */
-    public static enum RegistrationMsg {
-        TOO_SHORT_PASSWORD,
-        TOO_SHORT_USERNAME,
-        PASSWORDS_DO_NOT_MATCH,
-        USERNAME_TAKEN,
-        REGISTRATION_COMPLETED,
-        ERROR
-    }
-
-    /**
-     * List of error messages during updating a profile
-     * 
-     * @author Kim
-     * 
-     */
-    public static enum ProfileMsg {
-        TOO_SHORT_PASSWORD,
-        PASSWORDS_DO_NOT_MATCH,
-        PASSWORD_CHANGED,
-        WRONG_PASSWORD,
-        ERROR
-    }
 
     /**
      * Get the user object with the given primary key
@@ -72,24 +48,34 @@ public class UserUtil implements Serializable {
      *            Desired password
      * @param verifyPassword
      *            Verification of the desired password
-     * @return A RegistrationMsg defining the final state of the process
+     * @return The created user instance
+     * @throws TooShortPasswordException
+     *             Thrown if the given password is too short
+     * @throws TooShortUsernameException
+     *             Thrown i the given username is too short
+     * @throws PasswordsDoNotMatchException
+     *             Thrown i the password verification fails
+     * @throws UsernameExistsException
+     *             Thrown i the username already exists
      */
-    public static RegistrationMsg registerUser(String username,
-            String password, String verifyPassword) {
+    public static User registerUser(String username, String password,
+            String verifyPassword) throws TooShortPasswordException,
+            TooShortUsernameException, PasswordsDoNotMatchException,
+            UsernameExistsException {
         // Make sure that the username and password fulfill the minimum size
         // requirements.
         if (username == null || username.length() < minUsernameLength) {
-            return RegistrationMsg.TOO_SHORT_USERNAME;
+            throw new TooShortUsernameException();
         } else if (password == null || password.length() < minPasswordLength) {
-            return RegistrationMsg.TOO_SHORT_PASSWORD;
+            throw new TooShortPasswordException();
         }
         // Make sure that the password is verified correctly
         else if (!password.equals(verifyPassword)) {
-            return RegistrationMsg.PASSWORDS_DO_NOT_MATCH;
+            throw new PasswordsDoNotMatchException();
         }
         // Make sure the username is available
         else if (!checkUsernameAvailability(username)) {
-            return RegistrationMsg.USERNAME_TAKEN;
+            throw new UsernameExistsException();
         }
 
         // Everything is ok, create the user
@@ -99,7 +85,7 @@ public class UserUtil implements Serializable {
 
         FacadeFactory.getFacade().store(user);
 
-        return RegistrationMsg.REGISTRATION_COMPLETED;
+        return user;
     }
 
     /**
@@ -131,29 +117,34 @@ public class UserUtil implements Serializable {
      *            Desired new password
      * @param verifiedNewPassword
      *            New password verification
-     * @return ProfileMsg defining the final state of the process
+     * @throws InvalidCredentialsException
+     *             Thrown if the current password is incorrect
+     * @throws TooShortPasswordException
+     *             Thrown if the new password is too short
+     * @throws PasswordsDoNotMatchException
+     *             Thrown if the password verification fails
      */
-    public static ProfileMsg changePassword(User user, String currentPassword,
-            String newPassword, String verifiedNewPassword) {
+    public static void changePassword(User user, String currentPassword,
+            String newPassword, String verifiedNewPassword)
+            throws InvalidCredentialsException, TooShortPasswordException,
+            PasswordsDoNotMatchException {
 
         // Verify that the current password is correct
         if (!PasswordUtil.verifyPassword(user, currentPassword)) {
-            return ProfileMsg.WRONG_PASSWORD;
+            throw new InvalidCredentialsException();
         }
 
         // Check the new password's constraints
         if (newPassword == null || newPassword.length() < minPasswordLength) {
-            return ProfileMsg.TOO_SHORT_PASSWORD;
+            throw new TooShortPasswordException();
         } else if (!newPassword.equals(verifiedNewPassword)) {
-            return ProfileMsg.PASSWORDS_DO_NOT_MATCH;
+            throw new PasswordsDoNotMatchException();
         }
 
         // Password is ok, hash it and change it
         user.setPassword(PasswordUtil.generateHashedPassword(newPassword));
         // Store the user
         FacadeFactory.getFacade().store(user);
-
-        return ProfileMsg.PASSWORD_CHANGED;
     }
 
     /**

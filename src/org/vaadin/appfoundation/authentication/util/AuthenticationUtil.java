@@ -3,9 +3,9 @@ package org.vaadin.appfoundation.authentication.util;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.vaadin.appfoundation.authentication.AuthenticationMessage;
 import org.vaadin.appfoundation.authentication.SessionHandler;
 import org.vaadin.appfoundation.authentication.data.User;
+import org.vaadin.appfoundation.authentication.exceptions.InvalidCredentialsException;
 import org.vaadin.appfoundation.persistence.facade.FacadeFactory;
 
 /**
@@ -18,30 +18,21 @@ import org.vaadin.appfoundation.persistence.facade.FacadeFactory;
 public class AuthenticationUtil {
 
     /**
-     * Authentication messages which are returned by the authenticate() method.
-     * 
-     * @author Kim
-     * 
-     */
-    public enum AFAuthenticationMessage implements AuthenticationMessage{
-        INVALID_CREDENTIALS,
-        AUTH_SUCCESSFUL,
-        DATABASE_ERROR
-    }
-
-    /**
      * Try to log in a user with the given user credentials
      * 
      * @param username
      *            Username of the user
      * @param password
      *            Password of the user
-     * @return Returns an integer representing the authentication message
+     * @return The authenticated user object
+     * @throws InvalidCredentialsException
+     *             Thrown if the crendentials are incorrect
      */
-    public static AuthenticationMessage authenticate(String username, String password) {
+    public static User authenticate(String username, String password)
+            throws InvalidCredentialsException {
         // Login fails if either the username or password is null
         if (username == null || password == null) {
-            return AFAuthenticationMessage.INVALID_CREDENTIALS;
+            throw new InvalidCredentialsException();
         }
 
         // Create a query which searches the database for a user with the given
@@ -59,11 +50,11 @@ public class AuthenticationUtil {
                 // current user (inlogged)
                 SessionHandler.setUser(user);
 
-                return AFAuthenticationMessage.AUTH_SUCCESSFUL;
+                return user;
             }
         }
         // Either the username didn't exist or the passwords did not match
-        return AFAuthenticationMessage.INVALID_CREDENTIALS;
+        throw new InvalidCredentialsException();
     }
 
 }

@@ -5,11 +5,10 @@ import static org.junit.Assert.assertEquals;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.vaadin.appfoundation.authentication.AuthenticationMessage;
 import org.vaadin.appfoundation.authentication.data.User;
+import org.vaadin.appfoundation.authentication.exceptions.InvalidCredentialsException;
 import org.vaadin.appfoundation.authentication.util.AuthenticationUtil;
 import org.vaadin.appfoundation.authentication.util.PasswordUtil;
-import org.vaadin.appfoundation.authentication.util.AuthenticationUtil.AFAuthenticationMessage;
 import org.vaadin.appfoundation.persistence.facade.FacadeFactory;
 
 public class AuthenticationUtilTest {
@@ -24,49 +23,44 @@ public class AuthenticationUtilTest {
         FacadeFactory.clear();
     }
 
-    @Test
-    public void authenticateNoUsername() {
-        AuthenticationMessage msg = AuthenticationUtil
-                .authenticate(null, "foo");
-        assertEquals(AFAuthenticationMessage.INVALID_CREDENTIALS, msg);
+    @Test(expected = InvalidCredentialsException.class)
+    public void authenticateNoUsername() throws InvalidCredentialsException {
+        AuthenticationUtil.authenticate(null, "foo");
     }
 
-    @Test
-    public void authenticateNoPassword() {
-        AuthenticationMessage msg = AuthenticationUtil
-                .authenticate("foo", null);
-        assertEquals(AFAuthenticationMessage.INVALID_CREDENTIALS, msg);
+    @Test(expected = InvalidCredentialsException.class)
+    public void authenticateNoPassword() throws InvalidCredentialsException {
+        AuthenticationUtil.authenticate("foo", null);
     }
 
-    @Test
-    public void authenticationUserNotFound() {
-        AuthenticationMessage msg = AuthenticationUtil.authenticate("foo",
-                "foo");
-        assertEquals(AFAuthenticationMessage.INVALID_CREDENTIALS, msg);
+    @Test(expected = InvalidCredentialsException.class)
+    public void authenticationUserNotFound() throws InvalidCredentialsException {
+        AuthenticationUtil.authenticate("foo", "foo");
     }
 
-    @Test
-    public void authenticationInvalidPassword() {
+    @Test(expected = InvalidCredentialsException.class)
+    public void authenticationInvalidPassword()
+            throws InvalidCredentialsException {
         User user = new User();
         user.setUsername("test");
         user.setPassword("test");
         FacadeFactory.getFacade().store(user);
 
-        AuthenticationMessage msg = AuthenticationUtil.authenticate("test",
-                "foo");
-        assertEquals(AFAuthenticationMessage.INVALID_CREDENTIALS, msg);
+        AuthenticationUtil.authenticate("test", "foo");
     }
 
     @Test
-    public void authenticate() {
+    public void authenticate() throws InvalidCredentialsException {
         User user = new User();
         user.setUsername("test");
         user.setPassword(PasswordUtil.generateHashedPassword("foobar"));
 
         FacadeFactory.getFacade().store(user);
-        AuthenticationMessage msg = AuthenticationUtil.authenticate("test",
+        User authenticatedUser = AuthenticationUtil.authenticate("test",
                 "foobar");
-        assertEquals(AFAuthenticationMessage.AUTH_SUCCESSFUL, msg);
+        assertEquals(user.getUsername(), authenticatedUser.getUsername());
+        assertEquals(user.getPassword(), authenticatedUser.getPassword());
+        assertEquals(user.getId(), authenticatedUser.getId());
     }
 
 }
