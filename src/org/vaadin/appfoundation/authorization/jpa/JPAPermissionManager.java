@@ -4,7 +4,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.vaadin.appfoundation.authorization.AbstractPermissionManager;
 import org.vaadin.appfoundation.authorization.PermissionManager;
+import org.vaadin.appfoundation.authorization.PermissionResultType;
 import org.vaadin.appfoundation.authorization.Resource;
 import org.vaadin.appfoundation.authorization.Role;
 import org.vaadin.appfoundation.persistence.facade.FacadeFactory;
@@ -17,7 +19,7 @@ import org.vaadin.appfoundation.persistence.facade.FacadeFactory;
  * @author Kim
  * 
  */
-public class JPAPermissionManager implements PermissionManager {
+public class JPAPermissionManager extends AbstractPermissionManager {
 
     /**
      * {@inheritDoc}
@@ -94,38 +96,6 @@ public class JPAPermissionManager implements PermissionManager {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public boolean hasAccess(Role role, String action, Resource resource) {
-        checkRoleAndResourceNotNull(role, resource);
-
-        Map<PermissionType, PermissionEntity> permissions = getPermissions(
-                role, action, resource);
-
-        if (permissions.containsKey(PermissionType.ALLOW)) {
-            return true;
-        }
-
-        if (permissions.containsKey(PermissionType.DENY)) {
-            return false;
-        }
-
-        if (permissions.containsKey(PermissionType.ALLOW_ALL)) {
-            return true;
-        }
-
-        if (permissions.containsKey(PermissionType.DENY_ALL)) {
-            return false;
-        }
-
-        if (hasResourceActionAllowPermissions(resource, action)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
      * Checks if the given resource-action combination has any allow or allow
      * all permissions set for any role
      * 
@@ -148,24 +118,6 @@ public class JPAPermissionManager implements PermissionManager {
                 whereClause, parameters);
 
         return count > 0 ? true : false;
-    }
-
-    /**
-     * Checks that neither role or resource is null.
-     * 
-     * @param role
-     * @param resource
-     * @throws IllegalArgumentException
-     *             Thrown if either role or resource is null
-     */
-    private void checkRoleAndResourceNotNull(Role role, Resource resource) {
-        if (role == null) {
-            throw new IllegalArgumentException("Role may not be null");
-        }
-
-        if (resource == null) {
-            throw new IllegalArgumentException("Role may not be null");
-        }
     }
 
     /**
@@ -223,5 +175,36 @@ public class JPAPermissionManager implements PermissionManager {
         }
 
         return map;
+    }
+
+    @Override
+    protected PermissionResultType getPermissionResultType(Role role,
+            String action, Resource resource) {
+        checkRoleAndResourceNotNull(role, resource);
+
+        Map<PermissionType, PermissionEntity> permissions = getPermissions(
+                role, action, resource);
+
+        if (permissions.containsKey(PermissionType.ALLOW)) {
+            return PermissionResultType.ALLOW_EXPLICITLY;
+        }
+
+        if (permissions.containsKey(PermissionType.DENY)) {
+            return PermissionResultType.DENY_EXPLICITLY;
+        }
+
+        if (permissions.containsKey(PermissionType.ALLOW_ALL)) {
+            return PermissionResultType.ALLOW_EXPLICITLY;
+        }
+
+        if (permissions.containsKey(PermissionType.DENY_ALL)) {
+            return PermissionResultType.DENY_EXPLICITLY;
+        }
+
+        if (hasResourceActionAllowPermissions(resource, action)) {
+            return PermissionResultType.DENY_IMPLICITLY;
+        }
+
+        return PermissionResultType.ALLOW_IMPLICITLY;
     }
 }

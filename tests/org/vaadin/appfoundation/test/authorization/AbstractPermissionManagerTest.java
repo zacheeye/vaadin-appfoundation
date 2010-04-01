@@ -67,7 +67,7 @@ public abstract class AbstractPermissionManagerTest {
     @Test(expected = IllegalArgumentException.class)
     public void hasAccessNullRole() {
         PermissionManager pm = getPermissionHandler();
-        pm.hasAccess(null, "test", createResource());
+        pm.hasAccess((Role) null, "test", createResource());
     }
 
     @Test(expected = IllegalArgumentException.class)

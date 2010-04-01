@@ -1,6 +1,8 @@
 package org.vaadin.appfoundation.authorization.memory;
 
+import org.vaadin.appfoundation.authorization.AbstractPermissionManager;
 import org.vaadin.appfoundation.authorization.PermissionManager;
+import org.vaadin.appfoundation.authorization.PermissionResultType;
 import org.vaadin.appfoundation.authorization.Resource;
 import org.vaadin.appfoundation.authorization.Role;
 
@@ -11,7 +13,7 @@ import org.vaadin.appfoundation.authorization.Role;
  * @author Kim
  * 
  */
-public class MemoryPermissionManager implements PermissionManager {
+public class MemoryPermissionManager extends AbstractPermissionManager {
 
     /**
      * Contains the "allowed" permissions for those permission where an explicit
@@ -48,7 +50,7 @@ public class MemoryPermissionManager implements PermissionManager {
      * {@inheritDoc}
      */
     public void allow(Role role, String action, Resource resource) {
-        checkArguments(role, resource);
+        checkRoleAndResourceNotNull(role, resource);
 
         if (denied.contains(role, action, resource)) {
             denied.remove(role, action, resource);
@@ -61,7 +63,7 @@ public class MemoryPermissionManager implements PermissionManager {
      * {@inheritDoc}
      */
     public void allowAll(Role role, Resource resource) {
-        checkArguments(role, resource);
+        checkRoleAndResourceNotNull(role, resource);
 
         denied.removeAll(role, resource);
         globalDenied.removeAll(role, resource);
@@ -72,7 +74,7 @@ public class MemoryPermissionManager implements PermissionManager {
      * {@inheritDoc}
      */
     public void deny(Role role, String action, Resource resource) {
-        checkArguments(role, resource);
+        checkRoleAndResourceNotNull(role, resource);
 
         if (allowed.contains(role, action, resource)) {
             allowed.remove(role, action, resource);
@@ -85,59 +87,40 @@ public class MemoryPermissionManager implements PermissionManager {
      * {@inheritDoc}
      */
     public void denyAll(Role role, Resource resource) {
-        checkArguments(role, resource);
+        checkRoleAndResourceNotNull(role, resource);
 
         allowed.removeAll(role, resource);
         globalAllowed.removeAll(role, resource);
         globalDenied.put(role, "all", resource);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public boolean hasAccess(Role role, String action, Resource resource) {
-        checkArguments(role, resource);
+    @Override
+    protected PermissionResultType getPermissionResultType(Role role,
+            String action, Resource resource) {
+        checkRoleAndResourceNotNull(role, resource);
 
         if (allowed.contains(role, action, resource)) {
-            return true;
+            return PermissionResultType.ALLOW_EXPLICITLY;
         }
 
         if (denied.contains(role, action, resource)) {
-            return false;
+            return PermissionResultType.DENY_EXPLICITLY;
         }
 
         if (globalAllowed.contains(role, "all", resource)) {
-            return true;
+            return PermissionResultType.ALLOW_EXPLICITLY;
         }
 
         if (globalDenied.contains(role, "all", resource)) {
-            return false;
+            return PermissionResultType.DENY_EXPLICITLY;
         }
 
         if (globalAllowed.hasPermissions(resource, "all")
                 || allowed.hasPermissions(resource, action)) {
-            return false;
+            return PermissionResultType.DENY_IMPLICITLY;
         }
 
-        return true;
-    }
-
-    /**
-     * Checks that both the role and the resource is set.
-     * 
-     * @param role
-     * @param resource
-     * @throws IllegalArgumentException
-     *             Thrown if either role or resource is null
-     */
-    private void checkArguments(Role role, Resource resource) {
-        if (role == null) {
-            throw new IllegalArgumentException("Role may not be null");
-        }
-
-        if (resource == null) {
-            throw new IllegalArgumentException("Role may not be null");
-        }
+        return PermissionResultType.ALLOW_IMPLICITLY;
     }
 
 }

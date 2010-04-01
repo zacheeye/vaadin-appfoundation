@@ -1,5 +1,7 @@
 package org.vaadin.appfoundation.authorization;
 
+import java.util.Set;
+
 /**
  * This interface defines a set of methods for permission managers, which are
  * used by the application foundation's authorization module. Each
@@ -116,5 +118,24 @@ public interface PermissionManager {
      *             If either role or resource is null
      */
     public boolean hasAccess(Role role, String action, Resource resource);
+
+    /**
+     * Checks if the given roles has the permission to perform the given action
+     * for the given resource. If no restrictions have been set for the
+     * action-resource pair, then access is granted.
+     * 
+     * @param roles
+     *            A set of roles for which we want to check the permissions
+     * @param action
+     *            The identifier for the action for which we want to check the
+     *            permissions. This value should be null if we want to check
+     *            default permissions.
+     * @param resource
+     *            The resource for which the permission is being requested
+     * @return True if role has access to the given action in the given resource
+     * @throws IllegalArgumentException
+     *             If either role or resource is null
+     */
+    public boolean hasAccess(Set<Role> roles, String action, Resource resource);
 
 }
