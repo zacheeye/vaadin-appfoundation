@@ -3,6 +3,7 @@ package org.vaadin.appfoundation.test.authentication;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Properties;
 import java.util.UUID;
@@ -11,10 +12,13 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.vaadin.appfoundation.authentication.data.User;
+import org.vaadin.appfoundation.authentication.exceptions.InvalidCredentialsException;
+import org.vaadin.appfoundation.authentication.exceptions.PasswordsDoNotMatchException;
+import org.vaadin.appfoundation.authentication.exceptions.TooShortPasswordException;
+import org.vaadin.appfoundation.authentication.exceptions.TooShortUsernameException;
+import org.vaadin.appfoundation.authentication.exceptions.UsernameExistsException;
 import org.vaadin.appfoundation.authentication.util.PasswordUtil;
 import org.vaadin.appfoundation.authentication.util.UserUtil;
-import org.vaadin.appfoundation.authentication.util.UserUtil.ProfileMsg;
-import org.vaadin.appfoundation.authentication.util.UserUtil.RegistrationMsg;
 import org.vaadin.appfoundation.persistence.facade.FacadeFactory;
 
 public class UserUtilTest {
@@ -115,50 +119,57 @@ public class UserUtilTest {
         assertNotNull(user.getId());
     }
 
-    @Test
-    public void registerUserNullUsername() {
-        assertEquals(RegistrationMsg.TOO_SHORT_USERNAME, UserUtil.registerUser(
-                null, "test1", "test1"));
+    @Test(expected = TooShortUsernameException.class)
+    public void registerUserNullUsername() throws TooShortPasswordException,
+            TooShortUsernameException, PasswordsDoNotMatchException,
+            UsernameExistsException {
+        UserUtil.registerUser(null, "test1", "test1");
     }
 
-    @Test
-    public void registerUserShortUsername() {
-        assertEquals(RegistrationMsg.TOO_SHORT_USERNAME, UserUtil.registerUser(
-                "a", "test1", "test1"));
+    @Test(expected = TooShortUsernameException.class)
+    public void registerUserShortUsername() throws TooShortPasswordException,
+            TooShortUsernameException, PasswordsDoNotMatchException,
+            UsernameExistsException {
+        UserUtil.registerUser("a", "test1", "test1");
     }
 
-    @Test
-    public void registerUserNullPassword() {
-        assertEquals(RegistrationMsg.TOO_SHORT_PASSWORD, UserUtil.registerUser(
-                "test", null, null));
+    @Test(expected = TooShortPasswordException.class)
+    public void registerUserNullPassword() throws TooShortPasswordException,
+            TooShortUsernameException, PasswordsDoNotMatchException,
+            UsernameExistsException {
+        UserUtil.registerUser("test", null, null);
     }
 
-    @Test
-    public void registerUserShortPassword() {
-        assertEquals(RegistrationMsg.TOO_SHORT_PASSWORD, UserUtil.registerUser(
-                "test", "a", "a"));
+    @Test(expected = TooShortPasswordException.class)
+    public void registerUserShortPassword() throws TooShortPasswordException,
+            TooShortUsernameException, PasswordsDoNotMatchException,
+            UsernameExistsException {
+        UserUtil.registerUser("test", "a", "a");
     }
 
-    @Test
-    public void registerUserIncompatiblePassword() {
-        assertEquals(RegistrationMsg.PASSWORDS_DO_NOT_MATCH, UserUtil
-                .registerUser("test", "test1", "test2"));
+    @Test(expected = PasswordsDoNotMatchException.class)
+    public void registerUserIncompatiblePassword()
+            throws TooShortPasswordException, TooShortUsernameException,
+            PasswordsDoNotMatchException, UsernameExistsException {
+        UserUtil.registerUser("test", "test1", "test2");
     }
 
-    @Test
-    public void registerUserUsernameTaken() {
+    @Test(expected = UsernameExistsException.class)
+    public void registerUserUsernameTaken() throws TooShortPasswordException,
+            TooShortUsernameException, PasswordsDoNotMatchException,
+            UsernameExistsException {
         User user = new User();
         user.setUsername("test");
         FacadeFactory.getFacade().store(user);
 
-        assertEquals(RegistrationMsg.USERNAME_TAKEN, UserUtil.registerUser(
-                "test", "test1", "test1"));
+        UserUtil.registerUser("test", "test1", "test1");
     }
 
     @Test
-    public void registerUser() {
-        assertEquals(RegistrationMsg.REGISTRATION_COMPLETED, UserUtil
-                .registerUser("test", "test1", "test1"));
+    public void registerUser() throws TooShortPasswordException,
+            TooShortUsernameException, PasswordsDoNotMatchException,
+            UsernameExistsException {
+        assertTrue(UserUtil.registerUser("test", "test1", "test1") instanceof User);
     }
 
     @Test
@@ -171,59 +182,60 @@ public class UserUtilTest {
         assertEquals(user.getUsername(), user2.getUsername());
     }
 
-    @Test
-    public void changePasswordIncorrectOld() {
+    @Test(expected = InvalidCredentialsException.class)
+    public void changePasswordIncorrectOld()
+            throws InvalidCredentialsException, TooShortPasswordException,
+            PasswordsDoNotMatchException {
         User user = new User();
         user.setUsername("test");
         // Hashed value of "foobar"+"test" (the salt value)
         user.setPassword("61e38e2b77827e10777ee8f1a138b7cfb1eb895");
 
-        assertEquals(ProfileMsg.WRONG_PASSWORD, UserUtil.changePassword(user,
-                "test", null, null));
+        UserUtil.changePassword(user, "test", null, null);
+    }
+
+    @Test(expected = TooShortPasswordException.class)
+    public void changePasswordTooShortNew() throws InvalidCredentialsException,
+            TooShortPasswordException, PasswordsDoNotMatchException {
+        User user = new User();
+        user.setUsername("test");
+        // Hashed value of "foobar"+"test" (the salt value)
+        user.setPassword("61e38e2b77827e10777ee8f1a138b7cfb1eb895");
+
+        UserUtil.changePassword(user, "foobar", "a", "a");
+    }
+
+    @Test(expected = TooShortPasswordException.class)
+    public void changePasswordNullNew() throws InvalidCredentialsException,
+            TooShortPasswordException, PasswordsDoNotMatchException {
+        User user = new User();
+        user.setUsername("test");
+        // Hashed value of "foobar"+"test" (the salt value)
+        user.setPassword("61e38e2b77827e10777ee8f1a138b7cfb1eb895");
+
+        UserUtil.changePassword(user, "foobar", null, null);
+    }
+
+    @Test(expected = PasswordsDoNotMatchException.class)
+    public void changePasswordNotMatch() throws InvalidCredentialsException,
+            TooShortPasswordException, PasswordsDoNotMatchException {
+        User user = new User();
+        user.setUsername("test");
+        // Hashed value of "foobar"+"test" (the salt value)
+        user.setPassword("61e38e2b77827e10777ee8f1a138b7cfb1eb895");
+
+        UserUtil.changePassword(user, "foobar", "test1", "test2");
     }
 
     @Test
-    public void changePasswordTooShortNew() {
+    public void changePassword() throws InvalidCredentialsException,
+            TooShortPasswordException, PasswordsDoNotMatchException {
         User user = new User();
         user.setUsername("test");
         // Hashed value of "foobar"+"test" (the salt value)
         user.setPassword("61e38e2b77827e10777ee8f1a138b7cfb1eb895");
 
-        assertEquals(ProfileMsg.TOO_SHORT_PASSWORD, UserUtil.changePassword(
-                user, "foobar", "a", "a"));
-    }
-
-    @Test
-    public void changePasswordNullNew() {
-        User user = new User();
-        user.setUsername("test");
-        // Hashed value of "foobar"+"test" (the salt value)
-        user.setPassword("61e38e2b77827e10777ee8f1a138b7cfb1eb895");
-
-        assertEquals(ProfileMsg.TOO_SHORT_PASSWORD, UserUtil.changePassword(
-                user, "foobar", null, null));
-    }
-
-    @Test
-    public void changePasswordNotMatch() {
-        User user = new User();
-        user.setUsername("test");
-        // Hashed value of "foobar"+"test" (the salt value)
-        user.setPassword("61e38e2b77827e10777ee8f1a138b7cfb1eb895");
-
-        assertEquals(ProfileMsg.PASSWORDS_DO_NOT_MATCH, UserUtil
-                .changePassword(user, "foobar", "test1", "test2"));
-    }
-
-    @Test
-    public void changePassword() {
-        User user = new User();
-        user.setUsername("test");
-        // Hashed value of "foobar"+"test" (the salt value)
-        user.setPassword("61e38e2b77827e10777ee8f1a138b7cfb1eb895");
-
-        assertEquals(ProfileMsg.PASSWORD_CHANGED, UserUtil.changePassword(user,
-                "foobar", "testing", "testing"));
+        UserUtil.changePassword(user, "foobar", "testing", "testing");
 
         // Make sure the new hashed password is correct.
         // Hashed value of "testing"+"test" (the salt value)
