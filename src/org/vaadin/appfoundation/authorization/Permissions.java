@@ -199,4 +199,18 @@ public class Permissions implements TransactionListener {
             Resource resource) {
         return instance.get().pm.hasAccess(roles, action, resource);
     }
+
+    /**
+     * Initializes the {@link PermissionManager} for the given
+     * {@link Application}
+     * 
+     * @param application
+     */
+    public static void initialize(Application application,
+            PermissionManager manager) {
+        Permissions p = new Permissions(application, manager);
+        application.getContext().addTransactionListener(p);
+
+    }
+
 }

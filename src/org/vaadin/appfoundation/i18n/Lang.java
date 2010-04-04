@@ -85,4 +85,15 @@ public class Lang implements TransactionListener {
             instance.set(this);
         }
     }
+
+    /**
+     * Initializes the {@link Lang} for the given {@link Application}
+     * 
+     * @param application
+     */
+    public static void initialize(Application application) {
+        Lang handler = new Lang(application);
+        application.getContext().addTransactionListener(handler);
+    }
+
 }

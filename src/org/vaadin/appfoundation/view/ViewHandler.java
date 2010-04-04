@@ -390,4 +390,15 @@ public class ViewHandler implements TransactionListener,
             }
         }
     }
+
+    /**
+     * Initializes the {@link ViewHandler} for the given {@link Application}
+     * 
+     * @param application
+     */
+    public static void initialize(Application application) {
+        ViewHandler handler = new ViewHandler(application);
+        application.getContext().addTransactionListener(handler);
+    }
+
 }
