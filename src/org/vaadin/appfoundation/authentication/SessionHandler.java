@@ -84,4 +84,14 @@ public class SessionHandler implements TransactionListener {
         setUser(null);
     }
 
+    /**
+     * Initializes the {@link SessionHandler} for the given {@link Application}
+     * 
+     * @param application
+     */
+    public static void initialize(Application application) {
+        SessionHandler handler = new SessionHandler(application);
+        application.getContext().addTransactionListener(handler);
+    }
+
 }
