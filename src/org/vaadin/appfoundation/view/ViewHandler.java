@@ -397,6 +397,9 @@ public class ViewHandler implements TransactionListener,
      * @param application
      */
     public static void initialize(Application application) {
+        if (application == null) {
+            throw new IllegalArgumentException("Application may not be null");
+        }
         ViewHandler handler = new ViewHandler(application);
         application.getContext().addTransactionListener(handler);
     }

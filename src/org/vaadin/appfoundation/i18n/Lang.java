@@ -92,6 +92,9 @@ public class Lang implements TransactionListener {
      * @param application
      */
     public static void initialize(Application application) {
+        if (application == null) {
+            throw new IllegalArgumentException("Application may not be null");
+        }
         Lang handler = new Lang(application);
         application.getContext().addTransactionListener(handler);
     }

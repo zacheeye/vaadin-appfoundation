@@ -208,6 +208,14 @@ public class Permissions implements TransactionListener {
      */
     public static void initialize(Application application,
             PermissionManager manager) {
+        if (application == null) {
+            throw new IllegalArgumentException("Application may not be null");
+        }
+
+        if (manager == null) {
+            throw new IllegalArgumentException("PermissionManager must be set");
+        }
+
         Permissions p = new Permissions(application, manager);
         application.getContext().addTransactionListener(p);
 
