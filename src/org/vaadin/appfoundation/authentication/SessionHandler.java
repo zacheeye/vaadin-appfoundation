@@ -90,6 +90,9 @@ public class SessionHandler implements TransactionListener {
      * @param application
      */
     public static void initialize(Application application) {
+        if (application == null) {
+            throw new IllegalArgumentException("Application may not be null");
+        }
         SessionHandler handler = new SessionHandler(application);
         application.getContext().addTransactionListener(handler);
     }
