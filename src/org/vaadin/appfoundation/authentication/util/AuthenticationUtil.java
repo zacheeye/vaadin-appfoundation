@@ -35,26 +35,63 @@ public class AuthenticationUtil {
             throw new InvalidCredentialsException();
         }
 
+        User user = getUserForUsername(username);
+
+        if (user == null) {
+            // Invalid suername
+            throw new InvalidCredentialsException();
+        }
+
+        if (!PasswordUtil.verifyPassword(user, password)) {
+            // Invalid password
+            incrementFailedLoginAttempts(user);
+            throw new InvalidCredentialsException();
+        }
+        // The user's password was correct, so set the user as the
+        // current user (inlogged)
+        SessionHandler.setUser(user);
+        clearFailedLoginAttempts(user);
+
+        return user;
+    }
+
+    /**
+     * Fetches the User object from the database for the given username
+     * 
+     * @param username
+     * @return User object for username
+     */
+    private static User getUserForUsername(String username) {
         // Create a query which searches the database for a user with the given
         // username
         String query = "SELECT u FROM User u WHERE u.username = :username";
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("username", username);
-        User user = (User) FacadeFactory.getFacade().find(query, parameters);
+        return (User) FacadeFactory.getFacade().find(query, parameters);
+    }
 
-        // Check if the user exists
-        if (user != null) {
-            // Check if the user's password is correct
-            if (PasswordUtil.verifyPassword(user, password)) {
-                // The user's password was correct, so set the user as the
-                // current user (inlogged)
-                SessionHandler.setUser(user);
-
-                return user;
-            }
+    /**
+     * Clear the number of failed login attempts if the user has any failed
+     * attempts.
+     * 
+     * @param user
+     *            The user whose failed login attempt record should be cleared
+     */
+    private static void clearFailedLoginAttempts(User user) {
+        if (user.getFailedLoginAttempts() > 0) {
+            user.clearFailedLoginAttempts();
+            FacadeFactory.getFacade().store(user);
         }
-        // Either the username didn't exist or the passwords did not match
-        throw new InvalidCredentialsException();
+    }
+
+    /**
+     * Increment the user's number of failed login attempts by one
+     * 
+     * @param user
+     */
+    public static void incrementFailedLoginAttempts(User user) {
+        user.incrementFailedLoginAttempts();
+        FacadeFactory.getFacade().store(user);
     }
 
 }

@@ -2,6 +2,9 @@ package org.vaadin.appfoundation.test.authentication;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -61,6 +64,42 @@ public class AuthenticationUtilTest {
         assertEquals(user.getUsername(), authenticatedUser.getUsername());
         assertEquals(user.getPassword(), authenticatedUser.getPassword());
         assertEquals(user.getId(), authenticatedUser.getId());
+    }
+
+    @Test
+    public void incrementFailedLoginAttempts() {
+        User user = new User();
+        user.setUsername("test");
+        user.setPassword(PasswordUtil.generateHashedPassword("foobar"));
+        assertEquals(0, user.getFailedLoginAttempts());
+
+        FacadeFactory.getFacade().store(user);
+        try {
+            AuthenticationUtil.authenticate("test", "test");
+        } catch (InvalidCredentialsException e) {
+            // This is expected
+        }
+
+        user = FacadeFactory.getFacade().find(User.class, user.getId());
+        assertEquals(1, user.getFailedLoginAttempts());
+    }
+
+    @Test
+    public void clearFailedLoginAttempts() throws InvalidCredentialsException {
+        User user = new User();
+        user.setUsername("test");
+        user.setPassword(PasswordUtil.generateHashedPassword("foobar"));
+        assertEquals(0, user.getFailedLoginAttempts());
+
+        FacadeFactory.getFacade().store(user);
+        try {
+            AuthenticationUtil.authenticate("test", "test");
+        } catch (InvalidCredentialsException e) {
+            // This is expected
+        }
+        AuthenticationUtil.authenticate("test", "foobar");
+        user = FacadeFactory.getFacade().find(User.class, user.getId());
+        assertEquals(0, user.getFailedLoginAttempts());
     }
 
 }
