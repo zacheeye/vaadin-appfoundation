@@ -25,6 +25,12 @@ public class User extends AbstractPojo {
 
     private String email;
 
+    private int failedLoginAttempts = 0;
+
+    private boolean accountLocked = false;
+
+    private String reasonForLockedAccount;
+
     public User() {
 
     }
@@ -103,6 +109,68 @@ public class User extends AbstractPojo {
      */
     public String getEmail() {
         return email;
+    }
+
+    /**
+     * Increments the amount of failed login attempts by one
+     */
+    public void incrementFailedLoginAttempts() {
+        failedLoginAttempts++;
+    }
+
+    /**
+     * Define if the account should be locked
+     * 
+     * @param accountLocked
+     *            true if account should be locked, false if account should be
+     *            activated
+     */
+    public void setAccountLocked(boolean accountLocked) {
+        this.accountLocked = accountLocked;
+    }
+
+    /**
+     * Is the current user account locked
+     * 
+     * @return true if account is locked, otherwise false
+     */
+    public boolean isAccountLocked() {
+        return accountLocked;
+    }
+
+    /**
+     * Resets the number of failed login attempts back to zero
+     */
+    public void clearFailedLoginAttempts() {
+        failedLoginAttempts = 0;
+    }
+
+    /**
+     * Get the number of failed login attempts
+     * 
+     * @return The number of failed login attempts
+     */
+    public int getFailedLoginAttempts() {
+        return failedLoginAttempts;
+    }
+
+    /**
+     * Sets the reason why the account has been locked
+     * 
+     * @param reasonForLockedAccount
+     *            Reason for account being locked
+     */
+    public void setReasonForLockedAccount(String reasonForLockedAccount) {
+        this.reasonForLockedAccount = reasonForLockedAccount;
+    }
+
+    /**
+     * Get the reason why the account has been locked
+     * 
+     * @return Reason for account being locked
+     */
+    public String getReasonForLockedAccount() {
+        return reasonForLockedAccount;
     }
 
 }
