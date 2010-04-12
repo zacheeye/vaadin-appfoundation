@@ -104,6 +104,11 @@ public class ViewHandlerTest {
             public void activate(AbstractView<?> view) {
                 value.setValue(view);
             }
+
+            public void deactivate(AbstractView<?> view) {
+                // TODO Auto-generated method stub
+
+            }
         };
 
         ViewItem item = ViewHandler.addView(MockView.class, container);
@@ -179,6 +184,12 @@ public class ViewHandlerTest {
             public void activated(Object... params) {
                 viewActivated.setValue(true);
             }
+
+            @Override
+            public void deactivated(Object... params) {
+                // TODO Auto-generated method stub
+
+            }
         };
 
         ViewItem item = ViewHandler.addView("test");
@@ -191,6 +202,11 @@ public class ViewHandlerTest {
         ViewContainer container = new ViewContainer() {
             public void activate(AbstractView<?> view) {
                 parentCalled.setValue(true);
+            }
+
+            public void deactivate(AbstractView<?> view) {
+                // TODO Auto-generated method stub
+
             }
         };
 
@@ -214,12 +230,23 @@ public class ViewHandlerTest {
             public void activated(Object... params) {
                 parameters.setValue(params);
             }
+
+            @Override
+            public void deactivated(Object... params) {
+                // TODO Auto-generated method stub
+
+            }
         };
 
         ViewItem item = ViewHandler.addView("test");
         item.setView(view);
         ViewContainer container = new ViewContainer() {
             public void activate(AbstractView<?> view) {
+            }
+
+            public void deactivate(AbstractView<?> view) {
+                // TODO Auto-generated method stub
+
             }
         };
 
@@ -243,6 +270,12 @@ public class ViewHandlerTest {
             @Override
             public void activated(Object... params) {
                 viewActivated.setValue(true);
+            }
+
+            @Override
+            public void deactivated(Object... params) {
+                // TODO Auto-generated method stub
+
             }
         };
 
@@ -276,6 +309,28 @@ public class ViewHandlerTest {
                 }
 
             }
+
+            public void postActivation(DispatchEvent event) {
+                // TODO Auto-generated method stub
+
+            }
+
+            public void postDeactivation(DispatchEvent event) {
+                // TODO Auto-generated method stub
+
+            }
+
+            public void preActivation(DispatchEvent event)
+                    throws DispatchException {
+                // TODO Auto-generated method stub
+
+            }
+
+            public void preDeactivation(DispatchEvent event)
+                    throws DispatchException {
+                // TODO Auto-generated method stub
+
+            }
         };
 
         DispatchEventListener listener2 = new DispatchEventListener() {
@@ -296,6 +351,28 @@ public class ViewHandlerTest {
                     postCalls.setValue(((Integer) postCalls.getValue()) + 1);
                 }
             }
+
+            public void postActivation(DispatchEvent event) {
+                // TODO Auto-generated method stub
+
+            }
+
+            public void postDeactivation(DispatchEvent event) {
+                // TODO Auto-generated method stub
+
+            }
+
+            public void preActivation(DispatchEvent event)
+                    throws DispatchException {
+                // TODO Auto-generated method stub
+
+            }
+
+            public void preDeactivation(DispatchEvent event)
+                    throws DispatchException {
+                // TODO Auto-generated method stub
+
+            }
         };
 
         ViewHandler.addListener(listener);
@@ -306,6 +383,11 @@ public class ViewHandlerTest {
         ViewContainer container = new ViewContainer() {
             public void activate(AbstractView<?> view) {
                 parentCalled.setValue(true);
+            }
+
+            public void deactivate(AbstractView<?> view) {
+                // TODO Auto-generated method stub
+
             }
         };
         ViewHandler.setParent("test", container);
@@ -333,6 +415,28 @@ public class ViewHandlerTest {
             }
 
             public void postDispatch(DispatchEvent event) {
+            }
+
+            public void postActivation(DispatchEvent event) {
+                // TODO Auto-generated method stub
+
+            }
+
+            public void postDeactivation(DispatchEvent event) {
+                // TODO Auto-generated method stub
+
+            }
+
+            public void preActivation(DispatchEvent event)
+                    throws DispatchException {
+                // TODO Auto-generated method stub
+
+            }
+
+            public void preDeactivation(DispatchEvent event)
+                    throws DispatchException {
+                // TODO Auto-generated method stub
+
             }
         };
 
@@ -372,6 +476,28 @@ public class ViewHandlerTest {
                 }
 
             }
+
+            public void postActivation(DispatchEvent event) {
+                // TODO Auto-generated method stub
+
+            }
+
+            public void postDeactivation(DispatchEvent event) {
+                // TODO Auto-generated method stub
+
+            }
+
+            public void preActivation(DispatchEvent event)
+                    throws DispatchException {
+                // TODO Auto-generated method stub
+
+            }
+
+            public void preDeactivation(DispatchEvent event)
+                    throws DispatchException {
+                // TODO Auto-generated method stub
+
+            }
         };
 
         DispatchEventListener listener2 = new DispatchEventListener() {
@@ -391,6 +517,28 @@ public class ViewHandlerTest {
                     postCall = true;
                     postCalls.setValue(((Integer) postCalls.getValue()) + 1);
                 }
+            }
+
+            public void postActivation(DispatchEvent event) {
+                // TODO Auto-generated method stub
+
+            }
+
+            public void postDeactivation(DispatchEvent event) {
+                // TODO Auto-generated method stub
+
+            }
+
+            public void preActivation(DispatchEvent event)
+                    throws DispatchException {
+                // TODO Auto-generated method stub
+
+            }
+
+            public void preDeactivation(DispatchEvent event)
+                    throws DispatchException {
+                // TODO Auto-generated method stub
+
             }
         };
 
@@ -444,6 +592,12 @@ public class ViewHandlerTest {
             @Override
             public void activated(Object... params) {
                 viewActivated.setValue(true);
+            }
+
+            @Override
+            public void deactivated(Object... params) {
+                // TODO Auto-generated method stub
+
             }
         };
 

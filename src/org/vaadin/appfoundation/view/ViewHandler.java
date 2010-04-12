@@ -214,10 +214,10 @@ public class ViewHandler implements TransactionListener,
      *            The view's viewId
      * @param changeUriFramgent
      *            Should the uri fragment be changed if the view has one set
-     * 
      * @param params
      *            Parameters used for activating the view
      */
+    @SuppressWarnings("deprecation")
     public static void activateView(Object viewId, boolean changeUriFramgent,
             Object... params) {
         if (viewId != null && instance.get().viewMap.containsKey(viewId)
@@ -231,6 +231,7 @@ public class ViewHandler implements TransactionListener,
             // Loop through all the dispatch event listeners
             try {
                 for (DispatchEventListener listener : instance.get().listeners) {
+                    listener.preActivation(event);
                     listener.preDispatch(event);
                 }
             } catch (DispatchException e) {
@@ -252,7 +253,50 @@ public class ViewHandler implements TransactionListener,
 
             // View has been dispatched, send event
             for (DispatchEventListener listener : instance.get().listeners) {
+                listener.postActivation(event);
                 listener.postDispatch(event);
+            }
+        }
+    }
+
+    /**
+     * Deactivate the view with the given viewId. You can specify any given
+     * amount of parameters for the deactivation request. Each parameter is
+     * forwarded to the View's deactivated() method.
+     * 
+     * @param viewId
+     *            The view's viewId
+     * @param params
+     *            Parameters used for activating the view
+     */
+    public static void deactiveView(Object viewId, Object... params) {
+        if (viewId != null && instance.get().viewMap.containsKey(viewId)
+                && instance.get().parentMap.containsKey(viewId)) {
+            // Get the ViewItem and parent for this viewId
+            ViewItem item = instance.get().viewMap.get(viewId);
+            ViewContainer parent = instance.get().parentMap.get(viewId);
+
+            // Create the dispatch event object
+            DispatchEvent event = new DispatchEvent(item, params);
+            // Loop through all the dispatch event listeners
+            try {
+                for (DispatchEventListener listener : instance.get().listeners) {
+                    listener.preDeactivation(event);
+                }
+            } catch (DispatchException e) {
+                // The dispatch was canceled, stop the execution of this method.
+                return;
+            }
+
+            // Tell the parent to activate the given view
+            parent.deactivate(item.getView());
+
+            // Tell the view that it has been activated
+            item.getView().deactivated(params);
+
+            // View has been dispatched, send event
+            for (DispatchEventListener listener : instance.get().listeners) {
+                listener.postDeactivation(event);
             }
         }
     }

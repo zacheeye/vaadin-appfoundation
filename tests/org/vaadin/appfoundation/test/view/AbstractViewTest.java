@@ -54,6 +54,12 @@ public class AbstractViewTest {
             setContent(layout);
         }
 
+        @Override
+        public void deactivated(Object... params) {
+            // TODO Auto-generated method stub
+
+        }
+
     }
 
 }

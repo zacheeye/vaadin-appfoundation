@@ -20,4 +20,9 @@ public class MockViewContainer implements ViewContainer {
         return previouslyActivatedView;
     }
 
+    public void deactivate(AbstractView<?> view) {
+        // TODO Auto-generated method stub
+
+    }
+
 }

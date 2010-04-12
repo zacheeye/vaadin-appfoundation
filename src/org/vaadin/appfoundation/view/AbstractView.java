@@ -29,6 +29,12 @@ public abstract class AbstractView<A extends ComponentContainer> extends
     public abstract void activated(Object... params);
 
     /**
+     * This method is called when the view is deactivated via the
+     * {@link ViewHandler}.
+     */
+    public abstract void deactivated(Object... params);
+
+    /**
      * Set a new content container. Default value is the object provided as
      * parameter to the constructor.
      * 
