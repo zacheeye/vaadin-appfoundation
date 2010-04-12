@@ -23,4 +23,10 @@ public class MockView extends AbstractView<VerticalLayout> {
         return params;
     }
 
+    @Override
+    public void deactivated(Object... params) {
+        // TODO Auto-generated method stub
+
+    }
+
 }

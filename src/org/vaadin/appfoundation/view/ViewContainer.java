@@ -15,4 +15,11 @@ public interface ViewContainer {
      */
     public void activate(AbstractView<?> view);
 
+    /**
+     * Deactivates the given view.
+     * 
+     * @param view
+     */
+    public void deactivate(AbstractView<?> view);
+
 }

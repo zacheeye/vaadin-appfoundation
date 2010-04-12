@@ -42,6 +42,12 @@ public class DefaultViewFactoryTest {
             // TODO Auto-generated method stub
 
         }
+
+        @Override
+        public void deactivated(Object... params) {
+            // TODO Auto-generated method stub
+
+        }
     }
 
     public static class MockView2 extends AbstractView<VerticalLayout> {
@@ -53,6 +59,12 @@ public class DefaultViewFactoryTest {
 
         @Override
         public void activated(Object... params) {
+            // TODO Auto-generated method stub
+
+        }
+
+        @Override
+        public void deactivated(Object... params) {
             // TODO Auto-generated method stub
 
         }
