@@ -10,6 +10,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.vaadin.appfoundation.test.MockApplication;
+import org.vaadin.appfoundation.test.MockApplication.MockContext;
 import org.vaadin.appfoundation.view.AbstractView;
 import org.vaadin.appfoundation.view.DefaultViewFactory;
 import org.vaadin.appfoundation.view.DispatchEvent;
@@ -687,5 +688,21 @@ public class ViewHandlerTest {
         public Object getValue() {
             return value;
         }
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void initializeWithNullApplication() {
+        ViewHandler.initialize(null);
+
+    }
+
+    @Test
+    public void initialize() {
+        MockContext context = (MockContext) application.getContext();
+        assertEquals(0, context.getListeners().size());
+        ViewHandler.initialize(application);
+        assertEquals(1, context.getListeners().size());
+        assertEquals(ViewHandler.class, context.getListeners().get(0)
+                .getClass());
     }
 }

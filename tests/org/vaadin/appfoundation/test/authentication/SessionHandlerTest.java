@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.vaadin.appfoundation.authentication.SessionHandler;
 import org.vaadin.appfoundation.authentication.data.User;
 import org.vaadin.appfoundation.test.MockApplication;
+import org.vaadin.appfoundation.test.MockApplication.MockContext;
 
 public class SessionHandlerTest {
 
@@ -45,5 +46,21 @@ public class SessionHandlerTest {
         SessionHandler.setUser(user);
         SessionHandler.logout();
         assertNull(SessionHandler.get());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void initializeWithNullApplication() {
+        SessionHandler.initialize(null);
+
+    }
+
+    @Test
+    public void initialize() {
+        MockContext context = (MockContext) application.getContext();
+        assertEquals(0, context.getListeners().size());
+        SessionHandler.initialize(application);
+        assertEquals(1, context.getListeners().size());
+        assertEquals(SessionHandler.class, context.getListeners().get(0)
+                .getClass());
     }
 }

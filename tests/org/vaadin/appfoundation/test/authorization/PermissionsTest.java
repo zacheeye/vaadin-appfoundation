@@ -1,5 +1,6 @@
 package org.vaadin.appfoundation.test.authorization;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -10,7 +11,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.vaadin.appfoundation.authorization.Permissions;
 import org.vaadin.appfoundation.authorization.Role;
+import org.vaadin.appfoundation.authorization.memory.MemoryPermissionManager;
 import org.vaadin.appfoundation.test.MockApplication;
+import org.vaadin.appfoundation.test.MockApplication.MockContext;
 
 public class PermissionsTest {
 
@@ -82,6 +85,28 @@ public class PermissionsTest {
         assertFalse(manager.wasInvoked("hasAccessSet"));
         Permissions.hasAccess((Set<Role>) null, null, null);
         assertTrue(manager.wasInvoked("hasAccessSet"));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void initializeWithNullApplication() {
+        Permissions.initialize(null, new MemoryPermissionManager());
+
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void initializeWithNullManager() {
+        Permissions.initialize(application, null);
+
+    }
+
+    @Test
+    public void initialize() {
+        MockContext context = (MockContext) application.getContext();
+        assertEquals(0, context.getListeners().size());
+        Permissions.initialize(application, new MemoryPermissionManager());
+        assertEquals(1, context.getListeners().size());
+        assertEquals(Permissions.class, context.getListeners().get(0)
+                .getClass());
     }
 
 }

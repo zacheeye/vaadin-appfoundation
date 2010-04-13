@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.vaadin.appfoundation.i18n.InternationalizationServlet;
 import org.vaadin.appfoundation.i18n.Lang;
 import org.vaadin.appfoundation.test.MockApplication;
+import org.vaadin.appfoundation.test.MockApplication.MockContext;
 
 public class LangTest {
 
@@ -52,5 +53,20 @@ public class LangTest {
         InternationalizationServlet.loadTranslations(all);
         Lang.setLocale(Locale.ENGLISH);
         assertEquals("Foo bar bar bar", Lang.getMessage("TEST", "bar", "bar"));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void initializeWithNullApplication() {
+        Lang.initialize(null);
+
+    }
+
+    @Test
+    public void initialize() {
+        MockContext context = (MockContext) application.getContext();
+        assertEquals(0, context.getListeners().size());
+        Lang.initialize(application);
+        assertEquals(1, context.getListeners().size());
+        assertEquals(Lang.class, context.getListeners().get(0).getClass());
     }
 }
