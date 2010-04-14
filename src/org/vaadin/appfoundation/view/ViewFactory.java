@@ -1,5 +1,7 @@
 package org.vaadin.appfoundation.view;
 
+import java.io.Serializable;
+
 /**
  * Interface for view factories. A view factory's responsibility is to
  * initialize the view object instance for the given view id.
@@ -7,7 +9,7 @@ package org.vaadin.appfoundation.view;
  * @author Kim
  * 
  */
-public interface ViewFactory {
+public interface ViewFactory extends Serializable {
 
     /**
      * Initializes the view object for the given view id.

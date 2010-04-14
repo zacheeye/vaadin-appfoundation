@@ -15,6 +15,8 @@ import org.vaadin.appfoundation.authorization.Role;
  */
 public class MemoryPermissionManager extends AbstractPermissionManager {
 
+    private static final long serialVersionUID = 4925563808162478919L;
+
     /**
      * Contains the "allowed" permissions for those permission where an explicit
      * action has been defined.

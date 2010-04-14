@@ -6,6 +6,7 @@ import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -116,9 +117,9 @@ public class JPAFacade implements IFacade, Serializable {
             Query query = em.createQuery(queryStr);
             // Check if we have some parameters defined
             if (parameters != null) {
-                for (String key : parameters.keySet()) {
+                for (Entry<String, Object> entry : parameters.entrySet()) {
                     // Inject the parameter to the query
-                    query.setParameter(key, parameters.get(key));
+                    query.setParameter(entry.getKey(), entry.getValue());
                 }
             }
             // Execute query and return results
@@ -142,9 +143,9 @@ public class JPAFacade implements IFacade, Serializable {
             Query query = em.createQuery(queryStr);
             // Check if we have some parameters defined
             if (parameters != null) {
-                for (String key : parameters.keySet()) {
+                for (Entry<String, Object> entry : parameters.entrySet()) {
                     // Inject the parameter to the query
-                    query.setParameter(key, parameters.get(key));
+                    query.setParameter(entry.getKey(), entry.getValue());
                 }
             }
 
@@ -412,9 +413,9 @@ public class JPAFacade implements IFacade, Serializable {
             Query query = em.createQuery(queryStr);
             // Check if we have some parameters defined
             if (parameters != null) {
-                for (String key : parameters.keySet()) {
+                for (Entry<String, Object> entry : parameters.entrySet()) {
                     // Inject the parameter to the query
-                    query.setParameter(key, parameters.get(key));
+                    query.setParameter(entry.getKey(), entry.getValue());
                 }
             }
 

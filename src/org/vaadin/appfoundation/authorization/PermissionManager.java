@@ -1,5 +1,6 @@
 package org.vaadin.appfoundation.authorization;
 
+import java.io.Serializable;
 import java.util.Set;
 
 /**
@@ -11,7 +12,7 @@ import java.util.Set;
  * @author Kim
  * 
  */
-public interface PermissionManager {
+public interface PermissionManager extends Serializable {
 
     /**
      * Grants the given role the permission to perform the given action for the

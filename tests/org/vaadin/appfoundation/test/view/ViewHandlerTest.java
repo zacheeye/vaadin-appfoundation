@@ -670,7 +670,7 @@ public class ViewHandlerTest {
         ViewHandler.removeUri("");
     }
 
-    private class ValueContainer {
+    private static class ValueContainer {
 
         private Object value;
 

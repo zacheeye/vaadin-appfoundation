@@ -11,9 +11,9 @@ public class AbstractPojoTest {
         MockPojo pojo = new MockPojo();
         pojo.setId(1L);
 
-        assertEquals(new Long(1), pojo.getId());
+        assertEquals(Long.valueOf(1L), pojo.getId());
         pojo.setId(2L);
-        assertEquals(new Long(2), pojo.getId());
+        assertEquals(Long.valueOf(2L), pojo.getId());
     }
 
     @Test
@@ -21,8 +21,8 @@ public class AbstractPojoTest {
         MockPojo pojo = new MockPojo();
         pojo.setConsistencyVersion(1L);
 
-        assertEquals(new Long(1), pojo.getConsistencyVersion());
+        assertEquals(Long.valueOf(1L), pojo.getConsistencyVersion());
         pojo.setConsistencyVersion(2L);
-        assertEquals(new Long(2), pojo.getConsistencyVersion());
+        assertEquals(Long.valueOf(2L), pojo.getConsistencyVersion());
     }
 }
