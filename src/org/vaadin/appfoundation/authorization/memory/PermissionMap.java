@@ -1,5 +1,6 @@
 package org.vaadin.appfoundation.authorization.memory;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -9,8 +10,9 @@ import java.util.Map;
 import org.vaadin.appfoundation.authorization.Resource;
 import org.vaadin.appfoundation.authorization.Role;
 
-public class PermissionMap {
+public class PermissionMap implements Serializable {
 
+    private static final long serialVersionUID = 923392126142283039L;
     private final Map<String, Map<String, List<String>>> permissions;
 
     public PermissionMap() {

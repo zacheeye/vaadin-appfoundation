@@ -13,6 +13,8 @@ import java.util.Set;
  */
 public abstract class AbstractPermissionManager implements PermissionManager {
 
+    private static final long serialVersionUID = 8059417567360426160L;
+
     /**
      * Checks that neither role or resource is null.
      * 

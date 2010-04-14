@@ -3,7 +3,6 @@ package org.vaadin.appfoundation.test.authentication;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 import java.util.Properties;
 import java.util.UUID;
@@ -169,7 +168,9 @@ public class UserUtilTest {
     public void registerUser() throws TooShortPasswordException,
             TooShortUsernameException, PasswordsDoNotMatchException,
             UsernameExistsException {
-        assertTrue(UserUtil.registerUser("test", "test1", "test1") instanceof User);
+        User user = UserUtil.registerUser("test", "test1", "test1");
+        assertNotNull(user.getId());
+        assertEquals("test", user.getUsername());
     }
 
     @Test

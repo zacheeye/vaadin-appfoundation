@@ -38,10 +38,10 @@ public class JPAFacadeTest {
         assertNull(pojo.getId());
         facade.store(pojo);
         assertNotNull(pojo.getId());
-        assertEquals(new Long(1), pojo.getConsistencyVersion());
+        assertEquals(Long.valueOf(1L), pojo.getConsistencyVersion());
         pojo.setFoo("foobar");
         facade.store(pojo);
-        assertEquals(new Long(2), pojo.getConsistencyVersion());
+        assertEquals(Long.valueOf(2L), pojo.getConsistencyVersion());
         assertEquals("foobar", facade.find(MockPojo.class, pojo.getId())
                 .getFoo());
     }
@@ -94,7 +94,7 @@ public class JPAFacadeTest {
             facade.store(pojo);
         }
 
-        assertEquals(new Long(7), facade.count(MockPojo.class));
+        assertEquals(Long.valueOf(7L), facade.count(MockPojo.class));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -194,9 +194,9 @@ public class JPAFacadeTest {
             facade.store(pojo);
         }
 
-        assertEquals(new Long(7), facade.count(MockPojo.class));
+        assertEquals(Long.valueOf(7L), facade.count(MockPojo.class));
         facade.delete(new MockPojo());
-        assertEquals(new Long(7), facade.count(MockPojo.class));
+        assertEquals(Long.valueOf(7L), facade.count(MockPojo.class));
     }
 
     @Test
@@ -243,8 +243,8 @@ public class JPAFacadeTest {
         String whereClause = "p.foo = :foo";
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("foo", "foo");
-        assertEquals(new Long(4), facade.count(MockPojo.class, whereClause,
-                parameters));
+        assertEquals(Long.valueOf(4L), facade.count(MockPojo.class,
+                whereClause, parameters));
     }
 
     @Test(expected = IllegalArgumentException.class)

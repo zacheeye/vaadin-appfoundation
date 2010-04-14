@@ -1,6 +1,7 @@
 package org.vaadin.appfoundation.test.i18n;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -27,30 +28,29 @@ public class FillXmlTest {
     private File file = null;
 
     @Before
-    public void setUp() {
+    public void setUp() throws IOException {
         // Clear the servlet's memory
         InternationalizationServlet.clear();
 
         // create a random file
         file = new File(UUID.randomUUID().toString());
-        try {
-            file.createNewFile();
-
-            String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>"
-                    + "<tmx version=\"1.4\"><body></body></tmx>";
-            FileOutputStream fileoutstream = new FileOutputStream(file);
-            Writer writer = new OutputStreamWriter(fileoutstream, "UTF-8");
-            writer.write(xml);
-            writer.close();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        if (!file.createNewFile()) {
+            fail("Unable to create file");
         }
+
+        String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>"
+                + "<tmx version=\"1.4\"><body></body></tmx>";
+        FileOutputStream fileoutstream = new FileOutputStream(file);
+        Writer writer = new OutputStreamWriter(fileoutstream, "UTF-8");
+        writer.write(xml);
+        writer.close();
     }
 
     @After
     public void tearDown() {
-        file.delete();
+        if (!file.delete()) {
+            fail("Unable to delete file");
+        }
     }
 
     @Test
