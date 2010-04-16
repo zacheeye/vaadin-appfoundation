@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.vaadin.appfoundation.authentication.SessionHandler;
 import org.vaadin.appfoundation.authentication.data.User;
+import org.vaadin.appfoundation.authentication.exceptions.AccountLockedException;
 import org.vaadin.appfoundation.authentication.exceptions.InvalidCredentialsException;
 import org.vaadin.appfoundation.persistence.facade.FacadeFactory;
 
@@ -29,7 +30,7 @@ public class AuthenticationUtil {
      *             Thrown if the crendentials are incorrect
      */
     public static User authenticate(String username, String password)
-            throws InvalidCredentialsException {
+            throws InvalidCredentialsException, AccountLockedException {
         // Login fails if either the username or password is null
         if (username == null || password == null) {
             throw new InvalidCredentialsException();
@@ -40,6 +41,10 @@ public class AuthenticationUtil {
         if (user == null) {
             // Invalid suername
             throw new InvalidCredentialsException();
+        }
+
+        if (user.isAccountLocked()) {
+            throw new AccountLockedException();
         }
 
         if (!PasswordUtil.verifyPassword(user, password)) {
@@ -89,9 +94,36 @@ public class AuthenticationUtil {
      * 
      * @param user
      */
-    public static void incrementFailedLoginAttempts(User user) {
+    private static void incrementFailedLoginAttempts(User user)
+            throws AccountLockedException {
         user.incrementFailedLoginAttempts();
-        FacadeFactory.getFacade().store(user);
+        try {
+            if (user.getFailedLoginAttempts() >= numberOfAllowedFailedLoginAttempts()) {
+                user.setAccountLocked(true);
+                throw new AccountLockedException();
+            }
+        } finally {
+            FacadeFactory.getFacade().store(user);
+        }
+    }
+
+    private static int numberOfAllowedFailedLoginAttempts() {
+        String maxAttemptsStr = System
+                .getProperty("authentication.maxFailedLoginAttempts");
+        int maxAttempts = 5;
+        if (maxAttemptsStr == null) {
+            System.setProperty("authentication.maxFailedLoginAttempts", "5");
+            return maxAttempts;
+        }
+
+        try {
+            maxAttempts = Integer.valueOf(maxAttemptsStr);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException(
+                    "authentication.maxFailedLoginAttempts must be an integer");
+        }
+
+        return maxAttempts;
     }
 
 }
