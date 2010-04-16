@@ -28,8 +28,19 @@ public class PasswordUtil implements Serializable {
     protected static String getSalt() {
         // Check if the salt has been set. If not, then create a default salt
         // value.
+        String systemSalt = System.getProperty("authentication.password.salt");
+        if (salt != null && salt != systemSalt) {
+            throw new UnsupportedOperationException(
+                    "Password salt is already set");
+        }
+
+        if (salt == null && systemSalt != null) {
+            salt = systemSalt;
+        }
+
         if (salt == null) {
             salt = ")%gersK43q5)=%3qiyt34389py43pqhgwer8l9";
+            System.setProperty("authentication.password.salt", salt);
         }
 
         return salt;
@@ -40,7 +51,10 @@ public class PasswordUtil implements Serializable {
      * password.salt -property.
      * 
      * @param properties
+     * @deprecated Use System.setProperties instead
+     * 
      */
+    @Deprecated
     public static void setProperties(Properties properties) {
         // Make sure we don't get null values
         if (properties == null) {
@@ -57,6 +71,7 @@ public class PasswordUtil implements Serializable {
         // exception should be thrown
         if (salt == null) {
             salt = properties.getProperty("password.salt");
+            System.setProperty("authentication.password.salt", salt);
         } else {
             throw new UnsupportedOperationException(
                     "Password salt is already set");

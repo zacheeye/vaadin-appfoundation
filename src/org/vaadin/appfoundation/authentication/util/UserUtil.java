@@ -23,12 +23,6 @@ public class UserUtil implements Serializable {
 
     private static final long serialVersionUID = 6394812141386916155L;
 
-    // Define the minimum length for a username
-    private static int minUsernameLength = 4;
-
-    // Define the minimum length for a password
-    private static int minPasswordLength = 8;
-
     /**
      * Get the user object with the given primary key
      * 
@@ -64,9 +58,10 @@ public class UserUtil implements Serializable {
             UsernameExistsException {
         // Make sure that the username and password fulfill the minimum size
         // requirements.
-        if (username == null || username.length() < minUsernameLength) {
+        if (username == null || username.length() < getMinUsernameLength()) {
             throw new TooShortUsernameException();
-        } else if (password == null || password.length() < minPasswordLength) {
+        } else if (password == null
+                || password.length() < getMinPasswordLength()) {
             throw new TooShortPasswordException();
         }
         // Make sure that the password is verified correctly
@@ -135,7 +130,8 @@ public class UserUtil implements Serializable {
         }
 
         // Check the new password's constraints
-        if (newPassword == null || newPassword.length() < minPasswordLength) {
+        if (newPassword == null
+                || newPassword.length() < getMinPasswordLength()) {
             throw new TooShortPasswordException();
         } else if (!newPassword.equals(verifiedNewPassword)) {
             throw new PasswordsDoNotMatchException();
@@ -163,7 +159,9 @@ public class UserUtil implements Serializable {
      * 
      * @param properties
      *            Configuration properties
+     * @deprecated Use System.setProperties() instead
      */
+    @Deprecated
     public static void setProperties(Properties properties) {
         // Make sure properties is not null
         if (properties == null) {
@@ -188,31 +186,26 @@ public class UserUtil implements Serializable {
         String minPasswordLengthString = properties
                 .getProperty("password.length.min");
 
-        // Temporarily store the new lengths in these variables. We want to
-        // change both values in one "transaction", meaning either both values
-        // are change or neither are.
-        int newUsernameLength = 0;
-        int newPasswordLength = 0;
-
         // Make sure the values are integers
         try {
-            newUsernameLength = Integer.valueOf(minUsernameLengthString);
+            Integer.valueOf(minUsernameLengthString);
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException(
                     "username.length.min must be an integer");
         }
 
         try {
-            newPasswordLength = Integer.valueOf(minPasswordLengthString);
+            Integer.valueOf(minPasswordLengthString);
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException(
                     "password.length.min must be an integer");
         }
 
         // Everything is ok, now we can define the new values
-        minUsernameLength = newUsernameLength;
-        minPasswordLength = newPasswordLength;
-
+        System.setProperty("authentication.username.validation.length",
+                minUsernameLengthString);
+        System.setProperty("authentication.password.validation.length",
+                minPasswordLengthString);
     }
 
     /**
@@ -221,7 +214,24 @@ public class UserUtil implements Serializable {
      * @return Minimum username length
      */
     public static int getMinUsernameLength() {
-        return minUsernameLength;
+        String minLenghtStr = System
+                .getProperty("authentication.username.validation.length");
+        int minLenght = 4;
+        if (minLenghtStr == null) {
+            System
+                    .setProperty("authentication.username.validation.length",
+                            "4");
+            return minLenght;
+        }
+
+        try {
+            minLenght = Integer.valueOf(minLenghtStr);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException(
+                    "authentication.username.validation.length must be an integer");
+        }
+
+        return minLenght;
     }
 
     /**
@@ -230,7 +240,24 @@ public class UserUtil implements Serializable {
      * @return Minimum password length
      */
     public static int getMinPasswordLength() {
-        return minPasswordLength;
+        String minLenghtStr = System
+                .getProperty("authentication.password.validation.length");
+        int minLenght = 8;
+        if (minLenghtStr == null) {
+            System
+                    .setProperty("authentication.password.validation.length",
+                            "8");
+            return minLenght;
+        }
+
+        try {
+            minLenght = Integer.valueOf(minLenghtStr);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException(
+                    "authentication.password.validation.length must be an integer");
+        }
+
+        return minLenght;
     }
 
 }

@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import java.lang.reflect.Field;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -24,21 +25,22 @@ public class UserUtilTest {
 
     @Before
     public void setUp() throws InstantiationException, IllegalAccessException {
-        try {
-            Properties properties = new Properties();
-            properties.setProperty("password.salt", "test");
-            PasswordUtil.setProperties(properties);
-        } catch (UnsupportedOperationException e) {
-            // The properties for the PasswordUtil has already been set. Ignore
-            // this.
-        }
+        Properties properties = new Properties();
+        properties.setProperty("password.salt", "test");
+        PasswordUtil.setProperties(properties);
 
         FacadeFactory.registerFacade("default", true);
     }
 
     @After
-    public void tearDown() {
+    public void tearDown() throws SecurityException, NoSuchFieldException,
+            IllegalArgumentException, IllegalAccessException {
         FacadeFactory.clear();
+        Field field = PasswordUtil.class.getDeclaredField("salt");
+        field.setAccessible(true);
+        field.set(null, null);
+
+        System.clearProperty("authentication.password.salt");
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -242,6 +244,38 @@ public class UserUtilTest {
         // Hashed value of "testing"+"test" (the salt value)
         assertEquals("6b399df23c6b76d667f5e043d2dd13407a2245bb", user
                 .getPassword());
+    }
+
+    @Test
+    public void getMinPasswordLengthNullSetting() {
+        System.clearProperty("authentication.password.validation.length");
+        assertNull(System
+                .getProperty("authentication.password.validation.length"));
+        assertEquals(8, UserUtil.getMinPasswordLength());
+        assertEquals("8", System
+                .getProperty("authentication.password.validation.length"));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void getMinPasswordLengthInvalidSetting() {
+        System.setProperty("authentication.password.validation.length", "test");
+        UserUtil.getMinPasswordLength();
+    }
+
+    @Test
+    public void getMinUsernameLengthNullSetting() {
+        System.clearProperty("authentication.username.validation.length");
+        assertNull(System
+                .getProperty("authentication.username.validation.length"));
+        assertEquals(4, UserUtil.getMinUsernameLength());
+        assertEquals("4", System
+                .getProperty("authentication.username.validation.length"));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void getMinUsernameLengthInvalidSetting() {
+        System.setProperty("authentication.username.validation.length", "test");
+        UserUtil.getMinUsernameLength();
     }
 
 }
