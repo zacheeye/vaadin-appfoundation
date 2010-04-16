@@ -197,6 +197,8 @@ public class UserUtil implements Serializable {
             throw new InvalidCredentialsException();
         }
 
+        user.clearFailedPasswordChangeAttempts();
+
         // Check the new password's constraints
         verifyPasswordLength(newPassword);
         checkPasswordVerification(newPassword, verifiedNewPassword);
@@ -204,7 +206,6 @@ public class UserUtil implements Serializable {
         // Password is ok, hash it and change it
         user.setPassword(PasswordUtil.generateHashedPassword(newPassword));
         // Store the user
-        user.clearFailedPasswordChangeAttempts();
 
         FacadeFactory.getFacade().store(user);
     }

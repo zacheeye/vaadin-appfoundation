@@ -372,8 +372,8 @@ public class UserUtilTest {
 
     @Test
     public void clearingOfFailedPwdAttempts() throws TooShortPasswordException,
-            TooShortUsernameException, PasswordsDoNotMatchException,
-            UsernameExistsException, InvalidCredentialsException {
+            TooShortUsernameException, UsernameExistsException,
+            InvalidCredentialsException, PasswordsDoNotMatchException {
         User user = UserUtil.registerUser("user", "foobar123", "foobar123");
 
         try {
@@ -384,7 +384,12 @@ public class UserUtilTest {
 
         assertEquals(1, user.getFailedPasswordChangeAttemps());
 
-        UserUtil.changePassword(user, "foobar123", "testing123", "testing123");
+        try {
+            UserUtil.changePassword(user, "foobar123", "testing1234",
+                    "testing123");
+        } catch (PasswordsDoNotMatchException e) {
+            // Expected
+        }
         assertEquals(0, user.getFailedPasswordChangeAttemps());
     }
 
