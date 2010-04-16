@@ -1,6 +1,7 @@
 package org.vaadin.appfoundation.test.authentication;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Field;
 
@@ -8,6 +9,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.vaadin.appfoundation.authentication.data.User;
+import org.vaadin.appfoundation.authentication.exceptions.AccountLockedException;
 import org.vaadin.appfoundation.authentication.exceptions.InvalidCredentialsException;
 import org.vaadin.appfoundation.authentication.util.AuthenticationUtil;
 import org.vaadin.appfoundation.authentication.util.PasswordUtil;
@@ -33,23 +35,26 @@ public class AuthenticationUtilTest {
     }
 
     @Test(expected = InvalidCredentialsException.class)
-    public void authenticateNoUsername() throws InvalidCredentialsException {
+    public void authenticateNoUsername() throws InvalidCredentialsException,
+            AccountLockedException {
         AuthenticationUtil.authenticate(null, "foo");
     }
 
     @Test(expected = InvalidCredentialsException.class)
-    public void authenticateNoPassword() throws InvalidCredentialsException {
+    public void authenticateNoPassword() throws InvalidCredentialsException,
+            AccountLockedException {
         AuthenticationUtil.authenticate("foo", null);
     }
 
     @Test(expected = InvalidCredentialsException.class)
-    public void authenticationUserNotFound() throws InvalidCredentialsException {
+    public void authenticationUserNotFound()
+            throws InvalidCredentialsException, AccountLockedException {
         AuthenticationUtil.authenticate("foo", "foo");
     }
 
     @Test(expected = InvalidCredentialsException.class)
     public void authenticationInvalidPassword()
-            throws InvalidCredentialsException {
+            throws InvalidCredentialsException, AccountLockedException {
         User user = new User();
         user.setUsername("test");
         user.setPassword("test");
@@ -59,7 +64,8 @@ public class AuthenticationUtilTest {
     }
 
     @Test
-    public void authenticate() throws InvalidCredentialsException {
+    public void authenticate() throws InvalidCredentialsException,
+            AccountLockedException {
         User user = new User();
         user.setUsername("test");
         user.setPassword(PasswordUtil.generateHashedPassword("foobar"));
@@ -73,7 +79,7 @@ public class AuthenticationUtilTest {
     }
 
     @Test
-    public void incrementFailedLoginAttempts() {
+    public void incrementFailedLoginAttempts() throws AccountLockedException {
         User user = new User();
         user.setUsername("test");
         user.setPassword(PasswordUtil.generateHashedPassword("foobar"));
@@ -91,7 +97,8 @@ public class AuthenticationUtilTest {
     }
 
     @Test
-    public void clearFailedLoginAttempts() throws InvalidCredentialsException {
+    public void clearFailedLoginAttempts() throws InvalidCredentialsException,
+            AccountLockedException {
         User user = new User();
         user.setUsername("test");
         user.setPassword(PasswordUtil.generateHashedPassword("foobar"));
@@ -106,6 +113,52 @@ public class AuthenticationUtilTest {
         AuthenticationUtil.authenticate("test", "foobar");
         user = FacadeFactory.getFacade().find(User.class, user.getId());
         assertEquals(0, user.getFailedLoginAttempts());
+    }
+
+    @Test(expected = AccountLockedException.class)
+    public void lockAccountAfterFailedAttempts() throws AccountLockedException {
+        System.setProperty("authentication.maxFailedLoginAttempts", "3");
+
+        User user = new User();
+        user.setUsername("test");
+        user.setPassword(PasswordUtil.generateHashedPassword("foobar"));
+
+        FacadeFactory.getFacade().store(user);
+        for (int i = 0; i < 3; i++) {
+            if (i == 2) {
+                assertTrue(true);
+            }
+            try {
+                AuthenticationUtil.authenticate("test", "test");
+            } catch (InvalidCredentialsException e) {
+                // This is expected
+            }
+        }
+    }
+
+    @Test(expected = AccountLockedException.class)
+    public void exceptionWhenAccountIsLocked() throws AccountLockedException,
+            InvalidCredentialsException {
+        User user = new User();
+        user.setUsername("test");
+        user.setAccountLocked(true);
+        user.setPassword(PasswordUtil.generateHashedPassword("foobar"));
+
+        FacadeFactory.getFacade().store(user);
+        AuthenticationUtil.authenticate("test", "foobar");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void invalidNumberOfFailedAttempts() throws AccountLockedException,
+            InvalidCredentialsException {
+        System.setProperty("authentication.maxFailedLoginAttempts", "test");
+
+        User user = new User();
+        user.setUsername("test");
+        user.setPassword(PasswordUtil.generateHashedPassword("foobar"));
+
+        FacadeFactory.getFacade().store(user);
+        AuthenticationUtil.authenticate("test", "test");
     }
 
 }
