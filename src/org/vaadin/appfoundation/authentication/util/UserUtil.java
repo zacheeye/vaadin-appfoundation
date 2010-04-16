@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import org.vaadin.appfoundation.authentication.SessionHandler;
 import org.vaadin.appfoundation.authentication.data.User;
 import org.vaadin.appfoundation.authentication.exceptions.InvalidCredentialsException;
 import org.vaadin.appfoundation.authentication.exceptions.PasswordsDoNotMatchException;
@@ -192,6 +193,7 @@ public class UserUtil implements Serializable {
 
         // Verify that the current password is correct
         if (!PasswordUtil.verifyPassword(user, currentPassword)) {
+            incrementFailedPasswordChangeAttempts(user);
             throw new InvalidCredentialsException();
         }
 
@@ -202,7 +204,23 @@ public class UserUtil implements Serializable {
         // Password is ok, hash it and change it
         user.setPassword(PasswordUtil.generateHashedPassword(newPassword));
         // Store the user
+        user.clearFailedPasswordChangeAttempts();
+
         FacadeFactory.getFacade().store(user);
+    }
+
+    /**
+     * Increments the number of failed login attempts by one and if maximum is
+     * reached, logs out the user.
+     * 
+     * @param user
+     */
+    private static void incrementFailedPasswordChangeAttempts(User user) {
+        user.incrementFailedPasswordChangeAttempts();
+
+        if (user.getFailedPasswordChangeAttemps() > numberOfAllowedFailedPasswordChangeAttempts()) {
+            SessionHandler.logout();
+        }
     }
 
     /**
@@ -320,6 +338,31 @@ public class UserUtil implements Serializable {
         }
 
         return minLenght;
+    }
+
+    /**
+     * Returns the maximum number of consecutive failed login attempts.
+     * 
+     * @return
+     */
+    private static int numberOfAllowedFailedPasswordChangeAttempts() {
+        String maxAttemptsStr = System
+                .getProperty("authentication.maxFailedPasswordChangeAttempts");
+        int maxAttempts = 5;
+        if (maxAttemptsStr == null) {
+            System.setProperty(
+                    "authentication.maxFailedPasswordChangeAttempts", "5");
+            return maxAttempts;
+        }
+
+        try {
+            maxAttempts = Integer.valueOf(maxAttemptsStr);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException(
+                    "authentication.maxFailedPasswordChangeAttempts must be an integer");
+        }
+
+        return maxAttempts;
     }
 
 }

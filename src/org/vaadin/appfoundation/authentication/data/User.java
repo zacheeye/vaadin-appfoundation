@@ -2,6 +2,8 @@ package org.vaadin.appfoundation.authentication.data;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
 
 import org.vaadin.appfoundation.persistence.data.AbstractPojo;
 
@@ -12,7 +14,7 @@ import org.vaadin.appfoundation.persistence.data.AbstractPojo;
  * 
  */
 @Entity
-@Table(name = "appuser")
+@Table(name = "appuser", uniqueConstraints = { @UniqueConstraint(columnNames = { "username" }) })
 public class User extends AbstractPojo {
 
     private static final long serialVersionUID = 4417119399127203109L;
@@ -30,6 +32,9 @@ public class User extends AbstractPojo {
     private boolean accountLocked = false;
 
     private String reasonForLockedAccount;
+
+    @Transient
+    private int failedPasswordChanges = 0;
 
     public User() {
 
@@ -171,6 +176,32 @@ public class User extends AbstractPojo {
      */
     public String getReasonForLockedAccount() {
         return reasonForLockedAccount;
+    }
+
+    /**
+     * Increments the number of failed password change attempts. This value is
+     * not persisted.
+     */
+    public void incrementFailedPasswordChangeAttempts() {
+        failedPasswordChanges++;
+    }
+
+    /**
+     * Clears the number of failed password change attempts
+     */
+    public void clearFailedPasswordChangeAttempts() {
+        failedPasswordChanges = 0;
+    }
+
+    /**
+     * Returns the number of failed password change attempts. This value is not
+     * persisted.
+     * 
+     * @return Number of failed password change attempts for this object
+     *         instance
+     */
+    public int getFailedPasswordChangeAttemps() {
+        return failedPasswordChanges;
     }
 
 }

@@ -98,8 +98,9 @@ public class AuthenticationUtil {
             throws AccountLockedException {
         user.incrementFailedLoginAttempts();
         try {
-            if (user.getFailedLoginAttempts() >= numberOfAllowedFailedLoginAttempts()) {
+            if (user.getFailedLoginAttempts() > numberOfAllowedFailedLoginAttempts()) {
                 user.setAccountLocked(true);
+                user.setReasonForLockedAccount("tooManyLoginAttempts");
                 throw new AccountLockedException();
             }
         } finally {
@@ -107,6 +108,11 @@ public class AuthenticationUtil {
         }
     }
 
+    /**
+     * Returns the maximum number of consecutive failed login attempts.
+     * 
+     * @return
+     */
     private static int numberOfAllowedFailedLoginAttempts() {
         String maxAttemptsStr = System
                 .getProperty("authentication.maxFailedLoginAttempts");

@@ -1,5 +1,8 @@
 package org.vaadin.appfoundation.authentication;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.vaadin.appfoundation.authentication.data.User;
 
 import com.vaadin.Application;
@@ -18,6 +21,8 @@ public class SessionHandler implements TransactionListener {
     private final Application application;
 
     private User user;
+
+    private List<LogoutListener> listeners = new ArrayList<LogoutListener>();
 
     // Store the user object of the currently inlogged user
     private static ThreadLocal<SessionHandler> instance = new ThreadLocal<SessionHandler>();
@@ -80,7 +85,21 @@ public class SessionHandler implements TransactionListener {
      * Method for logging out a user
      */
     public static void logout() {
+        LogoutEvent event = new LogoutEvent(instance.get().user);
         setUser(null);
+        dispatchLogoutEvent(event);
+    }
+
+    /**
+     * Dispatches the {@link LogoutEvent} to all registered logout listeners.
+     * 
+     * @param event
+     *            The LogoutEvent
+     */
+    private static void dispatchLogoutEvent(LogoutEvent event) {
+        for (LogoutListener listener : instance.get().listeners) {
+            listener.logout(event);
+        }
     }
 
     /**
@@ -94,6 +113,24 @@ public class SessionHandler implements TransactionListener {
         }
         SessionHandler handler = new SessionHandler(application);
         application.getContext().addTransactionListener(handler);
+    }
+
+    /**
+     * Add a logout listener.
+     * 
+     * @param listener
+     */
+    public static void addListener(LogoutListener listener) {
+        instance.get().listeners.add(listener);
+    }
+
+    /**
+     * Remove the given listener from the active logout listeners.
+     * 
+     * @param listener
+     */
+    public static void removeListener(LogoutListener listener) {
+        instance.get().listeners.remove(listener);
     }
 
 }
