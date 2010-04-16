@@ -29,7 +29,6 @@ public class AuthenticationUtilTest {
     public void tearDown() throws SecurityException, NoSuchFieldException,
             IllegalArgumentException, IllegalAccessException {
         FacadeFactory.clear();
-        FacadeFactory.clear();
         Field field = PasswordUtil.class.getDeclaredField("salt");
         field.setAccessible(true);
         field.set(null, null);
@@ -127,8 +126,8 @@ public class AuthenticationUtilTest {
         user.setPassword(PasswordUtil.generateHashedPassword("foobar"));
 
         FacadeFactory.getFacade().store(user);
-        for (int i = 0; i < 3; i++) {
-            if (i == 2) {
+        for (int i = 0; i < 4; i++) {
+            if (i == 3) {
                 assertTrue(true);
             }
             try {
@@ -137,6 +136,27 @@ public class AuthenticationUtilTest {
                 // This is expected
             }
         }
+    }
+
+    @Test
+    public void getReasonForLocking() {
+        System.setProperty("authentication.maxFailedLoginAttempts", "0");
+
+        User user = new User();
+        user.setUsername("test");
+        user.setPassword(PasswordUtil.generateHashedPassword("foobar"));
+
+        FacadeFactory.getFacade().store(user);
+        try {
+            AuthenticationUtil.authenticate("test", "test");
+        } catch (InvalidCredentialsException e) {
+            // This is expected
+        } catch (AccountLockedException e) {
+            // Expected
+        }
+
+        user = FacadeFactory.getFacade().find(User.class, user.getId());
+        assertEquals("tooManyLoginAttempts", user.getReasonForLockedAccount());
     }
 
     @Test(expected = AccountLockedException.class)
