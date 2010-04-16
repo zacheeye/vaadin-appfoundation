@@ -27,7 +27,7 @@ import com.vaadin.ui.VerticalLayout;
 
 public class ViewHandlerTest {
 
-    private MockApplication application = new MockApplication();
+    private final MockApplication application = new MockApplication();
     private ViewHandler handler = null;
 
     @Before
@@ -122,6 +122,8 @@ public class ViewHandlerTest {
     @Test
     public void setDefaultViewFactory() {
         ViewFactory factory = new ViewFactory() {
+            private static final long serialVersionUID = -3121514093680829422L;
+
             public AbstractView<?> initView(Object viewId) {
                 return null;
             }
@@ -220,6 +222,53 @@ public class ViewHandlerTest {
     }
 
     @Test
+    public void deactivateView() {
+        final ValueContainer viewDeactivated = new ValueContainer();
+        final ValueContainer parentCalled = new ValueContainer();
+        viewDeactivated.setValue(false);
+        parentCalled.setValue(false);
+
+        AbstractView<ComponentContainer> view = new AbstractView<ComponentContainer>(
+                new VerticalLayout()) {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public void activated(Object... params) {
+
+            }
+
+            @Override
+            public void deactivated(Object... params) {
+                viewDeactivated.setValue(true);
+            }
+        };
+
+        ViewItem item = ViewHandler.addView("test");
+        item.setView(view);
+
+        ViewHandler.activateView("test");
+        // Parent not set
+        assertFalse((Boolean) viewDeactivated.getValue());
+
+        ViewContainer container = new ViewContainer() {
+            public void activate(AbstractView<?> view) {
+
+            }
+
+            public void deactivate(AbstractView<?> view) {
+                parentCalled.setValue(true);
+            }
+        };
+
+        ViewHandler.setParent("test", container);
+
+        ViewHandler.deactivateView("test");
+        // Parent is now set
+        assertTrue((Boolean) viewDeactivated.getValue());
+        assertTrue((Boolean) parentCalled.getValue());
+    }
+
+    @Test
     public void activateViewParamsPassed() {
         final ValueContainer parameters = new ValueContainer();
 
@@ -260,7 +309,45 @@ public class ViewHandlerTest {
     }
 
     @Test
-    public void dispatchEventListeners() {
+    public void deactivateViewParamsPassed() {
+        final ValueContainer parameters = new ValueContainer();
+
+        AbstractView<ComponentContainer> view = new AbstractView<ComponentContainer>(
+                new VerticalLayout()) {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public void activated(Object... params) {
+
+            }
+
+            @Override
+            public void deactivated(Object... params) {
+                parameters.setValue(params);
+            }
+        };
+
+        ViewItem item = ViewHandler.addView("test");
+        item.setView(view);
+        ViewContainer container = new ViewContainer() {
+            public void activate(AbstractView<?> view) {
+            }
+
+            public void deactivate(AbstractView<?> view) {
+
+            }
+        };
+
+        ViewHandler.setParent("test", container);
+
+        ViewHandler.deactivateView("test", "foo", "bar");
+        assertEquals(2, ((Object[]) parameters.getValue()).length);
+        assertEquals("foo", ((Object[]) parameters.getValue())[0]);
+        assertEquals("bar", ((Object[]) parameters.getValue())[1]);
+    }
+
+    @Test
+    public void activationEventListeners() {
         final ValueContainer viewActivated = new ValueContainer(false);
         final ValueContainer parentCalled = new ValueContainer(false);
 
@@ -284,11 +371,11 @@ public class ViewHandlerTest {
         item.setView(view);
 
         final ValueContainer preCalls = new ValueContainer(0);
+        final ValueContainer preActivation = new ValueContainer(0);
         final ValueContainer postCalls = new ValueContainer(0);
+        final ValueContainer postActiovation = new ValueContainer(0);
 
         DispatchEventListener listener = new DispatchEventListener() {
-            private boolean preCall = false;
-            private boolean postCall = false;
 
             public void preDispatch(DispatchEvent event)
                     throws DispatchException {
@@ -296,24 +383,17 @@ public class ViewHandlerTest {
                 assertEquals(1, (event.getActivationParameters()).length);
                 assertEquals("testParam", (event.getActivationParameters())[0]);
 
-                if (!preCall) {
-                    preCall = true;
-                    preCalls.setValue(((Integer) preCalls.getValue()) + 1);
-                    throw new DispatchException();
-                }
+                preCalls.setValue(((Integer) preCalls.getValue()) + 1);
             }
 
             public void postDispatch(DispatchEvent event) {
-                if (!postCall) {
-                    postCall = true;
-                    postCalls.setValue(((Integer) postCalls.getValue()) + 1);
-                }
+                postCalls.setValue(((Integer) postCalls.getValue()) + 1);
 
             }
 
             public void postActivation(DispatchEvent event) {
-                // TODO Auto-generated method stub
-
+                postActiovation
+                        .setValue(((Integer) postActiovation.getValue()) + 1);
             }
 
             public void postDeactivation(DispatchEvent event) {
@@ -323,8 +403,8 @@ public class ViewHandlerTest {
 
             public void preActivation(DispatchEvent event)
                     throws DispatchException {
-                // TODO Auto-generated method stub
-
+                preActivation
+                        .setValue(((Integer) preActivation.getValue()) + 1);
             }
 
             public void preDeactivation(DispatchEvent event)
@@ -335,27 +415,19 @@ public class ViewHandlerTest {
         };
 
         DispatchEventListener listener2 = new DispatchEventListener() {
-            private boolean preCall = false;
-            private boolean postCall = false;
 
             public void preDispatch(DispatchEvent event)
                     throws DispatchException {
-                if (!preCall) {
-                    preCall = true;
-                    preCalls.setValue(((Integer) preCalls.getValue()) + 1);
-                }
+                preCalls.setValue(((Integer) preCalls.getValue()) + 1);
             }
 
             public void postDispatch(DispatchEvent event) {
-                if (!postCall) {
-                    postCall = true;
-                    postCalls.setValue(((Integer) postCalls.getValue()) + 1);
-                }
+                postCalls.setValue(((Integer) postCalls.getValue()) + 1);
             }
 
             public void postActivation(DispatchEvent event) {
-                // TODO Auto-generated method stub
-
+                postActiovation
+                        .setValue(((Integer) postActiovation.getValue()) + 1);
             }
 
             public void postDeactivation(DispatchEvent event) {
@@ -365,8 +437,8 @@ public class ViewHandlerTest {
 
             public void preActivation(DispatchEvent event)
                     throws DispatchException {
-                // TODO Auto-generated method stub
-
+                preActivation
+                        .setValue(((Integer) preActivation.getValue()) + 1);
             }
 
             public void preDeactivation(DispatchEvent event)
@@ -394,10 +466,126 @@ public class ViewHandlerTest {
         ViewHandler.setParent("test", container);
         ViewHandler.activateView("test", "testParam");
 
-        assertEquals(1, ((Integer) preCalls.getValue()).intValue());
-        assertEquals(0, ((Integer) postCalls.getValue()).intValue());
-        assertFalse((Boolean) viewActivated.getValue());
-        assertFalse((Boolean) parentCalled.getValue());
+        assertEquals(2, ((Integer) preCalls.getValue()).intValue());
+        assertEquals(2, ((Integer) preActivation.getValue()).intValue());
+        assertEquals(2, ((Integer) postCalls.getValue()).intValue());
+        assertEquals(2, ((Integer) postActiovation.getValue()).intValue());
+        assertTrue((Boolean) viewActivated.getValue());
+        assertTrue((Boolean) parentCalled.getValue());
+    }
+
+    @Test
+    public void deactivationEventListeners() {
+        final ValueContainer viewDeactivated = new ValueContainer(false);
+        final ValueContainer parentCalled = new ValueContainer(false);
+
+        final AbstractView<ComponentContainer> view = new AbstractView<ComponentContainer>(
+                new VerticalLayout()) {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public void activated(Object... params) {
+            }
+
+            @Override
+            public void deactivated(Object... params) {
+                viewDeactivated.setValue(true);
+            }
+        };
+
+        final ViewItem item = ViewHandler.addView("test");
+        item.setView(view);
+
+        final ValueContainer preDeactivation = new ValueContainer(0);
+        final ValueContainer postDeactiovation = new ValueContainer(0);
+
+        DispatchEventListener listener = new DispatchEventListener() {
+
+            public void preDispatch(DispatchEvent event)
+                    throws DispatchException {
+
+            }
+
+            public void postDispatch(DispatchEvent event) {
+
+            }
+
+            public void postActivation(DispatchEvent event) {
+
+            }
+
+            public void postDeactivation(DispatchEvent event) {
+                postDeactiovation.setValue(((Integer) postDeactiovation
+                        .getValue()) + 1);
+            }
+
+            public void preActivation(DispatchEvent event)
+                    throws DispatchException {
+            }
+
+            public void preDeactivation(DispatchEvent event)
+                    throws DispatchException {
+                assertEquals(item, event.getViewItem());
+                assertEquals(1, (event.getActivationParameters()).length);
+                assertEquals("testParam", (event.getActivationParameters())[0]);
+
+                preDeactivation
+                        .setValue(((Integer) preDeactivation.getValue()) + 1);
+            }
+        };
+
+        DispatchEventListener listener2 = new DispatchEventListener() {
+
+            public void preDispatch(DispatchEvent event)
+                    throws DispatchException {
+            }
+
+            public void postDispatch(DispatchEvent event) {
+            }
+
+            public void postActivation(DispatchEvent event) {
+
+            }
+
+            public void postDeactivation(DispatchEvent event) {
+                postDeactiovation.setValue(((Integer) postDeactiovation
+                        .getValue()) + 1);
+            }
+
+            public void preActivation(DispatchEvent event)
+                    throws DispatchException {
+
+            }
+
+            public void preDeactivation(DispatchEvent event)
+                    throws DispatchException {
+                preDeactivation
+                        .setValue(((Integer) preDeactivation.getValue()) + 1);
+            }
+        };
+
+        ViewHandler.addListener(listener);
+        ViewHandler.addListener(listener2);
+
+        ViewHandler.activateView("test");
+
+        ViewContainer container = new ViewContainer() {
+            public void activate(AbstractView<?> view) {
+
+            }
+
+            public void deactivate(AbstractView<?> view) {
+                parentCalled.setValue(true);
+
+            }
+        };
+        ViewHandler.setParent("test", container);
+        ViewHandler.deactivateView("test", "testParam");
+
+        assertEquals(2, ((Integer) preDeactivation.getValue()).intValue());
+        assertEquals(2, ((Integer) postDeactiovation.getValue()).intValue());
+        assertTrue((Boolean) viewDeactivated.getValue());
+        assertTrue((Boolean) parentCalled.getValue());
     }
 
     @Test
@@ -405,14 +593,10 @@ public class ViewHandlerTest {
         final ValueContainer preCalls = new ValueContainer(0);
 
         DispatchEventListener listener = new DispatchEventListener() {
-            private boolean preCall = false;
 
             public void preDispatch(DispatchEvent event)
                     throws DispatchException {
-                if (!preCall) {
-                    preCall = true;
-                    preCalls.setValue(((Integer) preCalls.getValue()) + 1);
-                }
+                preCalls.setValue(((Integer) preCalls.getValue()) + 1);
             }
 
             public void postDispatch(DispatchEvent event) {
@@ -430,8 +614,7 @@ public class ViewHandlerTest {
 
             public void preActivation(DispatchEvent event)
                     throws DispatchException {
-                // TODO Auto-generated method stub
-
+                preCalls.setValue(((Integer) preCalls.getValue()) + 1);
             }
 
             public void preDeactivation(DispatchEvent event)
@@ -454,85 +637,69 @@ public class ViewHandlerTest {
     }
 
     @Test
-    public void cancelDispatch() {
+    public void cancelActivation() {
         final ValueContainer preCalls = new ValueContainer(0);
+        final ValueContainer preActivation = new ValueContainer(0);
         final ValueContainer postCalls = new ValueContainer(0);
+        final ValueContainer postActivation = new ValueContainer(0);
+        final ValueContainer parentCalled = new ValueContainer(false);
 
         DispatchEventListener listener = new DispatchEventListener() {
-            private boolean preCall = false;
-            private boolean postCall = false;
 
             public void preDispatch(DispatchEvent event)
                     throws DispatchException {
-                if (!preCall) {
-                    preCall = true;
-                    preCalls.setValue(((Integer) preCalls.getValue()) + 1);
-                }
+                preCalls.setValue(((Integer) preCalls.getValue()) + 1);
             }
 
             public void postDispatch(DispatchEvent event) {
-                if (!postCall) {
-                    postCall = true;
-                    postCalls.setValue(((Integer) postCalls.getValue()) + 1);
-                }
-
+                postCalls.setValue(((Integer) postCalls.getValue()) + 1);
             }
 
             public void postActivation(DispatchEvent event) {
-                // TODO Auto-generated method stub
-
+                postActivation
+                        .setValue(((Integer) postActivation.getValue()) + 1);
             }
 
             public void postDeactivation(DispatchEvent event) {
-                // TODO Auto-generated method stub
 
             }
 
             public void preActivation(DispatchEvent event)
                     throws DispatchException {
-                // TODO Auto-generated method stub
-
+                preActivation
+                        .setValue(((Integer) preActivation.getValue()) + 1);
+                throw new DispatchException();
             }
 
             public void preDeactivation(DispatchEvent event)
                     throws DispatchException {
-                // TODO Auto-generated method stub
-
             }
         };
 
         DispatchEventListener listener2 = new DispatchEventListener() {
-            private boolean preCall = false;
-            private boolean postCall = false;
-
             public void preDispatch(DispatchEvent event)
                     throws DispatchException {
-                if (!preCall) {
-                    preCall = true;
-                    preCalls.setValue(((Integer) preCalls.getValue()) + 1);
-                }
+                preCalls.setValue(((Integer) preCalls.getValue()) + 1);
             }
 
             public void postDispatch(DispatchEvent event) {
-                if (!postCall) {
-                    postCall = true;
-                    postCalls.setValue(((Integer) postCalls.getValue()) + 1);
-                }
+                postCalls.setValue(((Integer) postCalls.getValue()) + 1);
             }
 
             public void postActivation(DispatchEvent event) {
-                // TODO Auto-generated method stub
+                postActivation
+                        .setValue(((Integer) postActivation.getValue()) + 1);
 
             }
 
             public void postDeactivation(DispatchEvent event) {
-                // TODO Auto-generated method stub
 
             }
 
             public void preActivation(DispatchEvent event)
                     throws DispatchException {
-                // TODO Auto-generated method stub
+                preActivation
+                        .setValue(((Integer) preActivation.getValue()) + 1);
 
             }
 
@@ -546,16 +713,110 @@ public class ViewHandlerTest {
         ViewHandler.addListener(listener);
         ViewHandler.addListener(listener2);
 
-        MockViewContainer parent = new MockViewContainer();
-        ViewHandler.addView(MockView.class, parent);
+        ViewHandler.addView(MockView.class, new ViewContainer() {
+
+            public void deactivate(AbstractView<?> view) {
+
+            }
+
+            public void activate(AbstractView<?> view) {
+                parentCalled.setValue(true);
+            }
+        });
 
         assertEquals(0, ((Integer) preCalls.getValue()).intValue());
+        assertEquals(0, ((Integer) preActivation.getValue()).intValue());
         assertEquals(0, ((Integer) postCalls.getValue()).intValue());
+        assertEquals(0, ((Integer) postActivation.getValue()).intValue());
 
         ViewHandler.activateView(MockView.class);
 
-        assertEquals(2, ((Integer) preCalls.getValue()).intValue());
-        assertEquals(2, ((Integer) postCalls.getValue()).intValue());
+        assertEquals(1, ((Integer) preCalls.getValue()).intValue());
+        assertEquals(1, ((Integer) preActivation.getValue()).intValue());
+        assertEquals(0, ((Integer) postCalls.getValue()).intValue());
+        assertEquals(0, ((Integer) postActivation.getValue()).intValue());
+        assertFalse((Boolean) parentCalled.getValue());
+    }
+
+    @Test
+    public void cancelDeactivation() {
+        final ValueContainer preDeactivation = new ValueContainer(0);
+        final ValueContainer postDeactivation = new ValueContainer(0);
+
+        DispatchEventListener listener = new DispatchEventListener() {
+
+            public void preDispatch(DispatchEvent event)
+                    throws DispatchException {
+            }
+
+            public void postDispatch(DispatchEvent event) {
+            }
+
+            public void postActivation(DispatchEvent event) {
+
+            }
+
+            public void postDeactivation(DispatchEvent event) {
+                postDeactivation.setValue(((Integer) postDeactivation
+                        .getValue()) + 1);
+            }
+
+            public void preActivation(DispatchEvent event)
+                    throws DispatchException {
+
+            }
+
+            public void preDeactivation(DispatchEvent event)
+                    throws DispatchException {
+                preDeactivation
+                        .setValue(((Integer) preDeactivation.getValue()) + 1);
+                throw new DispatchException();
+            }
+        };
+
+        DispatchEventListener listener2 = new DispatchEventListener() {
+
+            public void preDispatch(DispatchEvent event)
+                    throws DispatchException {
+            }
+
+            public void postDispatch(DispatchEvent event) {
+            }
+
+            public void postActivation(DispatchEvent event) {
+            }
+
+            public void postDeactivation(DispatchEvent event) {
+                postDeactivation.setValue(((Integer) postDeactivation
+                        .getValue()) + 1);
+
+            }
+
+            public void preActivation(DispatchEvent event)
+                    throws DispatchException {
+
+            }
+
+            public void preDeactivation(DispatchEvent event)
+                    throws DispatchException {
+                preDeactivation
+                        .setValue(((Integer) preDeactivation.getValue()) + 1);
+            }
+        };
+
+        ViewHandler.addListener(listener);
+        ViewHandler.addListener(listener2);
+
+        MockViewContainer parent = new MockViewContainer();
+        ViewHandler.addView(MockView.class, parent);
+
+        assertEquals(0, ((Integer) preDeactivation.getValue()).intValue());
+        assertEquals(0, ((Integer) postDeactivation.getValue()).intValue());
+
+        ViewHandler.deactivateView(MockView.class);
+
+        assertEquals(1, ((Integer) preDeactivation.getValue()).intValue());
+        assertEquals(0, ((Integer) postDeactivation.getValue()).intValue());
     }
 
     @Test

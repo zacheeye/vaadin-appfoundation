@@ -231,8 +231,8 @@ public class ViewHandler implements TransactionListener,
             // Loop through all the dispatch event listeners
             try {
                 for (DispatchEventListener listener : instance.get().listeners) {
-                    listener.preActivation(event);
                     listener.preDispatch(event);
+                    listener.preActivation(event);
                 }
             } catch (DispatchException e) {
                 // The dispatch was canceled, stop the execution of this method.
@@ -253,8 +253,8 @@ public class ViewHandler implements TransactionListener,
 
             // View has been dispatched, send event
             for (DispatchEventListener listener : instance.get().listeners) {
-                listener.postActivation(event);
                 listener.postDispatch(event);
+                listener.postActivation(event);
             }
         }
     }
@@ -269,7 +269,7 @@ public class ViewHandler implements TransactionListener,
      * @param params
      *            Parameters used for activating the view
      */
-    public static void deactiveView(Object viewId, Object... params) {
+    public static void deactivateView(Object viewId, Object... params) {
         if (viewId != null && instance.get().viewMap.containsKey(viewId)
                 && instance.get().parentMap.containsKey(viewId)) {
             // Get the ViewItem and parent for this viewId
