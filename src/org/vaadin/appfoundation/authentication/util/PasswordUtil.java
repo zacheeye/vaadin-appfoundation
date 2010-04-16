@@ -29,7 +29,7 @@ public class PasswordUtil implements Serializable {
         // Check if the salt has been set. If not, then create a default salt
         // value.
         String systemSalt = System.getProperty("authentication.password.salt");
-        if (salt != null && salt != systemSalt) {
+        if (salt != null && !salt.equals(systemSalt)) {
             throw new UnsupportedOperationException(
                     "Password salt is already set");
         }
