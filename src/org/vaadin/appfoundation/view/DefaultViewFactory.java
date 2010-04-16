@@ -10,6 +10,8 @@ package org.vaadin.appfoundation.view;
  */
 public class DefaultViewFactory implements ViewFactory {
 
+    private static final long serialVersionUID = -3997486649672703615L;
+
     /**
      * {@inheritDoc}
      */

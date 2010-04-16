@@ -21,6 +21,8 @@ import org.vaadin.appfoundation.persistence.facade.FacadeFactory;
  */
 public class JPAPermissionManager extends AbstractPermissionManager {
 
+    private static final long serialVersionUID = -2165236481183896063L;
+
     /**
      * {@inheritDoc}
      */
