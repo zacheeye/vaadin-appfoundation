@@ -2,8 +2,7 @@ package org.vaadin.appfoundation.test.authentication;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.lang.reflect.Field;
 
 import org.junit.After;
 import org.junit.Before;
@@ -22,8 +21,15 @@ public class AuthenticationUtilTest {
     }
 
     @After
-    public void tearDown() {
+    public void tearDown() throws SecurityException, NoSuchFieldException,
+            IllegalArgumentException, IllegalAccessException {
         FacadeFactory.clear();
+        FacadeFactory.clear();
+        Field field = PasswordUtil.class.getDeclaredField("salt");
+        field.setAccessible(true);
+        field.set(null, null);
+
+        System.clearProperty("authentication.password.salt");
     }
 
     @Test(expected = InvalidCredentialsException.class)

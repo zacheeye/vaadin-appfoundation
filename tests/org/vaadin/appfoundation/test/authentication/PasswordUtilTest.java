@@ -102,4 +102,11 @@ public class PasswordUtilTest {
                 .generateHashedPassword("foobar"));
     }
 
+    @Test
+    public void useSystemSalt() {
+        System.setProperty("authentication.password.salt", "test");
+        assertEquals("51abb9636078defbf888d8457a7c76f85c8f114c", PasswordUtil
+                .generateHashedPassword("test"));
+    }
+
 }
