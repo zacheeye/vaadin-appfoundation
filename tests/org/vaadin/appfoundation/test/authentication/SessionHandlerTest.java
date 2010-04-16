@@ -6,9 +6,12 @@ import static org.junit.Assert.assertNull;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.vaadin.appfoundation.authentication.LogoutEvent;
+import org.vaadin.appfoundation.authentication.LogoutListener;
 import org.vaadin.appfoundation.authentication.SessionHandler;
 import org.vaadin.appfoundation.authentication.data.User;
 import org.vaadin.appfoundation.test.MockApplication;
+import org.vaadin.appfoundation.test.ValueContainer;
 import org.vaadin.appfoundation.test.MockApplication.MockContext;
 
 public class SessionHandlerTest {
@@ -62,5 +65,42 @@ public class SessionHandlerTest {
         assertEquals(1, context.getListeners().size());
         assertEquals(SessionHandler.class, context.getListeners().get(0)
                 .getClass());
+    }
+
+    @Test
+    public void addLogoutListener() {
+        final ValueContainer value = new ValueContainer();
+        LogoutListener listener = new LogoutListener() {
+
+            public void logout(LogoutEvent event) {
+                value.setValue(event.getUser());
+            }
+        };
+        User user = new User();
+        SessionHandler.initialize(new MockApplication());
+        SessionHandler.addListener(listener);
+        SessionHandler.setUser(user);
+        SessionHandler.logout();
+
+        assertEquals(user, value.getValue());
+    }
+
+    @Test
+    public void removeLogoutListener() {
+        final ValueContainer value = new ValueContainer();
+        LogoutListener listener = new LogoutListener() {
+
+            public void logout(LogoutEvent event) {
+                value.setValue(event.getUser());
+            }
+        };
+        User user = new User();
+        SessionHandler.initialize(new MockApplication());
+        SessionHandler.addListener(listener);
+        SessionHandler.removeListener(listener);
+        SessionHandler.setUser(user);
+        SessionHandler.logout();
+
+        assertNull(value.getValue());
     }
 }

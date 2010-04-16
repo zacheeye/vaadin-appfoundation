@@ -10,6 +10,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.vaadin.appfoundation.test.MockApplication;
+import org.vaadin.appfoundation.test.ValueContainer;
 import org.vaadin.appfoundation.test.MockApplication.MockContext;
 import org.vaadin.appfoundation.view.AbstractView;
 import org.vaadin.appfoundation.view.DefaultViewFactory;
@@ -929,26 +930,6 @@ public class ViewHandlerTest {
     @Test(expected = IllegalArgumentException.class)
     public void removeEmptyUri() {
         ViewHandler.removeUri("");
-    }
-
-    private static class ValueContainer {
-
-        private Object value;
-
-        public ValueContainer() {
-        }
-
-        public ValueContainer(Object value) {
-            this.value = value;
-        }
-
-        public void setValue(Object value) {
-            this.value = value;
-        }
-
-        public Object getValue() {
-            return value;
-        }
     }
 
     @Test(expected = IllegalArgumentException.class)
