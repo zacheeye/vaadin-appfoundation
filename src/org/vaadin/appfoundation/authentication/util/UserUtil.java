@@ -56,31 +56,97 @@ public class UserUtil implements Serializable {
             String verifyPassword) throws TooShortPasswordException,
             TooShortUsernameException, PasswordsDoNotMatchException,
             UsernameExistsException {
-        // Make sure that the username and password fulfill the minimum size
-        // requirements.
-        if (username == null || username.length() < getMinUsernameLength()) {
-            throw new TooShortUsernameException();
-        } else if (password == null
-                || password.length() < getMinPasswordLength()) {
-            throw new TooShortPasswordException();
-        }
-        // Make sure that the password is verified correctly
-        else if (!password.equals(verifyPassword)) {
-            throw new PasswordsDoNotMatchException();
-        }
-        // Make sure the username is available
-        else if (!checkUsernameAvailability(username)) {
-            throw new UsernameExistsException();
-        }
+
+        verifyUsernameLength(username);
+        verifyPasswordLength(password);
+
+        checkPasswordVerification(password, verifyPassword);
+        verifyUsernameAvailability(username);
 
         // Everything is ok, create the user
+        User user = createUser(username, password);
+
+        return user;
+    }
+
+    /**
+     * Creates and stores a user with the given username and password
+     * 
+     * @param username
+     *            The username for the user
+     * @param password
+     *            The user's password
+     * @return The created {@link User} object
+     */
+    private static User createUser(String username, String password) {
         User user = new User();
         user.setUsername(username);
         user.setPassword(PasswordUtil.generateHashedPassword(password));
 
         FacadeFactory.getFacade().store(user);
-
         return user;
+    }
+
+    /**
+     * Verifies that the given username doesn't exist
+     * 
+     * @param username
+     *            The username to check
+     * @throws UsernameExistsException
+     *             Thrown if username already exists
+     */
+    private static void verifyUsernameAvailability(String username)
+            throws UsernameExistsException {
+        if (!checkUsernameAvailability(username)) {
+            throw new UsernameExistsException();
+        }
+    }
+
+    /**
+     * Makes sure the given username is long enough
+     * 
+     * @param username
+     *            Username to check
+     * @throws TooShortUsernameException
+     *             Thrown if username is null or too short
+     */
+    private static void verifyUsernameLength(String username)
+            throws TooShortUsernameException {// Make sure that the username and
+        if (username == null || username.length() < getMinUsernameLength()) {
+            throw new TooShortUsernameException();
+        }
+    }
+
+    /**
+     * Makes sure the given password is long enough
+     * 
+     * @param password
+     *            Password to check
+     * @throws TooShortPasswordException
+     *             Thrown if password is null or too short
+     */
+    private static void verifyPasswordLength(String password)
+            throws TooShortPasswordException {
+        if (password == null || password.length() < getMinPasswordLength()) {
+            throw new TooShortPasswordException();
+        }
+    }
+
+    /**
+     * Verifies that the given passwords match with eachother
+     * 
+     * @param password
+     *            Password to check
+     * @param verifyPassword
+     *            Verification of the first password
+     * @throws PasswordsDoNotMatchException
+     *             Thrown if the given parameters do not equal eachother
+     */
+    private static void checkPasswordVerification(String password,
+            String verifyPassword) throws PasswordsDoNotMatchException {
+        if (!password.equals(verifyPassword)) {
+            throw new PasswordsDoNotMatchException();
+        }
     }
 
     /**
@@ -130,12 +196,8 @@ public class UserUtil implements Serializable {
         }
 
         // Check the new password's constraints
-        if (newPassword == null
-                || newPassword.length() < getMinPasswordLength()) {
-            throw new TooShortPasswordException();
-        } else if (!newPassword.equals(verifiedNewPassword)) {
-            throw new PasswordsDoNotMatchException();
-        }
+        verifyPasswordLength(newPassword);
+        checkPasswordVerification(newPassword, verifiedNewPassword);
 
         // Password is ok, hash it and change it
         user.setPassword(PasswordUtil.generateHashedPassword(newPassword));
