@@ -20,7 +20,7 @@ public class SessionHandler implements TransactionListener {
     private User user;
 
     // Store the user object of the currently inlogged user
-    private static ThreadLocal<User> currentUser = new ThreadLocal<User>();
+    private static ThreadLocal<SessionHandler> instance = new ThreadLocal<SessionHandler>();
 
     /**
      * Constructor
@@ -30,6 +30,7 @@ public class SessionHandler implements TransactionListener {
      */
     public SessionHandler(Application application) {
         this.application = application;
+        instance.set(this);
     }
 
     /**
@@ -38,9 +39,7 @@ public class SessionHandler implements TransactionListener {
     public void transactionEnd(Application application, Object transactionData) {
         // Clear the currentApplication field
         if (this.application == application) {
-            // Get the current user
-            user = SessionHandler.get();
-            SessionHandler.setUser(null);
+            instance.set(null);
         }
     }
 
@@ -53,7 +52,7 @@ public class SessionHandler implements TransactionListener {
         // local variable for this request.
         if (this.application == application) {
             // Set the current user
-            SessionHandler.setUser(user);
+            instance.set(this);
         }
     }
 
@@ -64,7 +63,7 @@ public class SessionHandler implements TransactionListener {
      * @param user
      */
     public static void setUser(User user) {
-        currentUser.set(user);
+        instance.get().user = user;
     }
 
     /**
@@ -74,7 +73,7 @@ public class SessionHandler implements TransactionListener {
      * @return The currently inlogged user
      */
     public static User get() {
-        return currentUser.get();
+        return instance.get().user;
     }
 
     /**

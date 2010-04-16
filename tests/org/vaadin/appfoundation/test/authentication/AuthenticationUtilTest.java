@@ -8,17 +8,20 @@ import java.lang.reflect.Field;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.vaadin.appfoundation.authentication.SessionHandler;
 import org.vaadin.appfoundation.authentication.data.User;
 import org.vaadin.appfoundation.authentication.exceptions.AccountLockedException;
 import org.vaadin.appfoundation.authentication.exceptions.InvalidCredentialsException;
 import org.vaadin.appfoundation.authentication.util.AuthenticationUtil;
 import org.vaadin.appfoundation.authentication.util.PasswordUtil;
 import org.vaadin.appfoundation.persistence.facade.FacadeFactory;
+import org.vaadin.appfoundation.test.MockApplication;
 
 public class AuthenticationUtilTest {
 
     @Before
     public void setUp() throws InstantiationException, IllegalAccessException {
+        SessionHandler.initialize(new MockApplication());
         FacadeFactory.registerFacade("default", true);
     }
 
