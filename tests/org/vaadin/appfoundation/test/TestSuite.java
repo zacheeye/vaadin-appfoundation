@@ -22,6 +22,7 @@ import org.vaadin.appfoundation.test.persistence.FacadeFactoryTest;
 import org.vaadin.appfoundation.test.persistence.JPAFacadeTest;
 import org.vaadin.appfoundation.test.view.AbstractViewTest;
 import org.vaadin.appfoundation.test.view.DefaultViewFactoryTest;
+import org.vaadin.appfoundation.test.view.SimpleViewContainerTest;
 import org.vaadin.appfoundation.test.view.ViewHandlerTest;
 import org.vaadin.appfoundation.test.view.ViewItemTest;
 
@@ -34,7 +35,8 @@ import org.vaadin.appfoundation.test.view.ViewItemTest;
         AbstractPojoTest.class, UserTest.class, AuthenticationUtilTest.class,
         SessionHandlerTest.class, UserUtilTest.class, PermissionMapTest.class,
         MemoryPermissionManagerTest.class, JPAPermissionManagerTest.class,
-        PermissionEntityTest.class, PermissionsTest.class })
+        PermissionEntityTest.class, PermissionsTest.class,
+        SimpleViewContainerTest.class })
 public class TestSuite {
 
 }
