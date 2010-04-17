@@ -6,12 +6,15 @@ import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 import java.util.Properties;
 
 import org.junit.After;
 import org.junit.Test;
 import org.vaadin.appfoundation.authentication.data.User;
 import org.vaadin.appfoundation.authentication.util.PasswordUtil;
+
+import com.vaadin.data.Validator;
 
 public class PasswordUtilTest {
 
@@ -23,6 +26,15 @@ public class PasswordUtilTest {
         field.set(null, null);
 
         System.clearProperty("authentication.password.salt");
+        System
+                .clearProperty("authentication.password.validation.specialCharacterRequired");
+        System
+                .clearProperty("authentication.password.validation.numericRequired");
+        System
+                .clearProperty("authentication.password.validation.upperCaseRequired");
+        System
+                .clearProperty("authentication.password.validation.lowerCaseRequired");
+        System.clearProperty("authentication.password.validation.length");
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -107,6 +119,221 @@ public class PasswordUtilTest {
         System.setProperty("authentication.password.salt", "test");
         assertEquals("51abb9636078defbf888d8457a7c76f85c8f114c", PasswordUtil
                 .generateHashedPassword("test"));
+    }
+
+    @Test
+    public void isValidNull() {
+        assertFalse(PasswordUtil.isValid(null));
+    }
+
+    @Test
+    public void isValidOnlyLenght() {
+        assertFalse(PasswordUtil.isValid("test"));
+        assertTrue(PasswordUtil.isValid("test-test-test"));
+    }
+
+    @Test
+    public void isValidLengthAndLowerCase() {
+        System.setProperty("authentication.password.validation.length", "4");
+        System.setProperty(
+                "authentication.password.validation.lowerCaseRequired", "true");
+        assertFalse(PasswordUtil.isValid("TEST"));
+        assertFalse(PasswordUtil.isValid("tes"));
+        assertTrue(PasswordUtil.isValid("test"));
+    }
+
+    @Test
+    public void isValidLengthAndUpperCase() {
+        System.setProperty("authentication.password.validation.length", "4");
+        System.setProperty(
+                "authentication.password.validation.upperCaseRequired", "true");
+        assertFalse(PasswordUtil.isValid("test"));
+        assertFalse(PasswordUtil.isValid("TES"));
+        assertTrue(PasswordUtil.isValid("TEST"));
+    }
+
+    @Test
+    public void isValidNumeric() {
+        System.setProperty("authentication.password.validation.length", "4");
+        System.setProperty(
+                "authentication.password.validation.numericRequired", "true");
+        assertFalse(PasswordUtil.isValid("test"));
+        assertTrue(PasswordUtil.isValid("test1"));
+    }
+
+    @Test
+    public void isValidSpecialCharacters() {
+        System.setProperty("authentication.password.validation.length", "4");
+        System.setProperty(
+                "authentication.password.validation.specialCharacterRequired",
+                "true");
+        assertFalse(PasswordUtil.isValid("test"));
+        assertTrue(PasswordUtil.isValid("test-"));
+        assertTrue(PasswordUtil.isValid("testå"));
+    }
+
+    @Test
+    public void getValidatorsNull() {
+        List<Validator> validators = PasswordUtil.getValidators();
+        boolean passed = true;
+        for (Validator v : validators) {
+            if (!v.isValid(null)) {
+                passed = false;
+            }
+        }
+
+        assertFalse(passed);
+    }
+
+    @Test
+    public void getValidatorsOnlyLenght() {
+        List<Validator> validators = PasswordUtil.getValidators();
+        boolean passed = true;
+        for (Validator v : validators) {
+            if (!v.isValid("test")) {
+                passed = false;
+            }
+        }
+
+        assertFalse(passed);
+
+        passed = true;
+        for (Validator v : validators) {
+            if (!v.isValid("test-test-test")) {
+                passed = false;
+            }
+        }
+
+        assertTrue(passed);
+    }
+
+    @Test
+    public void getValidatorsLengthAndLowerCase() {
+        System.setProperty("authentication.password.validation.length", "4");
+        System.setProperty(
+                "authentication.password.validation.lowerCaseRequired", "true");
+        List<Validator> validators = PasswordUtil.getValidators();
+        boolean passed = true;
+        for (Validator v : validators) {
+            if (!v.isValid("TEST")) {
+                passed = false;
+            }
+        }
+
+        assertFalse(passed);
+        passed = true;
+
+        for (Validator v : validators) {
+            if (!v.isValid("tes")) {
+                passed = false;
+            }
+        }
+
+        assertFalse(passed);
+
+        passed = true;
+        for (Validator v : validators) {
+            if (!v.isValid("test")) {
+                passed = false;
+            }
+        }
+
+        assertTrue(passed);
+    }
+
+    @Test
+    public void getValidatorsLengthAndUpperCase() {
+        System.setProperty("authentication.password.validation.length", "4");
+        System.setProperty(
+                "authentication.password.validation.upperCaseRequired", "true");
+
+        List<Validator> validators = PasswordUtil.getValidators();
+        boolean passed = true;
+        for (Validator v : validators) {
+            if (!v.isValid("test")) {
+                passed = false;
+            }
+        }
+
+        assertFalse(passed);
+        passed = true;
+
+        for (Validator v : validators) {
+            if (!v.isValid("TES")) {
+                passed = false;
+            }
+        }
+
+        assertFalse(passed);
+
+        passed = true;
+        for (Validator v : validators) {
+            if (!v.isValid("TEST")) {
+                passed = false;
+            }
+        }
+
+        assertTrue(passed);
+    }
+
+    @Test
+    public void getValidatorsNumeric() {
+        System.setProperty("authentication.password.validation.length", "4");
+        System.setProperty(
+                "authentication.password.validation.numericRequired", "true");
+        List<Validator> validators = PasswordUtil.getValidators();
+        boolean passed = true;
+        for (Validator v : validators) {
+            if (!v.isValid("test")) {
+                passed = false;
+            }
+        }
+
+        assertFalse(passed);
+
+        passed = true;
+        for (Validator v : validators) {
+            if (!v.isValid("test1")) {
+                passed = false;
+            }
+        }
+
+        assertTrue(passed);
+    }
+
+    @Test
+    public void getValidatorsSpecialCharacters() {
+        System.setProperty("authentication.password.validation.length", "4");
+        System.setProperty(
+                "authentication.password.validation.specialCharacterRequired",
+                "true");
+        List<Validator> validators = PasswordUtil.getValidators();
+        boolean passed = true;
+        for (Validator v : validators) {
+            if (!v.isValid("test")) {
+                passed = false;
+            }
+        }
+
+        assertFalse(passed);
+        passed = true;
+
+        for (Validator v : validators) {
+            if (!v.isValid("test-")) {
+                passed = false;
+            }
+        }
+
+        assertTrue(passed);
+
+        passed = true;
+        for (Validator v : validators) {
+            if (!v.isValid("testå")) {
+                passed = false;
+            }
+        }
+
+        assertTrue(passed);
     }
 
 }
