@@ -8,6 +8,7 @@ import java.util.Properties;
 import org.vaadin.appfoundation.authentication.SessionHandler;
 import org.vaadin.appfoundation.authentication.data.User;
 import org.vaadin.appfoundation.authentication.exceptions.InvalidCredentialsException;
+import org.vaadin.appfoundation.authentication.exceptions.PasswordRequirementException;
 import org.vaadin.appfoundation.authentication.exceptions.PasswordsDoNotMatchException;
 import org.vaadin.appfoundation.authentication.exceptions.TooShortPasswordException;
 import org.vaadin.appfoundation.authentication.exceptions.TooShortUsernameException;
@@ -56,11 +57,11 @@ public class UserUtil implements Serializable {
     public static User registerUser(String username, String password,
             String verifyPassword) throws TooShortPasswordException,
             TooShortUsernameException, PasswordsDoNotMatchException,
-            UsernameExistsException {
+            UsernameExistsException, PasswordRequirementException {
 
         verifyUsernameLength(username);
         verifyPasswordLength(password);
-
+        validatePassword(password);
         checkPasswordVerification(password, verifyPassword);
         verifyUsernameAvailability(username);
 
@@ -68,6 +69,22 @@ public class UserUtil implements Serializable {
         User user = createUser(username, password);
 
         return user;
+    }
+
+    /**
+     * Validates that the given password fulfills all the set requirements
+     * 
+     * @param password
+     *            Password to check
+     * @throws Exception
+     *             Exception thrown if the password doesn't meet the
+     *             requirements
+     */
+    private static void validatePassword(String password)
+            throws PasswordRequirementException {
+        if (!PasswordUtil.isValid(password)) {
+            throw new PasswordRequirementException();
+        }
     }
 
     /**
@@ -189,7 +206,7 @@ public class UserUtil implements Serializable {
     public static void changePassword(User user, String currentPassword,
             String newPassword, String verifiedNewPassword)
             throws InvalidCredentialsException, TooShortPasswordException,
-            PasswordsDoNotMatchException {
+            PasswordsDoNotMatchException, PasswordRequirementException {
 
         // Verify that the current password is correct
         if (!PasswordUtil.verifyPassword(user, currentPassword)) {
@@ -201,6 +218,8 @@ public class UserUtil implements Serializable {
 
         // Check the new password's constraints
         verifyPasswordLength(newPassword);
+        validatePassword(newPassword);
+
         checkPasswordVerification(newPassword, verifiedNewPassword);
 
         // Password is ok, hash it and change it
@@ -321,24 +340,7 @@ public class UserUtil implements Serializable {
      * @return Minimum password length
      */
     public static int getMinPasswordLength() {
-        String minLenghtStr = System
-                .getProperty("authentication.password.validation.length");
-        int minLenght = 8;
-        if (minLenghtStr == null) {
-            System
-                    .setProperty("authentication.password.validation.length",
-                            "8");
-            return minLenght;
-        }
-
-        try {
-            minLenght = Integer.valueOf(minLenghtStr);
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(
-                    "authentication.password.validation.length must be an integer");
-        }
-
-        return minLenght;
+        return PasswordUtil.getMinPasswordLength();
     }
 
     /**

@@ -17,6 +17,7 @@ import org.vaadin.appfoundation.authentication.LogoutListener;
 import org.vaadin.appfoundation.authentication.SessionHandler;
 import org.vaadin.appfoundation.authentication.data.User;
 import org.vaadin.appfoundation.authentication.exceptions.InvalidCredentialsException;
+import org.vaadin.appfoundation.authentication.exceptions.PasswordRequirementException;
 import org.vaadin.appfoundation.authentication.exceptions.PasswordsDoNotMatchException;
 import org.vaadin.appfoundation.authentication.exceptions.TooShortPasswordException;
 import org.vaadin.appfoundation.authentication.exceptions.TooShortUsernameException;
@@ -50,6 +51,8 @@ public class UserUtilTest {
         System.clearProperty("authentication.maxFailedPasswordChangeAttempts");
         System.clearProperty("authentication.password.validation.length");
         System.clearProperty("authentication.username.validation.length");
+        System
+                .clearProperty("authentication.password.validation.upperCaseRequired");
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -67,7 +70,7 @@ public class UserUtilTest {
         Properties properties = new Properties();
         properties.setProperty("username.length.min", "test");
         properties.setProperty("password.length.min", "3");
-        UserUtil.setProperties(properties);
+        extracted(properties);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -75,21 +78,21 @@ public class UserUtilTest {
         Properties properties = new Properties();
         properties.setProperty("username.length.min", "3");
         properties.setProperty("password.length.min", "test");
-        UserUtil.setProperties(properties);
+        extracted(properties);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void setPropertiesMissingUsername() {
         Properties properties = new Properties();
         properties.setProperty("password.length.min", "3");
-        UserUtil.setProperties(properties);
+        extracted(properties);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void setPropertiesMissingPassword() {
         Properties properties = new Properties();
         properties.setProperty("username.length.min", "3");
-        UserUtil.setProperties(properties);
+        extracted(properties);
     }
 
     @Test
@@ -97,7 +100,7 @@ public class UserUtilTest {
         Properties properties = new Properties();
         properties.setProperty("username.length.min", "5");
         properties.setProperty("password.length.min", "3");
-        UserUtil.setProperties(properties);
+        extracted(properties);
 
         assertEquals(5, UserUtil.getMinUsernameLength());
         assertEquals(3, UserUtil.getMinPasswordLength());
@@ -108,16 +111,20 @@ public class UserUtilTest {
         Properties properties = new Properties();
         properties.setProperty("username.length.min", "5");
         properties.setProperty("password.length.min", "3");
-        UserUtil.setProperties(properties);
+        extracted(properties);
 
         // Properties is already set
         Properties properties2 = new Properties();
         properties2.setProperty("username.length.min", "3");
         properties2.setProperty("password.length.min", "5");
-        UserUtil.setProperties(properties2);
+        extracted(properties2);
 
         assertEquals(3, UserUtil.getMinUsernameLength());
         assertEquals(5, UserUtil.getMinPasswordLength());
+    }
+
+    private void extracted(Properties properties2) {
+        UserUtil.setProperties(properties2);
     }
 
     @Test
@@ -132,35 +139,36 @@ public class UserUtilTest {
     @Test(expected = TooShortUsernameException.class)
     public void registerUserNullUsername() throws TooShortPasswordException,
             TooShortUsernameException, PasswordsDoNotMatchException,
-            UsernameExistsException {
+            UsernameExistsException, PasswordRequirementException {
         UserUtil.registerUser(null, "test1", "test1");
     }
 
     @Test(expected = TooShortUsernameException.class)
     public void registerUserShortUsername() throws TooShortPasswordException,
             TooShortUsernameException, PasswordsDoNotMatchException,
-            UsernameExistsException {
+            UsernameExistsException, PasswordRequirementException {
         UserUtil.registerUser("a", "test1", "test1");
     }
 
     @Test(expected = TooShortPasswordException.class)
     public void registerUserNullPassword() throws TooShortPasswordException,
             TooShortUsernameException, PasswordsDoNotMatchException,
-            UsernameExistsException {
+            UsernameExistsException, PasswordRequirementException {
         UserUtil.registerUser("test", null, null);
     }
 
     @Test(expected = TooShortPasswordException.class)
     public void registerUserShortPassword() throws TooShortPasswordException,
             TooShortUsernameException, PasswordsDoNotMatchException,
-            UsernameExistsException {
+            UsernameExistsException, PasswordRequirementException {
         UserUtil.registerUser("test", "a", "a");
     }
 
     @Test(expected = PasswordsDoNotMatchException.class)
     public void registerUserIncompatiblePassword()
             throws TooShortPasswordException, TooShortUsernameException,
-            PasswordsDoNotMatchException, UsernameExistsException {
+            PasswordsDoNotMatchException, UsernameExistsException,
+            PasswordRequirementException {
         System.setProperty("authentication.password.validation.length", "4");
         UserUtil.registerUser("test", "test1", "test2");
     }
@@ -168,7 +176,7 @@ public class UserUtilTest {
     @Test(expected = UsernameExistsException.class)
     public void registerUserUsernameTaken() throws TooShortPasswordException,
             TooShortUsernameException, PasswordsDoNotMatchException,
-            UsernameExistsException {
+            UsernameExistsException, PasswordRequirementException {
         User user = new User();
         user.setUsername("test");
         FacadeFactory.getFacade().store(user);
@@ -180,7 +188,7 @@ public class UserUtilTest {
     @Test
     public void registerUser() throws TooShortPasswordException,
             TooShortUsernameException, PasswordsDoNotMatchException,
-            UsernameExistsException {
+            UsernameExistsException, PasswordRequirementException {
         System.setProperty("authentication.password.validation.length", "4");
         User user = UserUtil.registerUser("test", "test1", "test1");
         assertNotNull(user.getId());
@@ -200,7 +208,7 @@ public class UserUtilTest {
     @Test(expected = InvalidCredentialsException.class)
     public void changePasswordIncorrectOld()
             throws InvalidCredentialsException, TooShortPasswordException,
-            PasswordsDoNotMatchException {
+            PasswordsDoNotMatchException, PasswordRequirementException {
         User user = new User();
         user.setUsername("test");
         // Hashed value of "foobar"+"test" (the salt value)
@@ -211,7 +219,8 @@ public class UserUtilTest {
 
     @Test(expected = TooShortPasswordException.class)
     public void changePasswordTooShortNew() throws InvalidCredentialsException,
-            TooShortPasswordException, PasswordsDoNotMatchException {
+            TooShortPasswordException, PasswordsDoNotMatchException,
+            PasswordRequirementException {
         User user = new User();
         user.setUsername("test");
         // Hashed value of "foobar"+"test" (the salt value)
@@ -222,7 +231,8 @@ public class UserUtilTest {
 
     @Test(expected = TooShortPasswordException.class)
     public void changePasswordNullNew() throws InvalidCredentialsException,
-            TooShortPasswordException, PasswordsDoNotMatchException {
+            TooShortPasswordException, PasswordsDoNotMatchException,
+            PasswordRequirementException {
         User user = new User();
         user.setUsername("test");
         // Hashed value of "foobar"+"test" (the salt value)
@@ -233,7 +243,8 @@ public class UserUtilTest {
 
     @Test(expected = PasswordsDoNotMatchException.class)
     public void changePasswordNotMatch() throws InvalidCredentialsException,
-            TooShortPasswordException, PasswordsDoNotMatchException {
+            TooShortPasswordException, PasswordsDoNotMatchException,
+            PasswordRequirementException {
         System.setProperty("authentication.password.validation.length", "4");
         User user = new User();
         user.setUsername("test");
@@ -245,7 +256,8 @@ public class UserUtilTest {
 
     @Test
     public void changePassword() throws InvalidCredentialsException,
-            TooShortPasswordException, PasswordsDoNotMatchException {
+            TooShortPasswordException, PasswordsDoNotMatchException,
+            PasswordRequirementException {
         System.setProperty("authentication.password.validation.length", "4");
         User user = new User();
         user.setUsername("test");
@@ -273,7 +285,7 @@ public class UserUtilTest {
     @Test(expected = TooShortPasswordException.class)
     public void minPasswordLength() throws TooShortPasswordException,
             TooShortUsernameException, PasswordsDoNotMatchException,
-            UsernameExistsException {
+            UsernameExistsException, PasswordRequirementException {
         System.setProperty("authentication.password.validation.length", "4");
         UserUtil.registerUser("testing", "123", "123");
     }
@@ -281,7 +293,7 @@ public class UserUtilTest {
     @Test
     public void minPasswordLengthOk() throws TooShortPasswordException,
             TooShortUsernameException, PasswordsDoNotMatchException,
-            UsernameExistsException {
+            UsernameExistsException, PasswordRequirementException {
         System.setProperty("authentication.password.validation.length", "4");
         User user = UserUtil.registerUser("testing", "1234", "1234");
         assertNotNull(user);
@@ -290,7 +302,7 @@ public class UserUtilTest {
     @Test(expected = TooShortUsernameException.class)
     public void minUsernameLength() throws TooShortPasswordException,
             TooShortUsernameException, PasswordsDoNotMatchException,
-            UsernameExistsException {
+            UsernameExistsException, PasswordRequirementException {
         System.setProperty("authentication.username.validation.length", "4");
         UserUtil.registerUser("tes", "123456789", "123456789");
 
@@ -299,7 +311,7 @@ public class UserUtilTest {
     @Test
     public void minUsernameLengthOk() throws TooShortPasswordException,
             TooShortUsernameException, PasswordsDoNotMatchException,
-            UsernameExistsException {
+            UsernameExistsException, PasswordRequirementException {
         System.setProperty("authentication.username.validation.length", "4");
         User user = UserUtil.registerUser("test", "123456789", "123456789");
         assertNotNull(user);
@@ -330,7 +342,8 @@ public class UserUtilTest {
     @Test
     public void logoutAfterFailedPasswordChangeAttempts()
             throws TooShortPasswordException, TooShortUsernameException,
-            PasswordsDoNotMatchException, UsernameExistsException {
+            PasswordsDoNotMatchException, UsernameExistsException,
+            PasswordRequirementException {
         final ValueContainer value = new ValueContainer(false);
         LogoutListener listener = new LogoutListener() {
             public void logout(LogoutEvent event) {
@@ -358,7 +371,8 @@ public class UserUtilTest {
     @Test(expected = IllegalArgumentException.class)
     public void invalidValueForMaxAllowedPasswordChangeAttempts()
             throws TooShortPasswordException, TooShortUsernameException,
-            PasswordsDoNotMatchException, UsernameExistsException {
+            PasswordsDoNotMatchException, UsernameExistsException,
+            PasswordRequirementException {
         System.setProperty("authentication.maxFailedPasswordChangeAttempts",
                 "test");
         User user = UserUtil.registerUser("user", "foobar123", "foobar123");
@@ -373,7 +387,8 @@ public class UserUtilTest {
     @Test
     public void clearingOfFailedPwdAttempts() throws TooShortPasswordException,
             TooShortUsernameException, UsernameExistsException,
-            InvalidCredentialsException, PasswordsDoNotMatchException {
+            InvalidCredentialsException, PasswordsDoNotMatchException,
+            PasswordRequirementException {
         User user = UserUtil.registerUser("user", "foobar123", "foobar123");
 
         try {
@@ -391,6 +406,29 @@ public class UserUtilTest {
             // Expected
         }
         assertEquals(0, user.getFailedPasswordChangeAttemps());
+    }
+
+    @Test(expected = PasswordRequirementException.class)
+    public void passwordRequirementsInRegistering()
+            throws TooShortPasswordException, TooShortUsernameException,
+            PasswordsDoNotMatchException, UsernameExistsException,
+            PasswordRequirementException {
+        System.setProperty("authentication.password.validation.length", "4");
+        System.setProperty(
+                "authentication.password.validation.upperCaseRequired", "true");
+        UserUtil.registerUser("testing", "test", "test");
+    }
+
+    @Test(expected = PasswordRequirementException.class)
+    public void passwordRequirementsInChangePassword()
+            throws TooShortPasswordException, TooShortUsernameException,
+            PasswordsDoNotMatchException, UsernameExistsException,
+            PasswordRequirementException, InvalidCredentialsException {
+        System.setProperty("authentication.password.validation.length", "4");
+        User user = UserUtil.registerUser("testing", "test", "test");
+        System.setProperty(
+                "authentication.password.validation.upperCaseRequired", "true");
+        UserUtil.changePassword(user, "test", "test", "test");
     }
 
 }

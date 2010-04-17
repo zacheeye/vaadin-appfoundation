@@ -3,9 +3,16 @@ package org.vaadin.appfoundation.authentication.util;
 import java.io.Serializable;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import org.vaadin.appfoundation.authentication.data.User;
+
+import com.vaadin.data.Validator;
+import com.vaadin.data.validator.RegexpValidator;
+import com.vaadin.data.validator.StringLengthValidator;
+import com.vaadin.ui.TextField;
 
 /**
  * Utility class containing useful helper methods related to passwords.
@@ -133,5 +140,128 @@ public class PasswordUtil implements Serializable {
         }
 
         return hashedPassword.toString();
+    }
+
+    /**
+     * Validates that the password has met all set requirements
+     * 
+     * @param password
+     *            String to be checked
+     * @return True if password meets all requirements, false if not
+     */
+    public static boolean isValid(String password) {
+        List<Validator> validators = getValidators();
+        for (Validator validator : validators) {
+            if (!validator.isValid(password)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Returns a list of {@link Validator} objects which can be attached to
+     * Vaadin {@link TextField}s. The Validators are built based on the the
+     * paswword requirements defined.
+     * 
+     * @return List of validators
+     */
+    public static List<Validator> getValidators() {
+        List<Validator> validators = new ArrayList<Validator>();
+
+        validators.add(new StringLengthValidator("Password is too short",
+                getMinPasswordLength(), 999999, false));
+
+        if (isLowerCaseRequired()) {
+            validators.add(new RegexpValidator(".*[a-z].*",
+                    "The password must contain lower case letters (a-z)"));
+        }
+
+        if (isUpperCaseRequired()) {
+            validators.add(new RegexpValidator(".*[A-Z].*",
+                    "The password must contain upper case latters (A-Z)"));
+        }
+
+        if (isNumericRequired()) {
+            validators.add(new RegexpValidator(".*[0-9].*",
+                    "The password must contain numbers)"));
+        }
+
+        if (isSpecialCharacterRequired()) {
+            validators.add(new RegexpValidator(".*[^a-zA-Z0-9].*",
+                    "The password must contain characters other than "
+                            + "letters from A to Z or numbers"));
+        }
+        return validators;
+    }
+
+    /**
+     * Checks if lower case letters (a-z) are required to be present in the
+     * password.
+     * 
+     * @return True if lower case letters are required, otherwise false
+     */
+    private static boolean isLowerCaseRequired() {
+        return Boolean
+                .getBoolean("authentication.password.validation.lowerCaseRequired");
+    }
+
+    /**
+     * Checks if upper case letters (A-Z) are required to be present in the
+     * password.
+     * 
+     * @return True if upper case letters are required, otherwise false
+     */
+    private static boolean isUpperCaseRequired() {
+        return Boolean
+                .getBoolean("authentication.password.validation.upperCaseRequired");
+    }
+
+    /**
+     * Checks if numbers (0-9) are required to be present in the password.
+     * 
+     * @return True if numbers are required, otherwise false
+     */
+    private static boolean isNumericRequired() {
+        return Boolean
+                .getBoolean("authentication.password.validation.numericRequired");
+    }
+
+    /**
+     * Checks if special characters (anything else than numbers and letters from
+     * a to z) are required to be present in the password.
+     * 
+     * @return True if special characters are required, otherwise false
+     */
+    private static boolean isSpecialCharacterRequired() {
+        return Boolean
+                .getBoolean("authentication.password.validation.specialCharacterRequired");
+    }
+
+    /**
+     * Returns the minimum length of a password
+     * 
+     * @return Minimum password length
+     */
+    public static int getMinPasswordLength() {
+        String minLenghtStr = System
+                .getProperty("authentication.password.validation.length");
+        int minLenght = 8;
+        if (minLenghtStr == null) {
+            System
+                    .setProperty("authentication.password.validation.length",
+                            "8");
+            return minLenght;
+        }
+
+        try {
+            minLenght = Integer.valueOf(minLenghtStr);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException(
+                    "authentication.password.validation.length must be an integer");
+        }
+
+        return minLenght;
     }
 }
