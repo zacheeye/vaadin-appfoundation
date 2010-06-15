@@ -25,7 +25,6 @@ public class SimpleViewContainer extends AbstractView<Panel> implements
     /**
      * {@inheritDoc}
      */
-    @Override
     public void activated(Object... params) {
         // Do nothing
     }
@@ -33,7 +32,6 @@ public class SimpleViewContainer extends AbstractView<Panel> implements
     /**
      * {@inheritDoc}
      */
-    @Override
     public void deactivated(Object... params) {
         // Do nothing
     }

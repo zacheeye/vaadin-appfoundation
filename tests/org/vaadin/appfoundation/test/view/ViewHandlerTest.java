@@ -185,12 +185,10 @@ public class ViewHandlerTest {
                 new VerticalLayout()) {
             private static final long serialVersionUID = 1L;
 
-            @Override
             public void activated(Object... params) {
                 viewActivated.setValue(true);
             }
 
-            @Override
             public void deactivated(Object... params) {
                 // TODO Auto-generated method stub
 
@@ -234,12 +232,10 @@ public class ViewHandlerTest {
                 new VerticalLayout()) {
             private static final long serialVersionUID = 1L;
 
-            @Override
             public void activated(Object... params) {
 
             }
 
-            @Override
             public void deactivated(Object... params) {
                 viewDeactivated.setValue(true);
             }
@@ -278,12 +274,10 @@ public class ViewHandlerTest {
                 new VerticalLayout()) {
             private static final long serialVersionUID = 1L;
 
-            @Override
             public void activated(Object... params) {
                 parameters.setValue(params);
             }
 
-            @Override
             public void deactivated(Object... params) {
                 // TODO Auto-generated method stub
 
@@ -318,12 +312,10 @@ public class ViewHandlerTest {
                 new VerticalLayout()) {
             private static final long serialVersionUID = 1L;
 
-            @Override
             public void activated(Object... params) {
 
             }
 
-            @Override
             public void deactivated(Object... params) {
                 parameters.setValue(params);
             }
@@ -357,12 +349,10 @@ public class ViewHandlerTest {
                 new VerticalLayout()) {
             private static final long serialVersionUID = 1L;
 
-            @Override
             public void activated(Object... params) {
                 viewActivated.setValue(true);
             }
 
-            @Override
             public void deactivated(Object... params) {
                 // TODO Auto-generated method stub
 
@@ -485,11 +475,9 @@ public class ViewHandlerTest {
                 new VerticalLayout()) {
             private static final long serialVersionUID = 1L;
 
-            @Override
             public void activated(Object... params) {
             }
 
-            @Override
             public void deactivated(Object... params) {
                 viewDeactivated.setValue(true);
             }
@@ -853,12 +841,10 @@ public class ViewHandlerTest {
                 new VerticalLayout()) {
             private static final long serialVersionUID = 1L;
 
-            @Override
             public void activated(Object... params) {
                 viewActivated.setValue(true);
             }
 
-            @Override
             public void deactivated(Object... params) {
                 // TODO Auto-generated method stub
 
