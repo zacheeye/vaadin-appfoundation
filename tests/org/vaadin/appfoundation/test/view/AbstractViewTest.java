@@ -40,7 +40,6 @@ public class AbstractViewTest {
 
         private static final long serialVersionUID = 1L;
 
-        @Override
         public void activated(Object... params) {
             // TODO Auto-generated method stub
 
@@ -54,7 +53,6 @@ public class AbstractViewTest {
             setContent(layout);
         }
 
-        @Override
         public void deactivated(Object... params) {
             // TODO Auto-generated method stub
 

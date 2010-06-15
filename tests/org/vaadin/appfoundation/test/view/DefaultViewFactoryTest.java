@@ -37,13 +37,11 @@ public class DefaultViewFactoryTest {
             super(new VerticalLayout());
         }
 
-        @Override
         public void activated(Object... params) {
             // TODO Auto-generated method stub
 
         }
 
-        @Override
         public void deactivated(Object... params) {
             // TODO Auto-generated method stub
 
@@ -57,13 +55,11 @@ public class DefaultViewFactoryTest {
             super(new VerticalLayout());
         }
 
-        @Override
         public void activated(Object... params) {
             // TODO Auto-generated method stub
 
         }
 
-        @Override
         public void deactivated(Object... params) {
             // TODO Auto-generated method stub
 

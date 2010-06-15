@@ -59,13 +59,11 @@ public class SimpleViewContainerTest {
     public void activateInvalidView() {
         View view = new View() {
 
-            @Override
             public void deactivated(Object... params) {
                 // TODO Auto-generated method stub
 
             }
 
-            @Override
             public void activated(Object... params) {
                 // TODO Auto-generated method stub
 
