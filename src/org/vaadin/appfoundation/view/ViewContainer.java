@@ -13,13 +13,13 @@ public interface ViewContainer {
      * 
      * @param view
      */
-    public void activate(AbstractView<?> view);
+    public void activate(View view);
 
     /**
      * Deactivates the given view.
      * 
      * @param view
      */
-    public void deactivate(AbstractView<?> view);
+    public void deactivate(View view);
 
 }

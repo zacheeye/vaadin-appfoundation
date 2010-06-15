@@ -12,7 +12,7 @@ import com.vaadin.ui.CustomComponent;
  * 
  */
 public abstract class AbstractView<A extends ComponentContainer> extends
-        CustomComponent implements Serializable {
+        CustomComponent implements View, Serializable {
 
     private static final long serialVersionUID = -1420553541682132603L;
 
@@ -22,17 +22,6 @@ public abstract class AbstractView<A extends ComponentContainer> extends
         setContent(layout);
         setSizeFull();
     }
-
-    /**
-     * This method is called when the view is activated.
-     */
-    public abstract void activated(Object... params);
-
-    /**
-     * This method is called when the view is deactivated via the
-     * {@link ViewHandler}.
-     */
-    public abstract void deactivated(Object... params);
 
     /**
      * Set a new content container. Default value is the object provided as

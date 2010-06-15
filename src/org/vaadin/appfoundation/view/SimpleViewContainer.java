@@ -1,5 +1,6 @@
 package org.vaadin.appfoundation.view;
 
+import com.vaadin.ui.Component;
 import com.vaadin.ui.Panel;
 
 /**
@@ -40,15 +41,18 @@ public class SimpleViewContainer extends AbstractView<Panel> implements
     /**
      * {@inheritDoc}
      */
-    public void activate(AbstractView<?> view) {
+    public void activate(View view) {
+        if (!(view instanceof Component)) {
+            throw new IllegalArgumentException("View must be a component");
+        }
         getContent().removeAllComponents();
-        getContent().addComponent(view);
+        getContent().addComponent((Component) view);
     }
 
     /**
      * {@inheritDoc}
      */
-    public void deactivate(AbstractView<?> view) {
+    public void deactivate(View view) {
         getContent().removeAllComponents();
     }
 
