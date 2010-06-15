@@ -1,26 +1,25 @@
 package org.vaadin.appfoundation.test.view;
 
-import org.vaadin.appfoundation.view.AbstractView;
+import org.vaadin.appfoundation.view.View;
 import org.vaadin.appfoundation.view.ViewContainer;
 
 public class MockViewContainer implements ViewContainer {
 
-    private AbstractView<?> previouslyActivatedView = null;
+    private View previouslyActivatedView = null;
 
-    public void activate(AbstractView<?> view) {
+    public void activate(View view) {
         setPreviouslyActivatedView(null);
     }
 
-    public void setPreviouslyActivatedView(
-            AbstractView<?> previouslyActivatedView) {
+    public void setPreviouslyActivatedView(View previouslyActivatedView) {
         this.previouslyActivatedView = previouslyActivatedView;
     }
 
-    public AbstractView<?> getPreviouslyActivatedView() {
+    public View getPreviouslyActivatedView() {
         return previouslyActivatedView;
     }
 
-    public void deactivate(AbstractView<?> view) {
+    public void deactivate(View view) {
         // TODO Auto-generated method stub
 
     }

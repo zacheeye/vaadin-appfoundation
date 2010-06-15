@@ -18,6 +18,6 @@ public interface ViewFactory extends Serializable {
      *            View id for the view we want to initialize
      * @return Instance of the initialized view
      */
-    public AbstractView<?> initView(Object viewId);
+    public View initView(Object viewId);
 
 }

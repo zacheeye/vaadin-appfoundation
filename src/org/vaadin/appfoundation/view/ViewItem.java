@@ -15,9 +15,9 @@ public class ViewItem implements Serializable {
 
     private final Object viewId;
 
-    private AbstractView<?> view;
+    private View view;
 
-    private Class<? extends AbstractView<?>> viewClass = null;
+    private Class<? extends View> viewClass = null;
 
     private ViewFactory factory = null;
 
@@ -34,7 +34,7 @@ public class ViewItem implements Serializable {
         if (viewId instanceof Class) {
             if (AbstractView.class.isAssignableFrom((Class<?>) viewId)) {
                 setFactory(new DefaultViewFactory());
-                viewClass = (Class<? extends AbstractView<?>>) viewId;
+                viewClass = (Class<? extends View>) viewId;
             }
 
         }
@@ -47,7 +47,7 @@ public class ViewItem implements Serializable {
      * @param view
      *            The view instance
      */
-    public void setView(AbstractView<?> view) {
+    public void setView(View view) {
         this.view = view;
     }
 
@@ -57,7 +57,7 @@ public class ViewItem implements Serializable {
      * 
      * @return The view instance
      */
-    public AbstractView<?> getView() {
+    public View getView() {
         if (view == null && factory != null) {
             view = factory.initView(getViewId());
         }
@@ -78,7 +78,7 @@ public class ViewItem implements Serializable {
      * 
      * @return The view's class
      */
-    public Class<? extends AbstractView<?>> getViewClass() {
+    public Class<? extends View> getViewClass() {
         return viewClass;
     }
 

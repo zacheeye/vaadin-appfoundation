@@ -17,6 +17,7 @@ import org.vaadin.appfoundation.view.DefaultViewFactory;
 import org.vaadin.appfoundation.view.DispatchEvent;
 import org.vaadin.appfoundation.view.DispatchEventListener;
 import org.vaadin.appfoundation.view.DispatchException;
+import org.vaadin.appfoundation.view.View;
 import org.vaadin.appfoundation.view.ViewContainer;
 import org.vaadin.appfoundation.view.ViewFactory;
 import org.vaadin.appfoundation.view.ViewHandler;
@@ -103,11 +104,11 @@ public class ViewHandlerTest {
         final ValueContainer value = new ValueContainer();
 
         ViewContainer container = new ViewContainer() {
-            public void activate(AbstractView<?> view) {
+            public void activate(View view) {
                 value.setValue(view);
             }
 
-            public void deactivate(AbstractView<?> view) {
+            public void deactivate(View view) {
                 // TODO Auto-generated method stub
 
             }
@@ -125,7 +126,7 @@ public class ViewHandlerTest {
         ViewFactory factory = new ViewFactory() {
             private static final long serialVersionUID = -3121514093680829422L;
 
-            public AbstractView<?> initView(Object viewId) {
+            public View initView(Object viewId) {
                 return null;
             }
         };
@@ -204,11 +205,11 @@ public class ViewHandlerTest {
         assertFalse((Boolean) viewActivated.getValue());
 
         ViewContainer container = new ViewContainer() {
-            public void activate(AbstractView<?> view) {
+            public void activate(View view) {
                 parentCalled.setValue(true);
             }
 
-            public void deactivate(AbstractView<?> view) {
+            public void deactivate(View view) {
                 // TODO Auto-generated method stub
 
             }
@@ -252,11 +253,11 @@ public class ViewHandlerTest {
         assertFalse((Boolean) viewDeactivated.getValue());
 
         ViewContainer container = new ViewContainer() {
-            public void activate(AbstractView<?> view) {
+            public void activate(View view) {
 
             }
 
-            public void deactivate(AbstractView<?> view) {
+            public void deactivate(View view) {
                 parentCalled.setValue(true);
             }
         };
@@ -292,10 +293,10 @@ public class ViewHandlerTest {
         ViewItem item = ViewHandler.addView("test");
         item.setView(view);
         ViewContainer container = new ViewContainer() {
-            public void activate(AbstractView<?> view) {
+            public void activate(View view) {
             }
 
-            public void deactivate(AbstractView<?> view) {
+            public void deactivate(View view) {
                 // TODO Auto-generated method stub
 
             }
@@ -331,10 +332,10 @@ public class ViewHandlerTest {
         ViewItem item = ViewHandler.addView("test");
         item.setView(view);
         ViewContainer container = new ViewContainer() {
-            public void activate(AbstractView<?> view) {
+            public void activate(View view) {
             }
 
-            public void deactivate(AbstractView<?> view) {
+            public void deactivate(View view) {
 
             }
         };
@@ -455,11 +456,11 @@ public class ViewHandlerTest {
         ViewHandler.activateView("test");
 
         ViewContainer container = new ViewContainer() {
-            public void activate(AbstractView<?> view) {
+            public void activate(View view) {
                 parentCalled.setValue(true);
             }
 
-            public void deactivate(AbstractView<?> view) {
+            public void deactivate(View view) {
                 // TODO Auto-generated method stub
 
             }
@@ -571,11 +572,11 @@ public class ViewHandlerTest {
         ViewHandler.activateView("test");
 
         ViewContainer container = new ViewContainer() {
-            public void activate(AbstractView<?> view) {
+            public void activate(View view) {
 
             }
 
-            public void deactivate(AbstractView<?> view) {
+            public void deactivate(View view) {
                 parentCalled.setValue(true);
 
             }
@@ -716,11 +717,11 @@ public class ViewHandlerTest {
 
         ViewHandler.addView(MockView.class, new ViewContainer() {
 
-            public void deactivate(AbstractView<?> view) {
+            public void deactivate(View view) {
 
             }
 
-            public void activate(AbstractView<?> view) {
+            public void activate(View view) {
                 parentCalled.setValue(true);
             }
         });

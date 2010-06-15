@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.vaadin.appfoundation.test.MockApplication;
 import org.vaadin.appfoundation.view.AbstractView;
 import org.vaadin.appfoundation.view.SimpleViewContainer;
+import org.vaadin.appfoundation.view.View;
 import org.vaadin.appfoundation.view.ViewHandler;
 import org.vaadin.appfoundation.view.ViewItem;
 
@@ -52,6 +53,27 @@ public class SimpleViewContainerTest {
         Iterator<Component> it = panel.getComponentIterator();
         assertEquals(view, it.next());
         assertFalse(it.hasNext());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void activateInvalidView() {
+        View view = new View() {
+
+            @Override
+            public void deactivated(Object... params) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void activated(Object... params) {
+                // TODO Auto-generated method stub
+
+            }
+        };
+        ViewItem item = ViewHandler.addView("test", viewContainer);
+        item.setView(view);
+        ViewHandler.activateView("test");
     }
 
     @Test

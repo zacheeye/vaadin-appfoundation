@@ -15,11 +15,11 @@ public class DefaultViewFactory implements ViewFactory {
     /**
      * {@inheritDoc}
      */
-    public AbstractView<?> initView(Object viewId) {
+    public View initView(Object viewId) {
         if (viewId instanceof Class<?>) {
-            if (AbstractView.class.isAssignableFrom((Class<?>) viewId))
+            if (View.class.isAssignableFrom((Class<?>) viewId))
                 try {
-                    return (AbstractView<?>) ((Class<?>) viewId).newInstance();
+                    return (View) ((Class<?>) viewId).newInstance();
                 } catch (InstantiationException e) {
                     return null;
                 } catch (IllegalAccessException e) {
