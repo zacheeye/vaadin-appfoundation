@@ -38,6 +38,7 @@ public class Permissions implements TransactionListener {
             throw new IllegalArgumentException("PermissionManager must be set");
         }
 
+        instance.set(this);
         this.application = application;
         pm = manager;
     }
