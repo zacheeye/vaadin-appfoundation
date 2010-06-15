@@ -109,4 +109,25 @@ public class PermissionsTest {
                 .getClass());
     }
 
+    @Test
+    public void removePermission() {
+        assertFalse(manager.wasInvoked("removePermission"));
+        Permissions.removePermission(null, null, null);
+        assertTrue(manager.wasInvoked("removePermission"));
+    }
+
+    @Test
+    public void removeAllPermission() {
+        assertFalse(manager.wasInvoked("removeAllPermission"));
+        Permissions.removeAllPermission(null, null);
+        assertTrue(manager.wasInvoked("removeAllPermission"));
+    }
+
+    @Test
+    public void removeAllPermissions() {
+        assertFalse(manager.wasInvoked("removeAllPermissions"));
+        Permissions.removeAllPermissions(null, null);
+        assertTrue(manager.wasInvoked("removeAllPermissions"));
+    }
+
 }

@@ -125,4 +125,25 @@ public class MemoryPermissionManager extends AbstractPermissionManager {
         return PermissionResultType.ALLOW_IMPLICITLY;
     }
 
+    public void removeAllPermission(Role role, Resource resource) {
+        checkRoleAndResourceNotNull(role, resource);
+        globalAllowed.removeAll(role, resource);
+        globalAllowed.removeAll(role, resource);
+    }
+
+    public void removeAllPermissions(Role role, Resource resource) {
+        checkRoleAndResourceNotNull(role, resource);
+
+        allowed.removeAll(role, resource);
+        denied.removeAll(role, resource);
+        globalAllowed.removeAll(role, resource);
+        globalDenied.removeAll(role, resource);
+    }
+
+    public void removePermission(Role role, String action, Resource resource) {
+        checkRoleAndResourceNotNull(role, resource);
+        allowed.remove(role, action, resource);
+        denied.remove(role, action, resource);
+    }
+
 }

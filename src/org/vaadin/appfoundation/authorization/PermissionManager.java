@@ -102,6 +102,48 @@ public interface PermissionManager extends Serializable {
     public void denyAll(Role role, Resource resource);
 
     /**
+     * Removes any permissions set for the given role, for the given action in
+     * the given resource.
+     * 
+     * @param role
+     *            The role whose permissions are being removed
+     * @param action
+     *            The identifier for the action
+     * @param resource
+     *            The resource from which permissions are removed
+     * 
+     * @throws IllegalArgumentException
+     *             If either role or resource is null
+     */
+    public void removePermission(Role role, String action, Resource resource);
+
+    /**
+     * Removes the ALL permission set for the given role in the given resource.
+     * 
+     * @param role
+     *            The role whose permissions are being removed
+     * @param resource
+     *            The resource from which permissions are removed
+     * 
+     * @throws IllegalArgumentException
+     *             If either role or resource is null
+     */
+    public void removeAllPermission(Role role, Resource resource);
+
+    /**
+     * Removes all permissions set for the given role in the given resource.
+     * 
+     * @param role
+     *            The role whose permissions are being removed
+     * @param resource
+     *            The resource from which permissions are removed
+     * 
+     * @throws IllegalArgumentException
+     *             If either role or resource is null
+     */
+    public void removeAllPermissions(Role role, Resource resource);
+
+    /**
      * Checks if the given role has the permission to perform the given action
      * for the given resource. If no restrictions have been set for the
      * action-resource pair, then the role is granted access.

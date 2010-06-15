@@ -222,4 +222,53 @@ public class Permissions implements TransactionListener {
 
     }
 
+    /**
+     * Removes any permissions set for the given role, for the given action in
+     * the given resource.
+     * 
+     * @param role
+     *            The role whose permissions are being removed
+     * @param action
+     *            The identifier for the action
+     * @param resource
+     *            The resource from which permissions are removed
+     * 
+     * @throws IllegalArgumentException
+     *             If either role or resource is null
+     */
+    public static void removePermission(Role role, String action,
+            Resource resource) {
+        instance.get().pm.removePermission(role, action, resource);
+    }
+
+    /**
+     * Removes the ALL permission set for the given role in the given resource.
+     * 
+     * @param role
+     *            The role whose permissions are being removed
+     * @param resource
+     *            The resource from which permissions are removed
+     * 
+     * @throws IllegalArgumentException
+     *             If either role or resource is null
+     */
+    public static void removeAllPermission(Role role, Resource resource) {
+        instance.get().pm.removeAllPermission(role, resource);
+    }
+
+    /**
+     * Removes all permissions set for the given role in the given resource.
+     * 
+     * @param role
+     *            The role whose permissions are being removed
+     * @param resource
+     *            The resource from which permissions are removed
+     * 
+     * @throws IllegalArgumentException
+     *             If either role or resource is null
+     */
+    public static void removeAllPermissions(Role role, Resource resource) {
+        instance.get().pm.removeAllPermissions(role, resource);
+    }
+
 }
