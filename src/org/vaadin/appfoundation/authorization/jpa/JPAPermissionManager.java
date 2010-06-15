@@ -209,4 +209,55 @@ public class JPAPermissionManager extends AbstractPermissionManager {
 
         return PermissionResultType.ALLOW_IMPLICITLY;
     }
+
+    public void removeAllPermission(Role role, Resource resource) {
+        checkRoleAndResourceNotNull(role, resource);
+        String queryStr = "SELECT p FROM PermissionEntity p WHERE "
+                + "p.resource = :resource AND "
+                + "(p.type = :typeAllowAll OR p.type = :typeDenyAll) AND p.role = :role";
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("resource", resource.getIdentifier());
+        parameters.put("role", role.getIdentifier());
+        parameters.put("typeAllowAll", PermissionType.ALLOW_ALL);
+        parameters.put("typeDenyAll", PermissionType.DENY_ALL);
+
+        List<PermissionEntity> permissions = FacadeFactory.getFacade().list(
+                queryStr, parameters);
+        FacadeFactory.getFacade().deleteAll(permissions);
+    }
+
+    public void removeAllPermissions(Role role, Resource resource) {
+        checkRoleAndResourceNotNull(role, resource);
+
+        String queryStr = "SELECT p FROM PermissionEntity p WHERE "
+                + "p.resource = :resource AND p.role = :role";
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("resource", resource.getIdentifier());
+        parameters.put("role", role.getIdentifier());
+
+        List<PermissionEntity> permissions = FacadeFactory.getFacade().list(
+                queryStr, parameters);
+        FacadeFactory.getFacade().deleteAll(permissions);
+
+    }
+
+    public void removePermission(Role role, String action, Resource resource) {
+        checkRoleAndResourceNotNull(role, resource);
+
+        String queryStr = "SELECT p FROM PermissionEntity p WHERE "
+                + "p.resource = :resource AND "
+                + "p.action = :action AND "
+                + "(p.type = :typeAllow OR p.type = :typeDeny) AND p.role = :role";
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("resource", resource.getIdentifier());
+        parameters.put("role", role.getIdentifier());
+        parameters.put("action", action);
+        parameters.put("typeAllow", PermissionType.ALLOW);
+        parameters.put("typeDeny", PermissionType.DENY);
+
+        List<PermissionEntity> permissions = FacadeFactory.getFacade().list(
+                queryStr, parameters);
+        FacadeFactory.getFacade().deleteAll(permissions);
+
+    }
 }

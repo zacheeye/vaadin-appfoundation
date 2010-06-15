@@ -444,4 +444,110 @@ public abstract class AbstractPermissionManagerTest {
         assertFalse(pm.hasAccess(roles, "test", resource));
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void removePermissionNullRole() {
+        PermissionManager pm = getPermissionHandler();
+        pm.removePermission(null, null, createResource());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void removePermissionNullResource() {
+        PermissionManager pm = getPermissionHandler();
+        pm.removePermission(createRole(), null, null);
+    }
+
+    @Test
+    public void removePermission() {
+        Role role1 = createRole();
+        Role role2 = createRole();
+
+        Resource resource = createResource();
+        PermissionManager pm = getPermissionHandler();
+        pm.allow(role1, "test", resource);
+        pm.allow(role2, "test", resource);
+
+        Set<Role> roles = new HashSet<Role>();
+        roles.add(role1);
+
+        assertTrue(pm.hasAccess(roles, "test", resource));
+
+        pm.removePermission(role1, "test", resource);
+        assertFalse(pm.hasAccess(roles, "test", resource));
+        pm.removePermission(role2, "test", resource);
+        assertTrue(pm.hasAccess(roles, "test", resource));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void removeAllPermissionNullRole() {
+        PermissionManager pm = getPermissionHandler();
+        pm.removeAllPermission(null, createResource());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void removeAllPermissionNullResource() {
+        PermissionManager pm = getPermissionHandler();
+        pm.removeAllPermission(createRole(), null);
+    }
+
+    @Test
+    public void removeAllPermission() {
+        Role role1 = createRole();
+        Role role2 = createRole();
+
+        Resource resource = createResource();
+        PermissionManager pm = getPermissionHandler();
+        pm.allowAll(role1, resource);
+        pm.allowAll(role2, resource);
+
+        Set<Role> roles = new HashSet<Role>();
+        roles.add(role1);
+
+        assertTrue(pm.hasAccess(roles, "test", resource));
+
+        pm.removeAllPermission(role1, resource);
+        assertFalse(pm.hasAccess(roles, "test", resource));
+
+        pm.removeAllPermission(role2, resource);
+        assertTrue(pm.hasAccess(roles, "test", resource));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void removeAllPermissionsNullRole() {
+        PermissionManager pm = getPermissionHandler();
+        pm.removeAllPermissions(null, createResource());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void removeAllPermissionsNullResource() {
+        PermissionManager pm = getPermissionHandler();
+        pm.removeAllPermissions(createRole(), null);
+    }
+
+    @Test
+    public void removeAllPermissions() {
+        Role role1 = createRole();
+        Role role2 = createRole();
+
+        Resource resource = createResource();
+        PermissionManager pm = getPermissionHandler();
+        pm.allow(role1, "test", resource);
+        pm.allow(role1, "test2", resource);
+        pm.allow(role2, "test", resource);
+        pm.allow(role2, "test2", resource);
+
+        Set<Role> roles = new HashSet<Role>();
+        roles.add(role1);
+
+        assertTrue(pm.hasAccess(roles, "test", resource));
+        assertTrue(pm.hasAccess(roles, "test2", resource));
+
+        pm.removeAllPermissions(role1, resource);
+        assertFalse(pm.hasAccess(roles, "test", resource));
+        assertFalse(pm.hasAccess(roles, "test2", resource));
+
+        pm.removeAllPermissions(role2, resource);
+        assertTrue(pm.hasAccess(roles, "test", resource));
+        assertTrue(pm.hasAccess(roles, "test2", resource));
+    }
+
 }

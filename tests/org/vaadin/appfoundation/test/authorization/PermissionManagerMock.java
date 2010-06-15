@@ -10,6 +10,7 @@ import org.vaadin.appfoundation.authorization.Role;
 
 public class PermissionManagerMock implements PermissionManager {
 
+    private static final long serialVersionUID = -1182254914654563528L;
     private final List<String> invokedMethods = new ArrayList<String>();
 
     public void allow(Role role, String action, Resource resource) {
@@ -40,6 +41,18 @@ public class PermissionManagerMock implements PermissionManager {
 
     public boolean wasInvoked(String method) {
         return invokedMethods.contains(method);
+    }
+
+    public void removeAllPermission(Role role, Resource resource) {
+        invokedMethods.add("removeAllPermission");
+    }
+
+    public void removeAllPermissions(Role role, Resource resource) {
+        invokedMethods.add("removeAllPermissions");
+    }
+
+    public void removePermission(Role role, String action, Resource resource) {
+        invokedMethods.add("removePermission");
     }
 
 }
