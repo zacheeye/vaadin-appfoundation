@@ -7,7 +7,10 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import nu.xom.Attribute;
 import nu.xom.Builder;
@@ -55,8 +58,6 @@ public class FillXml {
             throw new FileNotFoundException();
         }
         Builder builder = new Builder();
-        // A list of all identifiers already existing in the file
-        List<String> ids = new ArrayList<String>();
 
         // Read the file with the parser
         Document document = builder.build(file);
@@ -68,11 +69,13 @@ public class FillXml {
         Elements tu = root.getChildElements("body").get(0).getChildElements(
                 "tu");
 
+        Map<String, Element> elementMap = new HashMap<String, Element>();
+
         // Loop through all tu-elements and fetch the identifiers
         for (int i = 0; i < tu.size(); i++) {
             String id = tu.get(i).getAttributeValue("tuid");
-            // Add the id to the list
-            ids.add(id);
+            // Add the id and element to map
+            elementMap.put(id, tu.get(i));
         }
 
         NodeFactory nf = new NodeFactory();
@@ -81,7 +84,7 @@ public class FillXml {
         for (String id : identifiers) {
             // If the identifier didn't exist in the file, then we need to
             // create a stub for it
-            if (!ids.contains(id)) {
+            if (!elementMap.containsKey(id)) {
 
                 // Add a new tu-element
                 Element element = nf.startMakingElement("tu", null);
@@ -90,16 +93,21 @@ public class FillXml {
 
                 // Loop through all our languages
                 for (String lang : languages) {
-                    // Add the tuv-elements for each language
-                    Element e = nf.startMakingElement("tuv", null);
-                    e.addAttribute(new Attribute("lang", lang));
-
-                    Element seg = nf.startMakingElement("seg", null);
-                    seg.addAttribute(new Attribute("value", "TODO"));
-                    e.appendChild(seg);
-                    element.appendChild(e);
+                    writeTODOForLanguage(element, lang);
                 }
                 root.getChildElements("body").get(0).appendChild(element);
+            } else {
+                List<String> missingLanguages = new ArrayList<String>(Arrays
+                        .asList(languages));
+                Element element = elementMap.get(id);
+                Elements tuvs = element.getChildElements("tuv");
+                for (int i = 0; i < tuvs.size(); i++) {
+                    String lang = tuvs.get(i).getAttributeValue("lang");
+                    missingLanguages.remove(lang);
+                }
+                for (String lang : missingLanguages) {
+                    writeTODOForLanguage(element, lang);
+                }
             }
         }
 
@@ -111,5 +119,17 @@ public class FillXml {
         Writer writer = new OutputStreamWriter(fileoutstream, "UTF-8");
         writer.write(xml);
         writer.close();
+    }
+
+    private static void writeTODOForLanguage(Element element, String lang) {
+        NodeFactory nf = new NodeFactory();
+        // Add the tuv-elements for each language
+        Element e = nf.startMakingElement("tuv", null);
+        e.addAttribute(new Attribute("lang", lang));
+
+        Element seg = nf.startMakingElement("seg", null);
+        seg.addAttribute(new Attribute("value", "TODO"));
+        e.appendChild(seg);
+        element.appendChild(e);
     }
 }

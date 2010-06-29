@@ -934,4 +934,45 @@ public class ViewHandlerTest {
         assertEquals(ViewHandler.class, context.getListeners().get(0)
                 .getClass());
     }
+
+    @Test
+    public void uriFragmentParameters() {
+        final ValueContainer viewActivated = new ValueContainer(false);
+        final ValueContainer parameters = new ValueContainer();
+
+        AbstractView<ComponentContainer> view = new AbstractView<ComponentContainer>(
+                new VerticalLayout()) {
+            private static final long serialVersionUID = 1L;
+
+            public void activated(Object... params) {
+                viewActivated.setValue(true);
+                parameters.setValue(params);
+            }
+
+            public void deactivated(Object... params) {
+                // TODO Auto-generated method stub
+
+            }
+        };
+
+        ViewItem item = ViewHandler.addView("test", new MockViewContainer());
+        item.setView(view);
+
+        // Add two uris for the same view
+        ViewHandler.addUri("test", "test");
+        UriFragmentUtility util = ViewHandler.getUriFragmentUtil();
+        util.setFragment("test/foo/bar", true);
+        assertTrue((Boolean) viewActivated.getValue());
+        Object[] params = (Object[]) parameters.getValue();
+        assertNotNull(params);
+        assertEquals(2, params.length);
+        assertEquals("foo", params[0]);
+        assertEquals("bar", params[1]);
+
+        parameters.setValue(null);
+        util.setFragment("clear", false);
+        util.setFragment("test", true);
+        params = (Object[]) parameters.getValue();
+        assertEquals(0, params.length);
+    }
 }

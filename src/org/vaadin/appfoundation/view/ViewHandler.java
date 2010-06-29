@@ -426,11 +426,27 @@ public class ViewHandler implements TransactionListener,
         if (source != null) {
             // Get the uri fragment
             String fragment = source.getUriFragmentUtility().getFragment();
+
+            int i = fragment.indexOf('/');
+            Object[] params = null;
+            String uri;
+            if (i < 0) {
+                uri = fragment;
+            } else {
+                uri = fragment.substring(0, i);
+                params = fragment.subSequence(i + 1, fragment.length())
+                        .toString().split("/");
+            }
+
             // Check if the fragment exists in the map
-            if (instance.get().uriMap.containsKey(fragment)) {
+            if (instance.get().uriMap.containsKey(uri)) {
                 // The view was found, activate it
-                Object viewId = instance.get().uriMap.get(fragment);
-                activateView(viewId);
+                Object viewId = instance.get().uriMap.get(uri);
+                if (params != null) {
+                    activateView(viewId, params);
+                } else {
+                    activateView(viewId);
+                }
             }
         }
     }
