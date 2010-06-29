@@ -18,7 +18,6 @@ import nu.xom.ValidityException;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.vaadin.appfoundation.i18n.FillXml;
 import org.vaadin.appfoundation.i18n.InternationalizationServlet;
@@ -97,7 +96,6 @@ public class FillXmlTest {
 
     }
 
-    @Ignore("Feature not implemented")
     @Test
     public void addNewLanguages() throws ValidityException, ParsingException,
             IOException {
