@@ -19,7 +19,7 @@ public class I18nForm extends Form {
 
         private static final long serialVersionUID = 5324073411117437070L;
 
-        private Class<?> pojoClass;
+        protected Class<?> pojoClass;
 
         public I18nFormFieldFactory(Class<?> pojoClass) {
             this.pojoClass = pojoClass;
