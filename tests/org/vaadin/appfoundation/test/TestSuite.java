@@ -14,6 +14,7 @@ import org.vaadin.appfoundation.test.authorization.jpa.PermissionEntityTest;
 import org.vaadin.appfoundation.test.authorization.memory.MemoryPermissionManagerTest;
 import org.vaadin.appfoundation.test.authorization.memory.PermissionMapTest;
 import org.vaadin.appfoundation.test.i18n.FillXmlTest;
+import org.vaadin.appfoundation.test.i18n.I18nFormTest;
 import org.vaadin.appfoundation.test.i18n.InternationalizationServletTest;
 import org.vaadin.appfoundation.test.i18n.LangTest;
 import org.vaadin.appfoundation.test.i18n.TranslationUtilTest;
@@ -36,7 +37,7 @@ import org.vaadin.appfoundation.test.view.ViewItemTest;
         SessionHandlerTest.class, UserUtilTest.class, PermissionMapTest.class,
         MemoryPermissionManagerTest.class, JPAPermissionManagerTest.class,
         PermissionEntityTest.class, PermissionsTest.class,
-        SimpleViewContainerTest.class })
+        SimpleViewContainerTest.class, I18nFormTest.class })
 public class TestSuite {
 
 }
