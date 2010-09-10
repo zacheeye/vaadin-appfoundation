@@ -90,18 +90,34 @@ public class JPAFacade implements IFacade, Serializable {
     public <A extends AbstractPojo> List<A> list(Class<A> clazz) {
         EntityManager em = getEntityManager();
         try {
-            // Use the ExpressionBuilder to create a query which fetches a list
-            // of the given objects.
-            ExpressionBuilder builder = new ExpressionBuilder();
-            JpaEntityManager jpaEm = JpaHelper.getEntityManager(em);
-            // Build the query
-            Query query = jpaEm.createQuery(builder, clazz);
+            // Initialize the query
+            Query query = generateQuery(clazz, em);
             // Execute the query and return the result
             return query.getResultList();
         } finally {
             // Once we've done the query, close the EntityManager
             em.close();
         }
+    }
+
+    /**
+     * This method creates a Query object from the given entity class.
+     * 
+     * @param entityClass
+     *            The class of the entity for which we are creating the query
+     * @param em
+     *            EntityManager instance
+     * @return An instance of the Query object for the given entity class
+     */
+    private <A extends AbstractPojo> Query generateQuery(Class<A> entityClass,
+            EntityManager em) {
+        // Use the ExpressionBuilder to create a query which fetches a list
+        // of the given objects.
+        ExpressionBuilder builder = new ExpressionBuilder();
+        JpaEntityManager jpaEm = JpaHelper.getEntityManager(em);
+        // Build the query
+        Query query = jpaEm.createQuery(builder, entityClass);
+        return query;
     }
 
     /**
@@ -112,22 +128,41 @@ public class JPAFacade implements IFacade, Serializable {
             Map<String, Object> parameters) {
         EntityManager em = getEntityManager();
         try {
-            // Create a query object from the query string given as the
-            // parameter
-            Query query = em.createQuery(queryStr);
-            // Check if we have some parameters defined
-            if (parameters != null) {
-                for (Entry<String, Object> entry : parameters.entrySet()) {
-                    // Inject the parameter to the query
-                    query.setParameter(entry.getKey(), entry.getValue());
-                }
-            }
+            // Generate a query instance for the given query and parameters
+            Query query = generateQuery(queryStr, parameters, em);
             // Execute query and return results
             return query.getResultList();
         } finally {
             // Once we've done the query, close the EntityManager
             em.close();
         }
+    }
+
+    /**
+     * This method creates a Query object from the given query string and the
+     * given parameters.
+     * 
+     * @param queryStr
+     *            Database query string
+     * @param parameters
+     *            A map of parameters and parameter values used in the query
+     * @param em
+     *            EntityManager instance
+     * @return An instance of the Query object for the given entity class
+     */
+    private Query generateQuery(String queryStr,
+            Map<String, Object> parameters, EntityManager em) {
+        // Create a query object from the query string given as the
+        // parameter
+        Query query = em.createQuery(queryStr);
+        // Check if we have some parameters defined
+        if (parameters != null) {
+            for (Entry<String, Object> entry : parameters.entrySet()) {
+                // Inject the parameter to the query
+                query.setParameter(entry.getKey(), entry.getValue());
+            }
+        }
+        return query;
     }
 
     /**
@@ -479,6 +514,47 @@ public class JPAFacade implements IFacade, Serializable {
             // Now perform the same copying of fields to this class's
             // superclass.
             copyFieldsRecursively(pojo, pojo2, c.getSuperclass());
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @SuppressWarnings("unchecked")
+    public <A extends AbstractPojo> List<A> list(Class<A> clazz,
+            int startIndex, int amount) {
+        EntityManager em = getEntityManager();
+        try {
+            // Initialize the query
+            Query query = generateQuery(clazz, em);
+            query.setFirstResult(startIndex).setMaxResults(amount);
+            // Execute the query and return the result
+            return query.getResultList();
+        } finally {
+            // Once we've done the query, close the EntityManager
+            em.close();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @SuppressWarnings("unchecked")
+    public <A extends AbstractPojo> List<A> list(String queryStr,
+            Map<String, Object> parameters, int startIndex, int amount) {
+        EntityManager em = getEntityManager();
+        try {
+            // Generate a query instance for the given query and parameters
+            Query query = generateQuery(queryStr, parameters, em);
+
+            // Set the result limit parameters
+            query.setFirstResult(startIndex).setMaxResults(amount);
+
+            // Execute query and return results
+            return query.getResultList();
+        } finally {
+            // Once we've done the query, close the EntityManager
+            em.close();
         }
     }
 }
