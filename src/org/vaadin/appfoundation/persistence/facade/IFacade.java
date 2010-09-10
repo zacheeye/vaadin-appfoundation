@@ -44,6 +44,20 @@ public interface IFacade {
     public <A extends AbstractPojo> List<A> list(Class<A> clazz);
 
     /**
+     * Fetches all entities in the database of the given entity type
+     * 
+     * @param clazz
+     *            Entity class
+     * @param startIndex
+     *            Index from which we should start selecting entities
+     * @param amount
+     *            The maximum amount of entities returned
+     * @return List of A entities
+     */
+    public <A extends AbstractPojo> List<A> list(Class<A> clazz,
+            int startIndex, int amount);
+
+    /**
      * Fetches all entities in the database for the given query
      * 
      * @param queryStr
@@ -54,6 +68,22 @@ public interface IFacade {
      */
     public <A extends AbstractPojo> List<A> list(String queryStr,
             Map<String, Object> parameters);
+
+    /**
+     * Fetches all entities in the database for the given query
+     * 
+     * @param queryStr
+     *            Database query string
+     * @param parameters
+     *            A map of parameters and parameter values used in the query
+     * @param startIndex
+     *            Index from which we should start selecting entities
+     * @param amount
+     *            The maximum amount of entities returned
+     * @return List of A entities
+     */
+    public <A extends AbstractPojo> List<A> list(String queryStr,
+            Map<String, Object> parameters, int startIndex, int amount);
 
     /**
      * Fetch a specific entity object from the database for the given query
