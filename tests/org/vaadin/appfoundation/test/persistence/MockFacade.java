@@ -77,4 +77,10 @@ public class MockFacade implements IFacade {
         return null;
     }
 
+    public List<?> getFieldValues(Class<? extends AbstractPojo> c,
+            String field, String whereConditions, Map<String, Object> parameters) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }

@@ -174,4 +174,21 @@ public interface IFacade {
      */
     public Long count(Class<? extends AbstractPojo> c, String whereClause,
             Map<String, Object> parameters);
+
+    /**
+     * Fetches the values for a specific field for all entities which match the
+     * set criteria.
+     * 
+     * @param c
+     *            Entity class
+     * @param field
+     *            Field whose value is returned
+     * @param whereConditions
+     *            Where conditions
+     * @param parameters
+     *            Parameter values for the where conditions
+     * @return A list a field values
+     */
+    public List<?> getFieldValues(Class<? extends AbstractPojo> c,
+            String field, String whereConditions, Map<String, Object> parameters);
 }

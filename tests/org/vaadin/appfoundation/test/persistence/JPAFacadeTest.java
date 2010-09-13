@@ -313,4 +313,33 @@ public class JPAFacadeTest {
         facade.count(MockPojo.class, null, null);
     }
 
+    @Test
+    public void getFieldValues() {
+        List<String> uuids = new ArrayList<String>();
+        for (int i = 0; i < 7; i++) {
+            MockPojo pojo = new MockPojo();
+            String uuid = UUID.randomUUID().toString();
+            if (i % 2 == 0) {
+                pojo.setFoo("foo" + uuid);
+                uuids.add("foo" + uuid);
+            } else {
+                pojo.setFoo("bar" + uuid);
+            }
+
+            facade.store(pojo);
+        }
+
+        String whereClause = "p.foo LIKE :foo";
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("foo", "foo%");
+
+        List<?> fieldsValues = facade.getFieldValues(MockPojo.class, "foo",
+                whereClause, parameters);
+        assertEquals(4, fieldsValues.size());
+
+        for (String uuid : uuids) {
+            fieldsValues.contains(uuid);
+        }
+    }
+
 }

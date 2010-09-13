@@ -443,17 +443,8 @@ public class JPAFacade implements IFacade, Serializable {
         try {
             String queryStr = "SELECT COUNT(p.id) FROM " + c.getSimpleName()
                     + " p WHERE " + whereClause;
-            // Create a query object from the query string given as the
-            // parameter
-            Query query = em.createQuery(queryStr);
-            // Check if we have some parameters defined
-            if (parameters != null) {
-                for (Entry<String, Object> entry : parameters.entrySet()) {
-                    // Inject the parameter to the query
-                    query.setParameter(entry.getKey(), entry.getValue());
-                }
-            }
 
+            Query query = generateQuery(queryStr, parameters, em);
             // Execute query and return result
             return (Long) query.getSingleResult();
         } catch (NoResultException e) {
@@ -556,5 +547,43 @@ public class JPAFacade implements IFacade, Serializable {
             // Once we've done the query, close the EntityManager
             em.close();
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public List<?> getFieldValues(Class<? extends AbstractPojo> c,
+            String field, String whereConditions, Map<String, Object> parameters) {
+
+        String queryStr = createSelectFieldQuery(c, field, whereConditions);
+        EntityManager em = getEntityManager();
+        Query query = generateQuery(queryStr, parameters, em);
+
+        try {
+            // Execute query and return results
+            return query.getResultList();
+        } finally {
+            // Once we've done the query, close the EntityManager
+            em.close();
+        }
+    }
+
+    /**
+     * Creates the query for selecting a specific field's value from entities.
+     * 
+     * @param c
+     * @param field
+     * @param whereConditions
+     * @return
+     */
+    private String createSelectFieldQuery(Class<? extends AbstractPojo> c,
+            String field, String whereConditions) {
+        String queryStr = "SELECT p." + field + " FROM " + c.getSimpleName()
+                + " p";
+
+        if (whereConditions != null) {
+            queryStr += " WHERE " + whereConditions;
+        }
+        return queryStr;
     }
 }
