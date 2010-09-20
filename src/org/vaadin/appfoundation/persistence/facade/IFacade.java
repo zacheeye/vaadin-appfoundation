@@ -44,6 +44,20 @@ public interface IFacade {
     public <A extends AbstractPojo> List<A> list(Class<A> clazz);
 
     /**
+     * Fetches all entities in the database of the given entity type
+     * 
+     * @param clazz
+     *            Entity class
+     * @param startIndex
+     *            Index from which we should start selecting entities
+     * @param amount
+     *            The maximum amount of entities returned
+     * @return List of A entities
+     */
+    public <A extends AbstractPojo> List<A> list(Class<A> clazz,
+            int startIndex, int amount);
+
+    /**
      * Fetches all entities in the database for the given query
      * 
      * @param queryStr
@@ -54,6 +68,22 @@ public interface IFacade {
      */
     public <A extends AbstractPojo> List<A> list(String queryStr,
             Map<String, Object> parameters);
+
+    /**
+     * Fetches all entities in the database for the given query
+     * 
+     * @param queryStr
+     *            Database query string
+     * @param parameters
+     *            A map of parameters and parameter values used in the query
+     * @param startIndex
+     *            Index from which we should start selecting entities
+     * @param amount
+     *            The maximum amount of entities returned
+     * @return List of A entities
+     */
+    public <A extends AbstractPojo> List<A> list(String queryStr,
+            Map<String, Object> parameters, int startIndex, int amount);
 
     /**
      * Fetch a specific entity object from the database for the given query
@@ -144,4 +174,21 @@ public interface IFacade {
      */
     public Long count(Class<? extends AbstractPojo> c, String whereClause,
             Map<String, Object> parameters);
+
+    /**
+     * Fetches the values for a specific field for all entities which match the
+     * set criteria.
+     * 
+     * @param c
+     *            Entity class
+     * @param field
+     *            Field whose value is returned
+     * @param whereConditions
+     *            Where conditions
+     * @param parameters
+     *            Parameter values for the where conditions
+     * @return A list a field values
+     */
+    public List<?> getFieldValues(Class<? extends AbstractPojo> c,
+            String field, String whereConditions, Map<String, Object> parameters);
 }

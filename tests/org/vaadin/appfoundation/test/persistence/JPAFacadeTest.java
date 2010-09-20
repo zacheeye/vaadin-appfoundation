@@ -122,6 +122,32 @@ public class JPAFacadeTest {
     }
 
     @Test
+    public void listWithLimit() {
+        for (int i = 0; i < 17; i++) {
+            MockPojo pojo = new MockPojo();
+            pojo.setFoo(Integer.toString(i));
+            facade.store(pojo);
+        }
+
+        List<MockPojo> pojos = facade.list(MockPojo.class, 2, 7);
+
+        assertEquals(7, pojos.size());
+
+        List<String> numbers = new ArrayList<String>();
+        numbers.add("2");
+        numbers.add("3");
+        numbers.add("4");
+        numbers.add("5");
+        numbers.add("6");
+        numbers.add("7");
+        numbers.add("8");
+
+        for (MockPojo pojo : pojos) {
+            assertTrue(numbers.contains(pojo.getFoo()));
+        }
+    }
+
+    @Test
     public void listQuery() {
         List<String> uuids = new ArrayList<String>();
         for (int i = 0; i < 14; i++) {
@@ -144,6 +170,36 @@ public class JPAFacadeTest {
         for (MockPojo pojo : pojos) {
             assertTrue(uuids.contains(pojo.getFoo()));
         }
+    }
+
+    @Test
+    public void listQueryWithLimit() {
+        List<String> uuids = new ArrayList<String>();
+        for (int i = 0; i < 14; i++) {
+            MockPojo pojo = new MockPojo();
+            String prefix = i % 2 == 0 ? "foo" : "bar";
+            pojo.setFoo(prefix + UUID.randomUUID().toString());
+            if (i % 2 == 0) {
+                uuids.add(pojo.getFoo());
+            }
+            facade.store(pojo);
+        }
+
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("foo", "foo%");
+        List<MockPojo> pojos = facade.list(
+                "SELECT p FROM MockPojo p WHERE p.foo LIKE :foo", parameters,
+                4, 3);
+
+        assertEquals(3, pojos.size());
+
+        for (MockPojo pojo : pojos) {
+            assertTrue(uuids.contains(pojo.getFoo()));
+        }
+
+        assertEquals(uuids.get(4), pojos.get(0).getFoo());
+        assertEquals(uuids.get(5), pojos.get(1).getFoo());
+        assertEquals(uuids.get(6), pojos.get(2).getFoo());
     }
 
     @Test
@@ -255,6 +311,35 @@ public class JPAFacadeTest {
     @Test(expected = IllegalArgumentException.class)
     public void countQueryWhereIsNull() {
         facade.count(MockPojo.class, null, null);
+    }
+
+    @Test
+    public void getFieldValues() {
+        List<String> uuids = new ArrayList<String>();
+        for (int i = 0; i < 7; i++) {
+            MockPojo pojo = new MockPojo();
+            String uuid = UUID.randomUUID().toString();
+            if (i % 2 == 0) {
+                pojo.setFoo("foo" + uuid);
+                uuids.add("foo" + uuid);
+            } else {
+                pojo.setFoo("bar" + uuid);
+            }
+
+            facade.store(pojo);
+        }
+
+        String whereClause = "p.foo LIKE :foo";
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("foo", "foo%");
+
+        List<?> fieldsValues = facade.getFieldValues(MockPojo.class, "foo",
+                whereClause, parameters);
+        assertEquals(4, fieldsValues.size());
+
+        for (String uuid : uuids) {
+            fieldsValues.contains(uuid);
+        }
     }
 
 }
