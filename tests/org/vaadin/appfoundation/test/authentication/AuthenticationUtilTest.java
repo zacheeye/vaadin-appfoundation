@@ -1,6 +1,7 @@
 package org.vaadin.appfoundation.test.authentication;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Field;
@@ -182,6 +183,37 @@ public class AuthenticationUtilTest {
 
         FacadeFactory.getFacade().store(user);
         AuthenticationUtil.authenticate("test", "test");
+    }
+
+    @Test
+    public void accountUnlocked() throws AccountLockedException,
+            InvalidCredentialsException {
+        System.setProperty("authentication.maxFailedLoginAttempts", "3");
+
+        User user = new User();
+        user.setUsername("test");
+        user.setPassword(PasswordUtil.generateHashedPassword("foobar"));
+
+        FacadeFactory.getFacade().store(user);
+
+        long id = user.getId();
+        try {
+            for (int i = 0; i < 4; i++) {
+                try {
+                    AuthenticationUtil.authenticate("test", "test");
+                } catch (InvalidCredentialsException e) {
+                    // This is expected
+                }
+            }
+        } catch (AccountLockedException e) {
+            user = FacadeFactory.getFacade().find(User.class, user.getId());
+            user.clearFailedLoginAttempts();
+            user.setAccountLocked(false);
+            FacadeFactory.getFacade().store(user);
+            user = AuthenticationUtil.authenticate("test", "foobar");
+            assertNotNull(user);
+            assertEquals((long) id, (long) user.getId());
+        }
     }
 
 }
