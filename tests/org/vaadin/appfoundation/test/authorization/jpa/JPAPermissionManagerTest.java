@@ -13,14 +13,24 @@ import org.vaadin.appfoundation.test.authorization.RoleMock;
 
 public class JPAPermissionManagerTest extends AbstractPermissionManagerTest {
 
+    private String persistenceName = "default";
+
     @Before
     public void setUp() throws InstantiationException, IllegalAccessException {
-        FacadeFactory.registerFacade("default", true);
+        FacadeFactory.registerFacade(persistenceName, true);
     }
 
     @After
     public void tearDown() {
-        FacadeFactory.removeFacade("default");
+        FacadeFactory.removeFacade(persistenceName);
+
+        if (persistenceName.equals("oracle")) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
