@@ -24,7 +24,7 @@
 		</properties>
 
 	</persistence-unit>
-	
+
 	<persistence-unit name="second">
 		<provider>
                         org.eclipse.persistence.jpa.PersistenceProvider
@@ -39,6 +39,27 @@
 			<property name="eclipselink.jdbc.password" value="" />
 			<property name="eclipselink.target-database"
 				value="org.eclipse.persistence.platform.database.HSQLPlatform" />
+			<property name="eclipselink.ddl-generation" value="drop-and-create-tables" />
+			<property name="eclipselink.ddl-generation.output-mode"
+				value="database" />
+			<property name="eclipselink.orm.throw.exceptions" value="true" />
+		</properties>
+
+	</persistence-unit>
+
+
+	<persistence-unit name="oracle">
+		<provider>
+                        org.eclipse.persistence.jpa.PersistenceProvider
+                </provider>
+		<class>org.vaadin.appfoundation.test.persistence.MockPojo</class>
+		<exclude-unlisted-classes>false</exclude-unlisted-classes>
+		<properties>
+			<property name="eclipselink.logging.level" value="OFF" />
+			<property name="eclipselink.jdbc.driver" value="oracle.jdbc.OracleDriver" />
+			<property name="eclipselink.jdbc.url" value="jdbc:oracle:thin:@localhost:1521:XE" />
+			<property name="eclipselink.jdbc.user" value="unittest" />
+			<property name="eclipselink.jdbc.password" value="" />
 			<property name="eclipselink.ddl-generation" value="drop-and-create-tables" />
 			<property name="eclipselink.ddl-generation.output-mode"
 				value="database" />
