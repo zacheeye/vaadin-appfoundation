@@ -1,5 +1,6 @@
 package org.vaadin.appfoundation.authorization.jpa;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -23,6 +24,7 @@ public class PermissionEntity extends AbstractPojo {
 
     private String role;
 
+    @Column(name = "perm_resource")
     private String resource;
 
     private String action;
