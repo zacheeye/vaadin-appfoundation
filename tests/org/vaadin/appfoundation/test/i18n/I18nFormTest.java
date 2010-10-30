@@ -13,6 +13,8 @@ import org.vaadin.appfoundation.i18n.FieldTranslation;
 import org.vaadin.appfoundation.i18n.I18nForm;
 import org.vaadin.appfoundation.i18n.InternationalizationServlet;
 import org.vaadin.appfoundation.i18n.Lang;
+import org.vaadin.appfoundation.i18n.TmxSourceReader;
+import org.vaadin.appfoundation.i18n.TranslationSource;
 import org.vaadin.appfoundation.test.MockApplication;
 
 import com.vaadin.data.util.BeanItem;
@@ -24,7 +26,8 @@ public class I18nFormTest {
     public void setUp() {
         URL url = TranslationUtilTest.class.getClassLoader().getResource(
                 "org/vaadin/appfoundation/test/i18n/field.translations.xml");
-        File fieldTranslations = new File(url.getFile());
+        TranslationSource fieldTranslations = new TmxSourceReader(new File(url
+                .getFile()));
 
         InternationalizationServlet.loadTranslations(fieldTranslations);
 

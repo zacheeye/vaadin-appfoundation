@@ -21,6 +21,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.vaadin.appfoundation.i18n.FillXml;
 import org.vaadin.appfoundation.i18n.InternationalizationServlet;
+import org.vaadin.appfoundation.i18n.TmxSourceReader;
 
 public class FillXmlTest {
 
@@ -64,7 +65,7 @@ public class FillXmlTest {
         FillXml.updateTranslations(file, new String[] { "en", "fi" },
                 identifiers);
         // Load the newly created file into the servlet
-        InternationalizationServlet.loadTranslations(file);
+        InternationalizationServlet.loadTranslations(new TmxSourceReader(file));
 
         // Check that the TODO messages were added for both the "en" and
         // "fi" languages.
@@ -84,7 +85,7 @@ public class FillXmlTest {
         FillXml.updateTranslations(file, new String[] { "en", "fi" },
                 identifiers);
         // Load the new file
-        InternationalizationServlet.loadTranslations(file);
+        InternationalizationServlet.loadTranslations(new TmxSourceReader(file));
 
         // Check that old values exist
         assertEquals("TODO", InternationalizationServlet.getMessage("en",
@@ -107,7 +108,7 @@ public class FillXmlTest {
         // Update the file with the new list of identifiers
         FillXml.updateTranslations(file, new String[] { "en" }, identifiers);
         // Load the new file
-        InternationalizationServlet.loadTranslations(file);
+        InternationalizationServlet.loadTranslations(new TmxSourceReader(file));
 
         // Check that the new value was added
         assertEquals("TODO", InternationalizationServlet.getMessage("en",
@@ -121,7 +122,7 @@ public class FillXmlTest {
         FillXml.updateTranslations(file, new String[] { "en", "fi" },
                 identifiers);
         // Load the new file
-        InternationalizationServlet.loadTranslations(file);
+        InternationalizationServlet.loadTranslations(new TmxSourceReader(file));
 
         // Check that the finnish translation was added to the file
         assertEquals("TODO", InternationalizationServlet.getMessage("fi",

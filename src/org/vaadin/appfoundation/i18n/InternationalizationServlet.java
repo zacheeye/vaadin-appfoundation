@@ -1,16 +1,10 @@
 package org.vaadin.appfoundation.i18n;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServlet;
-
-import nu.xom.Builder;
-import nu.xom.Document;
-import nu.xom.Element;
-import nu.xom.Elements;
 
 /**
  * This servlet reads the xml file of all translations and loads them into a
@@ -32,9 +26,22 @@ public class InternationalizationServlet extends HttpServlet {
      * 
      * @param file
      *            The File object of the translation file
+     * @deprecated Use TranslationSource instead of file
      */
+    @Deprecated
     public static void loadTranslations(File file) {
         loadTranslations(file, false);
+    }
+
+    /**
+     * Load translations from the source into memory. Any duplicated
+     * translations will be discarded.
+     * 
+     * @param source
+     *            The source for translation message
+     */
+    public static void loadTranslations(TranslationSource source) {
+        loadTranslations(source, false);
     }
 
     /**
@@ -47,51 +54,38 @@ public class InternationalizationServlet extends HttpServlet {
     /**
      * Load a translation file into memory.
      * 
+     * @param source
+     *            The source for translation message
+     * @param force
+     *            If a translation already exists in-memory, should the new
+     *            translation override the existing translation
+     */
+    public static void loadTranslations(TranslationSource source, boolean force) {
+        if (source == null) {
+            throw new IllegalArgumentException("Source did not exist");
+        }
+
+        while (source.hasNext()) {
+            TranslationMessage message = source.getNext();
+            addMessage(message.getLanguage(), message.getTuid(), message
+                    .getValue(), force);
+        }
+    }
+
+    /**
+     * Load a translation file into memory.
+     * 
      * @param file
      *            The File object of the translation file
      * @param force
      *            If a translation already exists in-memory, should the new
      *            translation override the existing translation
+     * @deprecated Use TranslationSource instead of File
      */
+    @Deprecated
     public static void loadTranslations(File file, boolean force) {
-        // Make sure the input parameter is valid
-        if (file == null || !file.exists() || !file.isFile()) {
-            throw new IllegalArgumentException("Translation did not exist");
-        }
-
-        // Create an XML builder
-        Builder builder = new Builder();
-        try {
-            // Read the translations.xml file to the Document
-            Document document = builder.build(new FileInputStream(file));
-            Element root = document.getRootElement();
-            // Search for all "tu"-elements
-            Elements tu = root.getChildElements("body").get(0)
-                    .getChildElements("tu");
-
-            // Loop through the tu-elements. Each tu-element is a translation
-            // for a single localized string
-            for (int i = 0; i < tu.size(); i++) {
-                // Get the key for this translation string
-                String identifier = tu.get(i).getAttributeValue("tuid");
-
-                // Get the tuv-elements. Each tuv-element is the actual
-                // translation for one language
-                Elements tuv = tu.get(i).getChildElements("tuv");
-                for (int j = 0; j < tuv.size(); j++) {
-                    // Get the language
-                    String language = tuv.get(j).getAttributeValue("lang");
-                    // Get the translated message
-                    String message = tuv.get(j).getChildElements("seg").get(0)
-                            .getValue();
-                    // Add the translation to our map
-                    addMessage(language, identifier, message, force);
-                }
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        TranslationSource source = new TmxSourceReader(file);
+        loadTranslations(source, force);
     }
 
     /**
