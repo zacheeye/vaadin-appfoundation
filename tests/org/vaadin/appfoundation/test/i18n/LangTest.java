@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.vaadin.appfoundation.i18n.InternationalizationServlet;
 import org.vaadin.appfoundation.i18n.Lang;
+import org.vaadin.appfoundation.i18n.TmxSourceReader;
 import org.vaadin.appfoundation.test.MockApplication;
 import org.vaadin.appfoundation.test.MockApplication.MockContext;
 
@@ -50,7 +51,7 @@ public class LangTest {
                         "org/vaadin/appfoundation/test/i18n/translations.xml");
         File all = new File(url.getFile());
 
-        InternationalizationServlet.loadTranslations(all);
+        InternationalizationServlet.loadTranslations(new TmxSourceReader(all));
         Lang.setLocale(Locale.ENGLISH);
         assertEquals("Foo bar bar bar", Lang.getMessage("TEST", "bar", "bar"));
     }

@@ -17,6 +17,8 @@ import org.vaadin.appfoundation.test.i18n.FillXmlTest;
 import org.vaadin.appfoundation.test.i18n.I18nFormTest;
 import org.vaadin.appfoundation.test.i18n.InternationalizationServletTest;
 import org.vaadin.appfoundation.test.i18n.LangTest;
+import org.vaadin.appfoundation.test.i18n.TmxSourceReaderTest;
+import org.vaadin.appfoundation.test.i18n.TranslationMessageTest;
 import org.vaadin.appfoundation.test.i18n.TranslationUtilTest;
 import org.vaadin.appfoundation.test.persistence.AbstractPojoTest;
 import org.vaadin.appfoundation.test.persistence.FacadeFactoryTest;
@@ -37,7 +39,8 @@ import org.vaadin.appfoundation.test.view.ViewItemTest;
         SessionHandlerTest.class, UserUtilTest.class, PermissionMapTest.class,
         MemoryPermissionManagerTest.class, JPAPermissionManagerTest.class,
         PermissionEntityTest.class, PermissionsTest.class,
-        SimpleViewContainerTest.class, I18nFormTest.class })
+        SimpleViewContainerTest.class, I18nFormTest.class,
+        TranslationMessageTest.class, TmxSourceReaderTest.class })
 public class TestSuite {
 
 }
