@@ -58,7 +58,12 @@ public class ViewItem implements Serializable {
      * @return The view instance
      */
     public View getView() {
-        if (view == null && factory != null) {
+        if (view == null && factory == null) {
+            throw new NullPointerException(
+                    "Factory or view instance must be defined");
+        }
+
+        if (view == null) {
             view = factory.initView(getViewId());
         }
         return view;
