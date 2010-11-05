@@ -15,7 +15,6 @@ public class ViewItemTest {
         ViewItem item = new ViewItem("test");
         assertNull(item.getViewClass());
         assertNull(item.getFactory());
-        assertNull(item.getView());
         assertEquals("test", item.getViewId());
     }
 
@@ -34,5 +33,13 @@ public class ViewItemTest {
         MockView view = new MockView();
         item.setView(view);
         assertEquals(view, item.getView());
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void npeIfFactoryAndViewDoesntExist() {
+        ViewItem item = new ViewItem("test");
+        assertNull(item.getViewClass());
+        assertNull(item.getFactory());
+        item.getView();
     }
 }
