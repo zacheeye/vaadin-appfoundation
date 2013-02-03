@@ -20,7 +20,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.vaadin.appfoundation.i18n.FillXml;
-import org.vaadin.appfoundation.i18n.InternationalizationServlet;
+import org.vaadin.appfoundation.i18n.InternationalizationService;
 import org.vaadin.appfoundation.i18n.TmxSourceReader;
 
 public class FillXmlTest {
@@ -30,7 +30,7 @@ public class FillXmlTest {
     @Before
     public void setUp() throws IOException {
         // Clear the servlet's memory
-        InternationalizationServlet.clear();
+        InternationalizationService.clear();
 
         // create a random file
         file = new File(UUID.randomUUID().toString());
@@ -65,17 +65,17 @@ public class FillXmlTest {
         FillXml.updateTranslations(file, new String[] { "en", "fi" },
                 identifiers);
         // Load the newly created file into the servlet
-        InternationalizationServlet.loadTranslations(new TmxSourceReader(file));
+        InternationalizationService.loadTranslations(new TmxSourceReader(file));
 
         // Check that the TODO messages were added for both the "en" and
         // "fi" languages.
-        assertEquals("TODO", InternationalizationServlet.getMessage("en",
+        assertEquals("TODO", InternationalizationService.getMessage("en",
                 "TEST"));
-        assertEquals("TODO", InternationalizationServlet.getMessage("fi",
+        assertEquals("TODO", InternationalizationService.getMessage("fi",
                 "TEST"));
 
         // Check that the "ANOTHER" identifier doesn't exist yet in the file
-        assertEquals("", InternationalizationServlet
+        assertEquals("", InternationalizationService
                 .getMessage("en", "ANOTHER"));
 
         // Add a new identifier
@@ -85,14 +85,14 @@ public class FillXmlTest {
         FillXml.updateTranslations(file, new String[] { "en", "fi" },
                 identifiers);
         // Load the new file
-        InternationalizationServlet.loadTranslations(new TmxSourceReader(file));
+        InternationalizationService.loadTranslations(new TmxSourceReader(file));
 
         // Check that old values exist
-        assertEquals("TODO", InternationalizationServlet.getMessage("en",
+        assertEquals("TODO", InternationalizationService.getMessage("en",
                 "TEST"));
 
         // Check that the new value was added
-        assertEquals("TODO", InternationalizationServlet.getMessage("en",
+        assertEquals("TODO", InternationalizationService.getMessage("en",
                 "ANOTHER"));
 
     }
@@ -108,24 +108,24 @@ public class FillXmlTest {
         // Update the file with the new list of identifiers
         FillXml.updateTranslations(file, new String[] { "en" }, identifiers);
         // Load the new file
-        InternationalizationServlet.loadTranslations(new TmxSourceReader(file));
+        InternationalizationService.loadTranslations(new TmxSourceReader(file));
 
         // Check that the new value was added
-        assertEquals("TODO", InternationalizationServlet.getMessage("en",
+        assertEquals("TODO", InternationalizationService.getMessage("en",
                 "TEST"));
 
         // The "fi" language shouldn't be added, as it was not in the list
         // of available languages
-        assertEquals("", InternationalizationServlet.getMessage("fi", "TEST"));
+        assertEquals("", InternationalizationService.getMessage("fi", "TEST"));
 
         // Now run the same update, but including the "fi" language
         FillXml.updateTranslations(file, new String[] { "en", "fi" },
                 identifiers);
         // Load the new file
-        InternationalizationServlet.loadTranslations(new TmxSourceReader(file));
+        InternationalizationService.loadTranslations(new TmxSourceReader(file));
 
         // Check that the finnish translation was added to the file
-        assertEquals("TODO", InternationalizationServlet.getMessage("fi",
+        assertEquals("TODO", InternationalizationService.getMessage("fi",
                 "TEST"));
     }
 

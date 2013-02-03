@@ -1,17 +1,20 @@
 package org.vaadin.appfoundation.view;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import com.vaadin.Application;
-import com.vaadin.service.ApplicationContext.TransactionListener;
-import com.vaadin.ui.UriFragmentUtility;
-import com.vaadin.ui.UriFragmentUtility.FragmentChangedEvent;
-import com.vaadin.ui.UriFragmentUtility.FragmentChangedListener;
+import org.vaadin.appfoundation.authorization.Permissions;
+
+import com.apple.eawt.Application;
+import com.vaadin.server.Page.UriFragmentChangedEvent;
+import com.vaadin.server.Page.UriFragmentChangedListener;
+import com.vaadin.ui.UI;
 
 /**
  * Utility class for handling and chaning views in an application.
@@ -19,449 +22,424 @@ import com.vaadin.ui.UriFragmentUtility.FragmentChangedListener;
  * @author Kim
  * 
  */
-public class ViewHandler implements TransactionListener,
-        FragmentChangedListener {
+public class ViewHandler implements Serializable, UriFragmentChangedListener {
 
-    private static final long serialVersionUID = -3548570790687380424L;
+	private static final long serialVersionUID = -3548570790687380424L;
 
-    // A map between the view id and the view item
-    private final Map<Object, ViewItem> viewMap = new HashMap<Object, ViewItem>();
+	// A map between the view id and the view item
+	private final Map<Object, ViewItem> viewMap = new HashMap<Object, ViewItem>();
 
-    // A map between parent ids and parent views
-    private final Map<Object, ViewContainer> parentMap = new HashMap<Object, ViewContainer>();
+	// A map between parent ids and parent views
+	private final Map<Object, ViewContainer> parentMap = new HashMap<Object, ViewContainer>();
 
-    // A list of all known dispatch event listeners.
-    private final List<DispatchEventListener> listeners = new ArrayList<DispatchEventListener>();
+	// A list of all known dispatch event listeners.
+	private final List<DispatchEventListener> listeners = new ArrayList<DispatchEventListener>();
 
-    // Store this instance of the view handler in this thread local variable
-    private static final ThreadLocal<ViewHandler> instance = new ThreadLocal<ViewHandler>();
+	// A map between URIs and view ids
+	private final Map<String, Object> uriMap = new HashMap<String, Object>();
 
-    // A map between URIs and view ids
-    private final Map<String, Object> uriMap = new HashMap<String, Object>();
+	private ViewFactory defaultViewFactory = null;
 
-    private final Application application;
+	/**
+	 * 
+	 * @param ui
+	 *            Current application instance
+	 */
+	public ViewHandler(UI ui) {
+		ui.getSession().setAttribute(ui.getId() + "-viewhandler", this);
+		ui.getPage().addUriFragmentChangedListener(this);
+	}
 
-    private ViewFactory defaultViewFactory = null;
+	/**
+	 * Add a new View to the ViewHandler. Takes as input a viewId. The user is
+	 * responsible of setting the view class. If the viewId is already in use,
+	 * then null is returned.
+	 * 
+	 * @param viewId
+	 *            The view's id
+	 * @return The resulting ViewItem object
+	 */
+	public static ViewItem addView(Object viewId) {
+		if (viewId == null) {
+			throw new IllegalArgumentException("View id may not be null");
+		}
 
-    private UriFragmentUtility uriFragmentUtil = null;
+		// Check if the viewId is already in use. If it is, then return null.
+		if (getCurrent().viewMap.containsKey(viewId)) {
+			return null;
+		}
 
-    /**
-     * 
-     * @param application
-     *            Current application instance
-     */
-    public ViewHandler(Application application) {
-        instance.set(this);
-        this.application = application;
-    }
+		// Create a new ViewItem and add it to the map.
+		ViewItem item = new ViewItem(viewId);
+		getCurrent().viewMap.put(viewId, item);
 
-    /**
-     * {@inheritDoc}
-     */
-    public void transactionEnd(Application application, Object transactionData) {
-        // Clear thread local instance at the end of the transaction
-        if (this.application == application) {
-            instance.set(null);
-        }
-    }
+		// Check if we have a default ViewFactory defined. If one is defined,
+		// then set it to the item.
+		if (getCurrent().defaultViewFactory != null) {
+			item.setFactory(getCurrent().defaultViewFactory);
+		}
+		return item;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    public void transactionStart(Application application, Object transactionData) {
-        // Set the thread local instance
-        if (this.application == application) {
-            instance.set(this);
-        }
-    }
+	/**
+	 * Add a new view to the view handler.
+	 * 
+	 * @param viewId
+	 *            The view's id
+	 * @param parent
+	 *            Parent view for the given view
+	 * @return The resulting ViewItem object
+	 */
+	public static ViewItem addView(Object viewId, ViewContainer parent) {
+		ViewItem item = addView(viewId);
+		setParent(viewId, parent);
+		return item;
+	}
 
-    /**
-     * Add a new View to the ViewHandler. Takes as input a viewId. The user is
-     * responsible of setting the view class. If the viewId is already in use,
-     * then null is returned.
-     * 
-     * @param viewId
-     *            The view's id
-     * @return The resulting ViewItem object
-     */
-    public static ViewItem addView(Object viewId) {
-        if (viewId == null) {
-            throw new IllegalArgumentException("View id may not be null");
-        }
+	/**
+	 * Add a new view. Returns the viewId. Make sure to set either the view
+	 * instance or the view class for the ViewItem.
+	 * 
+	 * @return The viewId
+	 */
+	public static Object addView() {
+		Object viewId = UUID.randomUUID();
+		ViewItem item = new ViewItem(viewId);
+		getCurrent().viewMap.put(viewId, item);
+		return viewId;
+	}
 
-        // Check if the viewId is already in use. If it is, then return null.
-        if (instance.get().viewMap.containsKey(viewId)) {
-            return null;
-        }
+	/**
+	 * Fetch the ViewItem for the given viewId. If the viewId is not found, then
+	 * null is returned.
+	 * 
+	 * @param viewId
+	 * @return The ViewItem object for the given viewId
+	 */
+	public static ViewItem getViewItem(Object viewId) {
+		// Check if the viewId exists in the map
+		if (viewId != null && getCurrent().viewMap.containsKey(viewId)) {
+			return getCurrent().viewMap.get(viewId);
+		}
 
-        // Create a new ViewItem and add it to the map.
-        ViewItem item = new ViewItem(viewId);
-        instance.get().viewMap.put(viewId, item);
+		return null;
+	}
 
-        // Check if we have a default ViewFactory defined. If one is defined,
-        // then set it to the item.
-        if (instance.get().defaultViewFactory != null) {
-            item.setFactory(instance.get().defaultViewFactory);
-        }
-        return item;
-    }
+	/**
+	 * Removes the ViewItem from the handler for the given viewId.
+	 * 
+	 * @param viewId
+	 * @return Returns true if the viewId existed, otherwise false.
+	 */
+	public static boolean removeView(Object viewId) {
+		if (viewId != null && getCurrent().viewMap.containsKey(viewId)) {
+			getCurrent().viewMap.remove(viewId);
 
-    /**
-     * Add a new view to the view handler.
-     * 
-     * @param viewId
-     *            The view's id
-     * @param parent
-     *            Parent view for the given view
-     * @return The resulting ViewItem object
-     */
-    public static ViewItem addView(Object viewId, ViewContainer parent) {
-        ViewItem item = addView(viewId);
-        setParent(viewId, parent);
-        return item;
-    }
+			// Check if the view has an uri defined
+			String uri = getUriForViewId(viewId);
+			if (uri != null) {
+				// An uri definition was found, remove it
+				getCurrent().uriMap.remove(uri);
+			}
+			return true;
+		}
 
-    /**
-     * Add a new view. Returns the viewId. Make sure to set either the view
-     * instance or the view class for the ViewItem.
-     * 
-     * @return The viewId
-     */
-    public static Object addView() {
-        Object viewId = UUID.randomUUID();
-        ViewItem item = new ViewItem(viewId);
-        instance.get().viewMap.put(viewId, item);
-        return viewId;
-    }
+		return false;
+	}
 
-    /**
-     * Fetch the ViewItem for the given viewId. If the viewId is not found, then
-     * null is returned.
-     * 
-     * @param viewId
-     * @return The ViewItem object for the given viewId
-     */
-    public static ViewItem getViewItem(Object viewId) {
-        // Check if the viewId exists in the map
-        if (viewId != null && instance.get().viewMap.containsKey(viewId)) {
-            return instance.get().viewMap.get(viewId);
-        }
+	/**
+	 * Search and return the uri for the given view id
+	 * 
+	 * @param viewId
+	 *            View id we want to get the uri for
+	 * @return Returns the uri if one is found, otherwise returns null
+	 */
+	private static String getUriForViewId(Object viewId) {
+		Iterator<String> it = getCurrent().uriMap.keySet().iterator();
+		while (it.hasNext()) {
+			String uri = it.next();
+			if (getCurrent().uriMap.get(uri).equals(viewId)) {
+				return uri;
+			}
+		}
 
-        return null;
-    }
+		return null;
+	}
 
-    /**
-     * Removes the ViewItem from the handler for the given viewId.
-     * 
-     * @param viewId
-     * @return Returns true if the viewId existed, otherwise false.
-     */
-    public static boolean removeView(Object viewId) {
-        if (viewId != null && instance.get().viewMap.containsKey(viewId)) {
-            instance.get().viewMap.remove(viewId);
+	/**
+	 * Activate the view with the given viewId. You can specify any given amount
+	 * of parameters for the activation request. Each parameter is forwarded to
+	 * the View's activated() method.
+	 * 
+	 * @param viewId
+	 *            The view's viewId
+	 * @param params
+	 *            Parameters used for activating the view
+	 */
+	public static void activateView(Object viewId, Object... params) {
+		if (params != null && params.length > 0 && params[0] instanceof Boolean) {
+			boolean changeUriFragment = (Boolean) params[0];
+			// Workaround to remove first parameter
+			List<Object> parameters = new ArrayList<Object>(
+					Arrays.asList(params));
+			parameters.remove(0);
+			activateView(viewId, changeUriFragment, parameters.toArray());
+		} else {
+			activateView(viewId, false, params);
+		}
+	}
 
-            // Check if the view has an uri defined
-            String uri = getUriForViewId(viewId);
-            if (uri != null) {
-                // An uri definition was found, remove it
-                instance.get().uriMap.remove(uri);
-            }
-            return true;
-        }
+	/**
+	 * Activate the view with the given viewId. You can specify any given amount
+	 * of parameters for the activation request. Each parameter is forwarded to
+	 * the View's activated() method.
+	 * 
+	 * @param viewId
+	 *            The view's viewId
+	 * @param changeUriFragment
+	 *            Should the uri fragment be changed if the view has one set
+	 * @param params
+	 *            Parameters used for activating the view
+	 */
+	@SuppressWarnings("deprecation")
+	private static void activateView(Object viewId, boolean changeUriFragment,
+			Object... params) {
+		if (viewId != null && getCurrent().viewMap.containsKey(viewId)
+				&& getCurrent().parentMap.containsKey(viewId)) {
+			// Get the ViewItem and parent for this viewId
+			ViewItem item = getCurrent().viewMap.get(viewId);
+			ViewContainer parent = getCurrent().parentMap.get(viewId);
 
-        return false;
-    }
+			// Create the dispatch event object
+			DispatchEvent event = new DispatchEvent(item, params);
+			// Loop through all the dispatch event listeners
+			try {
+				for (DispatchEventListener listener : getCurrent().listeners) {
+					listener.preDispatch(event);
+					listener.preActivation(event);
+				}
+			} catch (DispatchException e) {
+				// The dispatch was canceled, stop the execution of this method.
+				return;
+			}
 
-    /**
-     * Search and return the uri for the given view id
-     * 
-     * @param viewId
-     *            View id we want to get the uri for
-     * @return Returns the uri if one is found, otherwise returns null
-     */
-    private static String getUriForViewId(Object viewId) {
-        Iterator<String> it = instance.get().uriMap.keySet().iterator();
-        while (it.hasNext()) {
-            String uri = it.next();
-            if (instance.get().uriMap.get(uri).equals(viewId)) {
-                return uri;
-            }
-        }
+			// Tell the parent to activate the given view
+			parent.activate(item.getView());
 
-        return null;
-    }
+			// Tell the view that it has been activated
+			item.getView().activated(params);
 
-    /**
-     * Activate the view with the given viewId. You can specify any given amount
-     * of parameters for the activation request. Each parameter is forwarded to
-     * the View's activated() method.
-     * 
-     * @param viewId
-     *            The view's viewId
-     * @param params
-     *            Parameters used for activating the view
-     */
-    public static void activateView(Object viewId, Object... params) {
-        activateView(viewId, false, params);
-    }
+			String uri = getUriForViewId(viewId);
+			if (changeUriFragment && uri != null) {
+				UI.getCurrent().getPage().setUriFragment(uri, false);
+			}
 
-    /**
-     * Activate the view with the given viewId. You can specify any given amount
-     * of parameters for the activation request. Each parameter is forwarded to
-     * the View's activated() method.
-     * 
-     * @param viewId
-     *            The view's viewId
-     * @param changeUriFramgent
-     *            Should the uri fragment be changed if the view has one set
-     * @param params
-     *            Parameters used for activating the view
-     */
-    @SuppressWarnings("deprecation")
-    public static void activateView(Object viewId, boolean changeUriFramgent,
-            Object... params) {
-        if (viewId != null && instance.get().viewMap.containsKey(viewId)
-                && instance.get().parentMap.containsKey(viewId)) {
-            // Get the ViewItem and parent for this viewId
-            ViewItem item = instance.get().viewMap.get(viewId);
-            ViewContainer parent = instance.get().parentMap.get(viewId);
+			// View has been dispatched, send event
+			for (DispatchEventListener listener : getCurrent().listeners) {
+				listener.postDispatch(event);
+				listener.postActivation(event);
+			}
+		}
+	}
 
-            // Create the dispatch event object
-            DispatchEvent event = new DispatchEvent(item, params);
-            // Loop through all the dispatch event listeners
-            try {
-                for (DispatchEventListener listener : instance.get().listeners) {
-                    listener.preDispatch(event);
-                    listener.preActivation(event);
-                }
-            } catch (DispatchException e) {
-                // The dispatch was canceled, stop the execution of this method.
-                return;
-            }
+	/**
+	 * Deactivate the view with the given viewId. You can specify any given
+	 * amount of parameters for the deactivation request. Each parameter is
+	 * forwarded to the View's deactivated() method.
+	 * 
+	 * @param viewId
+	 *            The view's viewId
+	 * @param params
+	 *            Parameters used for activating the view
+	 */
+	public static void deactivateView(Object viewId, Object... params) {
+		if (viewId != null && getCurrent().viewMap.containsKey(viewId)
+				&& getCurrent().parentMap.containsKey(viewId)) {
+			// Get the ViewItem and parent for this viewId
+			ViewItem item = getCurrent().viewMap.get(viewId);
+			ViewContainer parent = getCurrent().parentMap.get(viewId);
 
-            // Tell the parent to activate the given view
-            parent.activate(item.getView());
+			// Create the dispatch event object
+			DispatchEvent event = new DispatchEvent(item, params);
+			// Loop through all the dispatch event listeners
+			try {
+				for (DispatchEventListener listener : getCurrent().listeners) {
+					listener.preDeactivation(event);
+				}
+			} catch (DispatchException e) {
+				// The dispatch was canceled, stop the execution of this method.
+				return;
+			}
 
-            // Tell the view that it has been activated
-            item.getView().activated(params);
+			// Tell the parent to activate the given view
+			parent.deactivate(item.getView());
 
-            String uri = getUriForViewId(viewId);
-            if (changeUriFramgent && uri != null
-                    && instance.get().uriFragmentUtil != null) {
-                instance.get().uriFragmentUtil.setFragment(uri, false);
-            }
+			// Tell the view that it has been activated
+			item.getView().deactivated(params);
 
-            // View has been dispatched, send event
-            for (DispatchEventListener listener : instance.get().listeners) {
-                listener.postDispatch(event);
-                listener.postActivation(event);
-            }
-        }
-    }
+			// View has been dispatched, send event
+			for (DispatchEventListener listener : getCurrent().listeners) {
+				listener.postDeactivation(event);
+			}
+		}
+	}
 
-    /**
-     * Deactivate the view with the given viewId. You can specify any given
-     * amount of parameters for the deactivation request. Each parameter is
-     * forwarded to the View's deactivated() method.
-     * 
-     * @param viewId
-     *            The view's viewId
-     * @param params
-     *            Parameters used for activating the view
-     */
-    public static void deactivateView(Object viewId, Object... params) {
-        if (viewId != null && instance.get().viewMap.containsKey(viewId)
-                && instance.get().parentMap.containsKey(viewId)) {
-            // Get the ViewItem and parent for this viewId
-            ViewItem item = instance.get().viewMap.get(viewId);
-            ViewContainer parent = instance.get().parentMap.get(viewId);
+	/**
+	 * Set the parent view for the given viewId.
+	 * 
+	 * @param viewId
+	 *            The viewId of the ViewItem
+	 * @param parent
+	 *            New parent for the view
+	 */
+	public static void setParent(Object viewId, ViewContainer parent) {
+		if (viewId != null && parent != null
+				&& getCurrent().viewMap.containsKey(viewId)) {
+			getCurrent().parentMap.put(viewId, parent);
+		}
+	}
 
-            // Create the dispatch event object
-            DispatchEvent event = new DispatchEvent(item, params);
-            // Loop through all the dispatch event listeners
-            try {
-                for (DispatchEventListener listener : instance.get().listeners) {
-                    listener.preDeactivation(event);
-                }
-            } catch (DispatchException e) {
-                // The dispatch was canceled, stop the execution of this method.
-                return;
-            }
+	/**
+	 * Add a dispatch event listener.
+	 * 
+	 * @param listener
+	 *            The new listener
+	 */
+	public static void addListener(DispatchEventListener listener) {
+		if (listener != null) {
+			getCurrent().listeners.add(listener);
+		}
+	}
 
-            // Tell the parent to activate the given view
-            parent.deactivate(item.getView());
+	/**
+	 * Remove a dispatch event listener.
+	 * 
+	 * @param listener
+	 *            The listener to be removed
+	 */
+	public static void removeListener(DispatchEventListener listener) {
+		if (listener != null) {
+			getCurrent().listeners.remove(listener);
+		}
+	}
 
-            // Tell the view that it has been activated
-            item.getView().deactivated(params);
+	/**
+	 * Set the default ViewFactory which is to be used in all <b>newly</b> added
+	 * views.
+	 * 
+	 * @param defaultViewFactory
+	 *            Default ViewFactory to be used in all new views.
+	 */
+	public static void setDefaultViewFactory(ViewFactory defaultViewFactory) {
+		getCurrent().defaultViewFactory = defaultViewFactory;
+	}
 
-            // View has been dispatched, send event
-            for (DispatchEventListener listener : instance.get().listeners) {
-                listener.postDeactivation(event);
-            }
-        }
-    }
+	/**
+	 * Get the current default ViewFactory.
+	 * 
+	 * @return Default ViewFactory
+	 */
+	public static ViewFactory getDefaultViewFactory() {
+		return getCurrent().defaultViewFactory;
+	}
 
-    /**
-     * Set the parent view for the given viewId.
-     * 
-     * @param viewId
-     *            The viewId of the ViewItem
-     * @param parent
-     *            New parent for the view
-     */
-    public static void setParent(Object viewId, ViewContainer parent) {
-        if (viewId != null && parent != null
-                && instance.get().viewMap.containsKey(viewId)) {
-            instance.get().parentMap.put(viewId, parent);
-        }
-    }
+	/**
+	 * Maps an uri to the given view id
+	 * 
+	 * @param uri
+	 * @param viewId
+	 */
+	public static void addUri(String uri, Object viewId) {
+		// Make sure the uri is valid
+		if (uri == null || uri.isEmpty()) {
+			throw new IllegalArgumentException("Uri must be defined");
+		}
 
-    /**
-     * Add a dispatch event listener.
-     * 
-     * @param listener
-     *            The new listener
-     */
-    public static void addListener(DispatchEventListener listener) {
-        if (listener != null) {
-            instance.get().listeners.add(listener);
-        }
-    }
+		// Make sure the view id is set
+		if (viewId == null) {
+			throw new IllegalArgumentException("View id must be defined");
+		}
 
-    /**
-     * Remove a dispatch event listener.
-     * 
-     * @param listener
-     *            The listener to be removed
-     */
-    public static void removeListener(DispatchEventListener listener) {
-        if (listener != null) {
-            instance.get().listeners.remove(listener);
-        }
-    }
+		if (getCurrent().uriMap.containsKey(uri)) {
+			throw new IllegalArgumentException(
+					"A view is already defined for this uri");
+		}
 
-    /**
-     * Set the default ViewFactory which is to be used in all <b>newly</b> added
-     * views.
-     * 
-     * @param defaultViewFactory
-     *            Default ViewFactory to be used in all new views.
-     */
-    public static void setDefaultViewFactory(ViewFactory defaultViewFactory) {
-        instance.get().defaultViewFactory = defaultViewFactory;
-    }
+		// Make sure that a view has been added for the given view id
+		if (!getCurrent().viewMap.containsKey(viewId)) {
+			throw new IllegalArgumentException(
+					"View id not found - a valid view id must be provided");
+		}
 
-    /**
-     * Get the current default ViewFactory.
-     * 
-     * @return Default ViewFactory
-     */
-    public static ViewFactory getDefaultViewFactory() {
-        return instance.get().defaultViewFactory;
-    }
+		// Add the uri to the map
+		getCurrent().uriMap.put(uri, viewId);
+	}
 
-    /**
-     * Maps an uri to the given view id
-     * 
-     * @param uri
-     * @param viewId
-     */
-    public static void addUri(String uri, Object viewId) {
-        // Make sure the uri is valid
-        if (uri == null || uri.isEmpty()) {
-            throw new IllegalArgumentException("Uri must be defined");
-        }
+	/**
+	 * Remove an uri which have been mapped to a specific view id
+	 * 
+	 * @param uri
+	 */
+	public static void removeUri(String uri) {
+		// Make sure the uri is valid
+		if (uri == null || uri.isEmpty()) {
+			throw new IllegalArgumentException("Uri must be defined");
+		}
 
-        // Make sure the view id is set
-        if (viewId == null) {
-            throw new IllegalArgumentException("View id must be defined");
-        }
+		getCurrent().uriMap.remove(uri);
+	}
 
-        if (instance.get().uriMap.containsKey(uri)) {
-            throw new IllegalArgumentException(
-                    "A view is already defined for this uri");
-        }
+	/**
+	 * Initializes the {@link ViewHandler} for the given {@link Application}
+	 * 
+	 * @param ui
+	 */
+	public static void initialize(UI ui) {
+		if (ui == null) {
+			throw new IllegalArgumentException("Application may not be null");
+		}
+		new ViewHandler(ui);
+	}
 
-        // Make sure that a view has been added for the given view id
-        if (!instance.get().viewMap.containsKey(viewId)) {
-            throw new IllegalArgumentException(
-                    "View id not found - a valid view id must be provided");
-        }
+	private static ViewHandler getCurrent() {
+		UI ui = UI.getCurrent();
+		ViewHandler current = (ViewHandler) ui.getSession().getAttribute(
+				ui.getId() + "-viewhandler");
+		return current;
+	}
 
-        // Add the uri to the map
-        instance.get().uriMap.put(uri, viewId);
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void uriFragmentChanged(UriFragmentChangedEvent event) {
+		// TODO Auto-generated method stub
+		if (event != null) {
+			// Get the uri fragment
+			String fragment = event.getUriFragment();
 
-    /**
-     * Remove an uri which have been mapped to a specific view id
-     * 
-     * @param uri
-     */
-    public static void removeUri(String uri) {
-        // Make sure the uri is valid
-        if (uri == null || uri.isEmpty()) {
-            throw new IllegalArgumentException("Uri must be defined");
-        }
+			int i = fragment.indexOf('/');
+			Object[] params = null;
+			String uri;
+			if (i < 0) {
+				uri = fragment;
+			} else {
+				uri = fragment.substring(0, i);
+				params = fragment.subSequence(i + 1, fragment.length())
+						.toString().split("/");
+			}
 
-        instance.get().uriMap.remove(uri);
-    }
-
-    public static UriFragmentUtility getUriFragmentUtil() {
-        // Check if an UriFragmentUtil is defined, if not, create a new one
-        if (instance.get().uriFragmentUtil == null) {
-            instance.get().uriFragmentUtil = new UriFragmentUtility();
-            // Register this instance of the view handler as the uri fragment
-            // change listener
-            instance.get().uriFragmentUtil.addListener(instance.get());
-        }
-
-        return instance.get().uriFragmentUtil;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void fragmentChanged(FragmentChangedEvent source) {
-        // Make sure we don't get a null for some reason
-        if (source != null) {
-            // Get the uri fragment
-            String fragment = source.getUriFragmentUtility().getFragment();
-
-            int i = fragment.indexOf('/');
-            Object[] params = null;
-            String uri;
-            if (i < 0) {
-                uri = fragment;
-            } else {
-                uri = fragment.substring(0, i);
-                params = fragment.subSequence(i + 1, fragment.length())
-                        .toString().split("/");
-            }
-
-            // Check if the fragment exists in the map
-            if (instance.get().uriMap.containsKey(uri)) {
-                // The view was found, activate it
-                Object viewId = instance.get().uriMap.get(uri);
-                if (params != null) {
-                    activateView(viewId, params);
-                } else {
-                    activateView(viewId);
-                }
-            }
-        }
-    }
-
-    /**
-     * Initializes the {@link ViewHandler} for the given {@link Application}
-     * 
-     * @param application
-     */
-    public static void initialize(Application application) {
-        if (application == null) {
-            throw new IllegalArgumentException("Application may not be null");
-        }
-        ViewHandler handler = new ViewHandler(application);
-        application.getContext().addTransactionListener(handler);
-    }
+			// Check if the fragment exists in the map
+			if (getCurrent().uriMap.containsKey(uri)) {
+				// The view was found, activate it
+				Object viewId = getCurrent().uriMap.get(uri);
+				if (params != null) {
+					activateView(viewId, params);
+				} else {
+					activateView(viewId);
+				}
+			}
+		}
+	}
 
 }

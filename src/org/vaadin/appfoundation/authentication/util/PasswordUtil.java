@@ -152,9 +152,12 @@ public class PasswordUtil implements Serializable {
     public static boolean isValid(String password) {
         List<Validator> validators = getValidators();
         for (Validator validator : validators) {
-            if (!validator.isValid(password)) {
-                return false;
-            }
+        	try {
+        		validator.validate(password);
+        	} catch(Validator.InvalidValueException e) {
+        		return false;
+        		
+        	}
         }
 
         return true;

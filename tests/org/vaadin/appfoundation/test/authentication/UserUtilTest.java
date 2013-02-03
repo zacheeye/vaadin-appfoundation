@@ -25,7 +25,7 @@ import org.vaadin.appfoundation.authentication.exceptions.UsernameExistsExceptio
 import org.vaadin.appfoundation.authentication.util.PasswordUtil;
 import org.vaadin.appfoundation.authentication.util.UserUtil;
 import org.vaadin.appfoundation.persistence.facade.FacadeFactory;
-import org.vaadin.appfoundation.test.MockApplication;
+import org.vaadin.appfoundation.test.MockUI;
 import org.vaadin.appfoundation.test.ValueContainer;
 
 public class UserUtilTest {
@@ -351,7 +351,7 @@ public class UserUtilTest {
             }
         };
 
-        SessionHandler.initialize(new MockApplication());
+        SessionHandler.initialize(new MockUI());
         SessionHandler.addListener(listener);
 
         User user = UserUtil.registerUser("user", "foobar123", "foobar123");

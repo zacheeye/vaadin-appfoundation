@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import com.vaadin.ui.ComponentContainer;
 import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.HasComponents;
 
 /**
  * Interface which all main views should implement
@@ -11,7 +12,7 @@ import com.vaadin.ui.CustomComponent;
  * @author Kim
  * 
  */
-public abstract class AbstractView<A extends ComponentContainer> extends
+public abstract class AbstractView<A extends HasComponents> extends
         CustomComponent implements View, Serializable {
 
     private static final long serialVersionUID = -1420553541682132603L;

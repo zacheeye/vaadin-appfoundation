@@ -1,9 +1,17 @@
 package org.vaadin.appfoundation.i18n;
 
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.Locale;
 
-import com.vaadin.Application;
-import com.vaadin.service.ApplicationContext.TransactionListener;
+import org.vaadin.appfoundation.authorization.Permissions;
+
+import com.apple.eawt.Application;
+import com.vaadin.server.RequestHandler;
+import com.vaadin.server.VaadinRequest;
+import com.vaadin.server.VaadinResponse;
+import com.vaadin.server.VaadinSession;
+import com.vaadin.ui.UI;
 
 /**
  * A utility class for keeping track of the used locale instance for each
@@ -12,25 +20,25 @@ import com.vaadin.service.ApplicationContext.TransactionListener;
  * @author Kim
  * 
  */
-public class Lang implements TransactionListener {
+public class Lang implements Serializable {
 
     private static final long serialVersionUID = -217583268167388861L;
 
     private Locale locale = Locale.getDefault();
 
-    private static ThreadLocal<Lang> instance = new ThreadLocal<Lang>();
-
-    private Application application;
+    private UI ui;
 
     /**
      * Constructor. Takes as parameter the application instance.
      * 
-     * @param application
+     * @param ui
      *            Application instance.
      */
-    public Lang(Application application) {
-        this.application = application;
-        instance.set(this);
+    public Lang(UI ui) {
+        this.ui = ui;
+        VaadinSession session = ui.getSession();
+        String id = ui.getId();
+        session.setAttribute(id + "-lang", this);
     }
 
     /**
@@ -39,7 +47,7 @@ public class Lang implements TransactionListener {
      * @return Locale
      */
     public static Locale getLocale() {
-        return instance.get().locale;
+        return getCurrent().locale;
     }
 
     /**
@@ -49,7 +57,7 @@ public class Lang implements TransactionListener {
      *            Locale
      */
     public static void setLocale(Locale locale) {
-        instance.get().locale = locale;
+        getCurrent().locale = locale;
     }
 
     /**
@@ -62,41 +70,29 @@ public class Lang implements TransactionListener {
      * @return Translated message string
      */
     public static String getMessage(String identifier, Object... params) {
-        return InternationalizationServlet.getMessage(
+        return InternationalizationService.getMessage(
                 getLocale().getLanguage(), identifier, params);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void transactionEnd(Application application, Object transactionData) {
-        // Clear thread local instance at the end of the transaction
-        if (this.application == application) {
-            instance.set(null);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void transactionStart(Application application, Object transactionData) {
-        // Set the thread local instance
-        if (this.application == application) {
-            instance.set(this);
-        }
-    }
 
     /**
      * Initializes the {@link Lang} for the given {@link Application}
      * 
-     * @param application
+     * @param ui
      */
-    public static void initialize(Application application) {
-        if (application == null) {
+    public static void initialize(UI ui) {
+        if (ui == null) {
             throw new IllegalArgumentException("Application may not be null");
         }
-        Lang handler = new Lang(application);
-        application.getContext().addTransactionListener(handler);
+        new Lang(ui);
     }
+    
+	private static Lang getCurrent() {
+		UI ui = UI.getCurrent();
+		Lang current = (Lang) ui.getSession().getAttribute(
+				ui.getId() + "-lang");
+		return current;
+	}
+
 
 }

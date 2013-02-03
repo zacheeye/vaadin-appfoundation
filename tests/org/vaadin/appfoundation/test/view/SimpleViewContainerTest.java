@@ -10,7 +10,7 @@ import java.util.Iterator;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.vaadin.appfoundation.test.MockApplication;
+import org.vaadin.appfoundation.test.MockUI;
 import org.vaadin.appfoundation.view.AbstractView;
 import org.vaadin.appfoundation.view.SimpleViewContainer;
 import org.vaadin.appfoundation.view.View;
@@ -28,7 +28,7 @@ public class SimpleViewContainerTest {
     @Before
     public void setUp() throws SecurityException, NoSuchFieldException,
             IllegalArgumentException, IllegalAccessException {
-        ViewHandler.initialize(new MockApplication());
+        ViewHandler.initialize(new MockUI());
         viewContainer = new SimpleViewContainer();
         Field field = AbstractView.class.getDeclaredField("content");
         field.setAccessible(true);
@@ -46,13 +46,10 @@ public class SimpleViewContainerTest {
         MockView view = new MockView();
         ViewItem item = ViewHandler.addView(MockView.class, viewContainer);
         item.setView(view);
-        assertFalse(panel.getComponentIterator().hasNext());
+        assertFalse(panel.getContent() instanceof MockView);
         ViewHandler.activateView(MockView.class);
-        assertTrue(panel.getComponentIterator().hasNext());
-
-        Iterator<Component> it = panel.getComponentIterator();
-        assertEquals(view, it.next());
-        assertFalse(it.hasNext());
+        assertTrue(panel.getContent() instanceof MockView);
+        assertEquals(view, panel.getContent());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -86,11 +83,7 @@ public class SimpleViewContainerTest {
 
         ViewHandler.activateView(MockView.class);
         ViewHandler.activateView("view2");
-        assertTrue(panel.getComponentIterator().hasNext());
-
-        Iterator<Component> it = panel.getComponentIterator();
-        assertEquals(view2, it.next());
-        assertFalse(it.hasNext());
+        assertEquals(view2, panel.getContent());
     }
 
     @Test
@@ -100,6 +93,6 @@ public class SimpleViewContainerTest {
         item.setView(view);
         ViewHandler.activateView(MockView.class);
         ViewHandler.deactivateView(MockView.class);
-        assertFalse(panel.getComponentIterator().hasNext());
+        assertFalse(panel.getContent() instanceof MockView);
     }
 }

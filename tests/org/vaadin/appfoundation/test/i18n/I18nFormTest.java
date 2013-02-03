@@ -11,11 +11,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.vaadin.appfoundation.i18n.FieldTranslation;
 import org.vaadin.appfoundation.i18n.I18nForm;
-import org.vaadin.appfoundation.i18n.InternationalizationServlet;
+import org.vaadin.appfoundation.i18n.InternationalizationService;
 import org.vaadin.appfoundation.i18n.Lang;
 import org.vaadin.appfoundation.i18n.TmxSourceReader;
 import org.vaadin.appfoundation.i18n.TranslationSource;
-import org.vaadin.appfoundation.test.MockApplication;
+import org.vaadin.appfoundation.test.MockUI;
 
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.ui.Field;
@@ -29,16 +29,16 @@ public class I18nFormTest {
         TranslationSource fieldTranslations = new TmxSourceReader(new File(url
                 .getFile()));
 
-        InternationalizationServlet.loadTranslations(fieldTranslations);
+        InternationalizationService.loadTranslations(fieldTranslations);
 
         // Initialize the Lang class with the MockApplication
-        new Lang(new MockApplication());
+        new Lang(new MockUI());
         Lang.setLocale(Locale.ENGLISH);
     }
 
     @After
     public void tearDown() {
-        InternationalizationServlet.clear();
+        InternationalizationService.clear();
     }
 
     @Test

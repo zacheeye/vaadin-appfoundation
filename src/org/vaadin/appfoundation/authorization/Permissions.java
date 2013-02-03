@@ -1,9 +1,10 @@
 package org.vaadin.appfoundation.authorization;
 
+import java.io.Serializable;
 import java.util.Set;
 
-import com.vaadin.Application;
-import com.vaadin.service.ApplicationContext.TransactionListener;
+import com.apple.eawt.Application;
+import com.vaadin.ui.UI;
 
 /**
  * Utility class for invoking permission manager's method in a static way.
@@ -11,26 +12,22 @@ import com.vaadin.service.ApplicationContext.TransactionListener;
  * @author Kim
  * 
  */
-public class Permissions implements TransactionListener {
+public class Permissions implements Serializable {
 
     private static final long serialVersionUID = -7370158934115935499L;
-
-    private static ThreadLocal<Permissions> instance = new ThreadLocal<Permissions>();
-
-    private final Application application;
 
     private final PermissionManager pm;
 
     /**
      * Constructor.
      * 
-     * @param application
+     * @param ui
      *            Application instance for which this object belongs
      * @param manager
      *            The permission manager to be used
      */
-    public Permissions(Application application, PermissionManager manager) {
-        if (application == null) {
+    public Permissions(UI ui, PermissionManager manager) {
+        if (ui == null) {
             throw new IllegalArgumentException("Application must be set");
         }
 
@@ -38,29 +35,8 @@ public class Permissions implements TransactionListener {
             throw new IllegalArgumentException("PermissionManager must be set");
         }
 
-        instance.set(this);
-        this.application = application;
+        ui.getSession().setAttribute(ui.getId() + "-permissions", this);
         pm = manager;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void transactionEnd(Application application, Object transactionData) {
-        // Clear thread local instance at the end of the transaction
-        if (this.application == application) {
-            instance.set(null);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void transactionStart(Application application, Object transactionData) {
-        // Set the thread local instance
-        if (this.application == application) {
-            instance.set(this);
-        }
     }
 
     /**
@@ -78,7 +54,7 @@ public class Permissions implements TransactionListener {
      *             If either role or resource is null
      */
     public static void allow(Role role, String action, Resource resource) {
-        instance.get().pm.allow(role, action, resource);
+        getCurrent().pm.allow(role, action, resource);
     }
 
     /**
@@ -108,7 +84,7 @@ public class Permissions implements TransactionListener {
      *             If either role or resource is null
      */
     public static void allowAll(Role role, Resource resource) {
-        instance.get().pm.allowAll(role, resource);
+        getCurrent().pm.allowAll(role, resource);
     }
 
     /**
@@ -125,7 +101,7 @@ public class Permissions implements TransactionListener {
      *             If either role or resource is null
      */
     public static void deny(Role role, String action, Resource resource) {
-        instance.get().pm.deny(role, action, resource);
+        getCurrent().pm.deny(role, action, resource);
     }
 
     /**
@@ -155,7 +131,7 @@ public class Permissions implements TransactionListener {
      *             If either role or resource is null
      */
     public static void denyAll(Role role, Resource resource) {
-        instance.get().pm.denyAll(role, resource);
+        getCurrent().pm.denyAll(role, resource);
     }
 
     /**
@@ -176,7 +152,7 @@ public class Permissions implements TransactionListener {
      *             If either role or resource is null
      */
     public static boolean hasAccess(Role role, String action, Resource resource) {
-        return instance.get().pm.hasAccess(role, action, resource);
+        return getCurrent().pm.hasAccess(role, action, resource);
     }
 
     /**
@@ -198,18 +174,18 @@ public class Permissions implements TransactionListener {
      */
     public static boolean hasAccess(Set<Role> roles, String action,
             Resource resource) {
-        return instance.get().pm.hasAccess(roles, action, resource);
+        return getCurrent().pm.hasAccess(roles, action, resource);
     }
 
     /**
      * Initializes the {@link PermissionManager} for the given
      * {@link Application}
      * 
-     * @param application
+     * @param ui
      */
-    public static void initialize(Application application,
+    public static void initialize(UI ui,
             PermissionManager manager) {
-        if (application == null) {
+        if (ui == null) {
             throw new IllegalArgumentException("Application may not be null");
         }
 
@@ -217,9 +193,7 @@ public class Permissions implements TransactionListener {
             throw new IllegalArgumentException("PermissionManager must be set");
         }
 
-        Permissions p = new Permissions(application, manager);
-        application.getContext().addTransactionListener(p);
-
+        new Permissions(ui, manager);
     }
 
     /**
@@ -238,7 +212,7 @@ public class Permissions implements TransactionListener {
      */
     public static void removePermission(Role role, String action,
             Resource resource) {
-        instance.get().pm.removePermission(role, action, resource);
+        getCurrent().pm.removePermission(role, action, resource);
     }
 
     /**
@@ -253,7 +227,7 @@ public class Permissions implements TransactionListener {
      *             If either role or resource is null
      */
     public static void removeAllPermission(Role role, Resource resource) {
-        instance.get().pm.removeAllPermission(role, resource);
+        getCurrent().pm.removeAllPermission(role, resource);
     }
 
     /**
@@ -268,7 +242,15 @@ public class Permissions implements TransactionListener {
      *             If either role or resource is null
      */
     public static void removeAllPermissions(Role role, Resource resource) {
-        instance.get().pm.removeAllPermissions(role, resource);
+        getCurrent().pm.removeAllPermissions(role, resource);
     }
+    
+	private static Permissions getCurrent() {
+		UI ui = UI.getCurrent();
+		Permissions current = (Permissions) ui.getSession().getAttribute(
+				ui.getId() + "-permissions");
+		return current;
+	}
+
 
 }

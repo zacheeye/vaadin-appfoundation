@@ -22,7 +22,7 @@ public class TranslationUtil {
         if (field != null && field.isAnnotationPresent(FieldTranslation.class)) {
             FieldTranslation translation = field
                     .getAnnotation(FieldTranslation.class);
-            return InternationalizationServlet.getMessage(Lang.getLocale()
+            return InternationalizationService.getMessage(Lang.getLocale()
                     .getLanguage(), translation.tuid());
         }
 
