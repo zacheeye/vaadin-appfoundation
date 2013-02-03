@@ -1,19 +1,18 @@
 package org.vaadin.appfoundation.i18n;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.http.HttpServlet;
-
 /**
- * This servlet reads the xml file of all translations and loads them into a
+ * This service reads the xml file of all translations and loads them into a
  * map.
  * 
  * @author Kim
  * 
  */
-public class InternationalizationServlet extends HttpServlet {
+public class InternationalizationService implements Serializable {
 
     private static final long serialVersionUID = 6849398292635918231L;
 

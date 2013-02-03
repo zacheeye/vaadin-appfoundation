@@ -7,7 +7,7 @@ import java.net.URL;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.vaadin.appfoundation.i18n.InternationalizationServlet;
+import org.vaadin.appfoundation.i18n.InternationalizationService;
 import org.vaadin.appfoundation.i18n.TmxSourceReader;
 import org.vaadin.appfoundation.i18n.TranslationSource;
 
@@ -15,7 +15,7 @@ public class InternationalizationServletTest {
 
     @Before
     public void setUp() {
-        InternationalizationServlet.clear();
+        InternationalizationService.clear();
     }
 
     @Test
@@ -25,11 +25,11 @@ public class InternationalizationServletTest {
                         "org/vaadin/appfoundation/test/i18n/translations.xml");
         TranslationSource all = new TmxSourceReader(new File(url.getFile()));
 
-        InternationalizationServlet.loadTranslations(all);
+        InternationalizationService.loadTranslations(all);
 
-        assertEquals("test1", InternationalizationServlet.getMessage("en",
+        assertEquals("test1", InternationalizationService.getMessage("en",
                 "GENERIC_NAME"));
-        assertEquals("testi1", InternationalizationServlet.getMessage("fi",
+        assertEquals("testi1", InternationalizationService.getMessage("fi",
                 "GENERIC_NAME"));
     }
 
@@ -41,11 +41,11 @@ public class InternationalizationServletTest {
                         "org/vaadin/appfoundation/test/i18n/translations.xml");
         File all = new File(url.getFile());
 
-        InternationalizationServlet.loadTranslations(all);
+        InternationalizationService.loadTranslations(all);
 
-        assertEquals("test1", InternationalizationServlet.getMessage("en",
+        assertEquals("test1", InternationalizationService.getMessage("en",
                 "GENERIC_NAME"));
-        assertEquals("testi1", InternationalizationServlet.getMessage("fi",
+        assertEquals("testi1", InternationalizationService.getMessage("fi",
                 "GENERIC_NAME"));
     }
 
@@ -63,12 +63,12 @@ public class InternationalizationServletTest {
                         "org/vaadin/appfoundation/test/i18n/translations.en.xml");
         TranslationSource en = new TmxSourceReader(new File(url.getFile()));
 
-        InternationalizationServlet.loadTranslations(fi);
-        InternationalizationServlet.loadTranslations(en);
+        InternationalizationService.loadTranslations(fi);
+        InternationalizationService.loadTranslations(en);
 
-        assertEquals("Name", InternationalizationServlet.getMessage("en",
+        assertEquals("Name", InternationalizationService.getMessage("en",
                 "GENERIC_NAME"));
-        assertEquals("Nimi", InternationalizationServlet.getMessage("fi",
+        assertEquals("Nimi", InternationalizationService.getMessage("fi",
                 "GENERIC_NAME"));
     }
 
@@ -79,7 +79,7 @@ public class InternationalizationServletTest {
                         "org/vaadin/appfoundation/test/i18n/translations.xml");
         TranslationSource all = new TmxSourceReader(new File(url.getFile()));
 
-        InternationalizationServlet.loadTranslations(all);
+        InternationalizationService.loadTranslations(all);
 
         url = InternationalizationServletTest.class
                 .getClassLoader()
@@ -87,18 +87,18 @@ public class InternationalizationServletTest {
                         "org/vaadin/appfoundation/test/i18n/translations.en.xml");
         TranslationSource en = new TmxSourceReader(new File(url.getFile()));
 
-        InternationalizationServlet.loadTranslations(en, false);
+        InternationalizationService.loadTranslations(en, false);
 
-        assertEquals("test1", InternationalizationServlet.getMessage("en",
+        assertEquals("test1", InternationalizationService.getMessage("en",
                 "GENERIC_NAME"));
-        assertEquals("testi1", InternationalizationServlet.getMessage("fi",
+        assertEquals("testi1", InternationalizationService.getMessage("fi",
                 "GENERIC_NAME"));
 
         en = new TmxSourceReader(new File(url.getFile()));
-        InternationalizationServlet.loadTranslations(en, true);
-        assertEquals("Name", InternationalizationServlet.getMessage("en",
+        InternationalizationService.loadTranslations(en, true);
+        assertEquals("Name", InternationalizationService.getMessage("en",
                 "GENERIC_NAME"));
-        assertEquals("testi1", InternationalizationServlet.getMessage("fi",
+        assertEquals("testi1", InternationalizationService.getMessage("fi",
                 "GENERIC_NAME"));
     }
 
@@ -110,7 +110,7 @@ public class InternationalizationServletTest {
                         "org/vaadin/appfoundation/test/i18n/translations.xml");
         TranslationSource all = new TmxSourceReader(new File(url.getFile()));
 
-        InternationalizationServlet.loadTranslations(all);
+        InternationalizationService.loadTranslations(all);
 
         url = InternationalizationServletTest.class
                 .getClassLoader()
@@ -118,18 +118,18 @@ public class InternationalizationServletTest {
                         "org/vaadin/appfoundation/test/i18n/translations.en.xml");
         TranslationSource en = new TmxSourceReader(new File(url.getFile()));
 
-        InternationalizationServlet.loadTranslations(en, false);
+        InternationalizationService.loadTranslations(en, false);
 
-        assertEquals("test1", InternationalizationServlet.getMessage("en",
+        assertEquals("test1", InternationalizationService.getMessage("en",
                 "GENERIC_NAME"));
-        assertEquals("testi1", InternationalizationServlet.getMessage("fi",
+        assertEquals("testi1", InternationalizationService.getMessage("fi",
                 "GENERIC_NAME"));
 
-        InternationalizationServlet.loadTranslations(new File(url.getFile()),
+        InternationalizationService.loadTranslations(new File(url.getFile()),
                 true);
-        assertEquals("Name", InternationalizationServlet.getMessage("en",
+        assertEquals("Name", InternationalizationService.getMessage("en",
                 "GENERIC_NAME"));
-        assertEquals("testi1", InternationalizationServlet.getMessage("fi",
+        assertEquals("testi1", InternationalizationService.getMessage("fi",
                 "GENERIC_NAME"));
     }
 
@@ -140,15 +140,15 @@ public class InternationalizationServletTest {
                         "org/vaadin/appfoundation/test/i18n/translations.xml");
         TranslationSource all = new TmxSourceReader(new File(url.getFile()));
 
-        InternationalizationServlet.loadTranslations(all);
+        InternationalizationService.loadTranslations(all);
 
-        assertEquals("", InternationalizationServlet.getMessage("DOESNTEXIST",
+        assertEquals("", InternationalizationService.getMessage("DOESNTEXIST",
                 "DOESNEXIST"));
-        assertEquals("", InternationalizationServlet.getMessage("en",
+        assertEquals("", InternationalizationService.getMessage("en",
                 "DOESNEXIST"));
-        assertEquals("Foo {0} bar {1}", InternationalizationServlet.getMessage(
+        assertEquals("Foo {0} bar {1}", InternationalizationService.getMessage(
                 "en", "TEST"));
-        assertEquals("Foo Hello bar world", InternationalizationServlet
+        assertEquals("Foo Hello bar world", InternationalizationService
                 .getMessage("en", "TEST", "Hello", "world"));
 
     }
@@ -156,24 +156,24 @@ public class InternationalizationServletTest {
     @SuppressWarnings("deprecation")
     @Test(expected = IllegalArgumentException.class)
     public void invalidFileNull() {
-        InternationalizationServlet.loadTranslations((File) null);
+        InternationalizationService.loadTranslations((File) null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void invalidSourceNull() {
-        InternationalizationServlet.loadTranslations((TranslationSource) null);
+        InternationalizationService.loadTranslations((TranslationSource) null);
     }
 
     @SuppressWarnings("deprecation")
     @Test(expected = IllegalArgumentException.class)
     public void invalidFileDoesntExist() {
-        InternationalizationServlet.loadTranslations(new File("foobar.xml"));
+        InternationalizationService.loadTranslations(new File("foobar.xml"));
 
     }
 
     @SuppressWarnings("deprecation")
     @Test(expected = IllegalArgumentException.class)
     public void invalidFileFolder() {
-        InternationalizationServlet.loadTranslations(new File("org/"));
+        InternationalizationService.loadTranslations(new File("org/"));
     }
 }

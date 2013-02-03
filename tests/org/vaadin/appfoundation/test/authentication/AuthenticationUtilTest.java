@@ -16,13 +16,13 @@ import org.vaadin.appfoundation.authentication.exceptions.InvalidCredentialsExce
 import org.vaadin.appfoundation.authentication.util.AuthenticationUtil;
 import org.vaadin.appfoundation.authentication.util.PasswordUtil;
 import org.vaadin.appfoundation.persistence.facade.FacadeFactory;
-import org.vaadin.appfoundation.test.MockApplication;
+import org.vaadin.appfoundation.test.MockUI;
 
 public class AuthenticationUtilTest {
 
     @Before
     public void setUp() throws InstantiationException, IllegalAccessException {
-        SessionHandler.initialize(new MockApplication());
+        SessionHandler.initialize(new MockUI());
         FacadeFactory.registerFacade("default", true);
     }
 

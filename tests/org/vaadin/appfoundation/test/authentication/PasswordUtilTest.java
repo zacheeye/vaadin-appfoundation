@@ -15,325 +15,350 @@ import org.vaadin.appfoundation.authentication.data.User;
 import org.vaadin.appfoundation.authentication.util.PasswordUtil;
 
 import com.vaadin.data.Validator;
+import com.vaadin.data.Validator.InvalidValueException;
 
 public class PasswordUtilTest {
 
-    @After
-    public void tearDown() throws SecurityException, NoSuchFieldException,
-            IllegalArgumentException, IllegalAccessException {
-        Field field = PasswordUtil.class.getDeclaredField("salt");
-        field.setAccessible(true);
-        field.set(null, null);
+	@After
+	public void tearDown() throws SecurityException, NoSuchFieldException,
+			IllegalArgumentException, IllegalAccessException {
+		Field field = PasswordUtil.class.getDeclaredField("salt");
+		field.setAccessible(true);
+		field.set(null, null);
 
-        System.clearProperty("authentication.password.salt");
-        System
-                .clearProperty("authentication.password.validation.specialCharacterRequired");
-        System
-                .clearProperty("authentication.password.validation.numericRequired");
-        System
-                .clearProperty("authentication.password.validation.upperCaseRequired");
-        System
-                .clearProperty("authentication.password.validation.lowerCaseRequired");
-        System.clearProperty("authentication.password.validation.length");
-    }
+		System.clearProperty("authentication.password.salt");
+		System.clearProperty("authentication.password.validation.specialCharacterRequired");
+		System.clearProperty("authentication.password.validation.numericRequired");
+		System.clearProperty("authentication.password.validation.upperCaseRequired");
+		System.clearProperty("authentication.password.validation.lowerCaseRequired");
+		System.clearProperty("authentication.password.validation.length");
+	}
 
-    @Test(expected = IllegalArgumentException.class)
-    public void setPropertiesWithNull() {
-        PasswordUtil.setProperties(null);
-    }
+	@Test(expected = IllegalArgumentException.class)
+	public void setPropertiesWithNull() {
+		PasswordUtil.setProperties(null);
+	}
 
-    @Test(expected = IllegalArgumentException.class)
-    public void setPropertiesMissingProperty() {
-        PasswordUtil.setProperties(new Properties());
-    }
+	@Test(expected = IllegalArgumentException.class)
+	public void setPropertiesMissingProperty() {
+		PasswordUtil.setProperties(new Properties());
+	}
 
-    @Test
-    public void setProperties() {
-        Properties properties = new Properties();
-        properties.setProperty("password.salt", "test");
-        PasswordUtil.setProperties(properties);
-    }
+	@Test
+	public void setProperties() {
+		Properties properties = new Properties();
+		properties.setProperty("password.salt", "test");
+		PasswordUtil.setProperties(properties);
+	}
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void setPropertiesTwice() {
-        // Properties is already set
-        Properties properties = new Properties();
-        properties.setProperty("password.salt", "foobar");
-        PasswordUtil.setProperties(properties);
+	@Test(expected = UnsupportedOperationException.class)
+	public void setPropertiesTwice() {
+		// Properties is already set
+		Properties properties = new Properties();
+		properties.setProperty("password.salt", "foobar");
+		PasswordUtil.setProperties(properties);
 
-        properties.setProperty("password.salt", "foobar2");
-        PasswordUtil.setProperties(properties);
-    }
+		properties.setProperty("password.salt", "foobar2");
+		PasswordUtil.setProperties(properties);
+	}
 
-    @Test
-    public void verifyPasswordNullUser() {
-        assertFalse(PasswordUtil.verifyPassword(null, "foo"));
-    }
+	@Test
+	public void verifyPasswordNullUser() {
+		assertFalse(PasswordUtil.verifyPassword(null, "foo"));
+	}
 
-    @Test
-    public void verifyPasswordNullPassword() {
-        assertFalse(PasswordUtil.verifyPassword(new User(), null));
-    }
+	@Test
+	public void verifyPasswordNullPassword() {
+		assertFalse(PasswordUtil.verifyPassword(new User(), null));
+	}
 
-    @Test
-    public void verifyPasswordWrongPassword() {
-        User user = new User();
-        // Note that the password should be hashed for this to pass
-        user.setPassword("test");
-        assertFalse(PasswordUtil.verifyPassword(user, "test"));
-    }
+	@Test
+	public void verifyPasswordWrongPassword() {
+		User user = new User();
+		// Note that the password should be hashed for this to pass
+		user.setPassword("test");
+		assertFalse(PasswordUtil.verifyPassword(user, "test"));
+	}
 
-    @Test
-    public void verifyPassword() {
-        Properties properties = new Properties();
-        properties.setProperty("password.salt", "test");
-        PasswordUtil.setProperties(properties);
+	@Test
+	public void verifyPassword() {
+		Properties properties = new Properties();
+		properties.setProperty("password.salt", "test");
+		PasswordUtil.setProperties(properties);
 
-        User user = new User();
-        // Hashed value of "foobar"+"test" (the salt value)
-        user.setPassword("61e38e2b77827e10777ee8f1a138b7cfb1eb895");
-        assertTrue(PasswordUtil.verifyPassword(user, "foobar"));
-    }
+		User user = new User();
+		// Hashed value of "foobar"+"test" (the salt value)
+		user.setPassword("61e38e2b77827e10777ee8f1a138b7cfb1eb895");
+		assertTrue(PasswordUtil.verifyPassword(user, "foobar"));
+	}
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void getSaltSaltAlreadySet() throws SecurityException,
-            NoSuchFieldException, IllegalArgumentException,
-            IllegalAccessException, NoSuchMethodException,
-            InvocationTargetException {
-        Field field = PasswordUtil.class.getDeclaredField("salt");
-        field.setAccessible(true);
-        field.set(null, "foobar");
+	@Test(expected = UnsupportedOperationException.class)
+	public void getSaltSaltAlreadySet() throws SecurityException,
+			NoSuchFieldException, IllegalArgumentException,
+			IllegalAccessException, NoSuchMethodException,
+			InvocationTargetException {
+		Field field = PasswordUtil.class.getDeclaredField("salt");
+		field.setAccessible(true);
+		field.set(null, "foobar");
 
-        System.setProperty("authentication.password.salt", "test");
-        PasswordUtil.generateHashedPassword("test");
-    }
+		System.setProperty("authentication.password.salt", "test");
+		PasswordUtil.generateHashedPassword("test");
+	}
 
-    @Test
-    public void generateDefaultSalt() {
-        assertEquals("a4f1fbb1274f1fceba9dfae181d7afe6fca96f", PasswordUtil
-                .generateHashedPassword("foobar"));
-    }
+	@Test
+	public void generateDefaultSalt() {
+		assertEquals("a4f1fbb1274f1fceba9dfae181d7afe6fca96f",
+				PasswordUtil.generateHashedPassword("foobar"));
+	}
 
-    @Test
-    public void useSystemSalt() {
-        System.setProperty("authentication.password.salt", "test");
-        assertEquals("51abb9636078defbf888d8457a7c76f85c8f114c", PasswordUtil
-                .generateHashedPassword("test"));
-    }
+	@Test
+	public void useSystemSalt() {
+		System.setProperty("authentication.password.salt", "test");
+		assertEquals("51abb9636078defbf888d8457a7c76f85c8f114c",
+				PasswordUtil.generateHashedPassword("test"));
+	}
 
-    @Test
-    public void isValidNull() {
-        assertFalse(PasswordUtil.isValid(null));
-    }
+	@Test
+	public void isValidNull() {
+		assertFalse(PasswordUtil.isValid(null));
+	}
 
-    @Test
-    public void isValidOnlyLenght() {
-        assertFalse(PasswordUtil.isValid("test"));
-        assertTrue(PasswordUtil.isValid("test-test-test"));
-    }
+	@Test
+	public void isValidOnlyLenght() {
+		assertFalse(PasswordUtil.isValid("test"));
+		assertTrue(PasswordUtil.isValid("test-test-test"));
+	}
 
-    @Test
-    public void isValidLengthAndLowerCase() {
-        System.setProperty("authentication.password.validation.length", "4");
-        System.setProperty(
-                "authentication.password.validation.lowerCaseRequired", "true");
-        assertFalse(PasswordUtil.isValid("TEST"));
-        assertFalse(PasswordUtil.isValid("tes"));
-        assertTrue(PasswordUtil.isValid("test"));
-    }
+	@Test
+	public void isValidLengthAndLowerCase() {
+		System.setProperty("authentication.password.validation.length", "4");
+		System.setProperty(
+				"authentication.password.validation.lowerCaseRequired", "true");
+		assertFalse(PasswordUtil.isValid("TEST"));
+		assertFalse(PasswordUtil.isValid("tes"));
+		assertTrue(PasswordUtil.isValid("test"));
+	}
 
-    @Test
-    public void isValidLengthAndUpperCase() {
-        System.setProperty("authentication.password.validation.length", "4");
-        System.setProperty(
-                "authentication.password.validation.upperCaseRequired", "true");
-        assertFalse(PasswordUtil.isValid("test"));
-        assertFalse(PasswordUtil.isValid("TES"));
-        assertTrue(PasswordUtil.isValid("TEST"));
-    }
+	@Test
+	public void isValidLengthAndUpperCase() {
+		System.setProperty("authentication.password.validation.length", "4");
+		System.setProperty(
+				"authentication.password.validation.upperCaseRequired", "true");
+		assertFalse(PasswordUtil.isValid("test"));
+		assertFalse(PasswordUtil.isValid("TES"));
+		assertTrue(PasswordUtil.isValid("TEST"));
+	}
 
-    @Test
-    public void isValidNumeric() {
-        System.setProperty("authentication.password.validation.length", "4");
-        System.setProperty(
-                "authentication.password.validation.numericRequired", "true");
-        assertFalse(PasswordUtil.isValid("test"));
-        assertTrue(PasswordUtil.isValid("test1"));
-    }
+	@Test
+	public void isValidNumeric() {
+		System.setProperty("authentication.password.validation.length", "4");
+		System.setProperty(
+				"authentication.password.validation.numericRequired", "true");
+		assertFalse(PasswordUtil.isValid("test"));
+		assertTrue(PasswordUtil.isValid("test1"));
+	}
 
-    @Test
-    public void isValidSpecialCharacters() {
-        System.setProperty("authentication.password.validation.length", "4");
-        System.setProperty(
-                "authentication.password.validation.specialCharacterRequired",
-                "true");
-        assertFalse(PasswordUtil.isValid("test"));
-        assertTrue(PasswordUtil.isValid("test-"));
-        assertTrue(PasswordUtil.isValid("testÂ"));
-    }
+	@Test
+	public void isValidSpecialCharacters() {
+		System.setProperty("authentication.password.validation.length", "4");
+		System.setProperty(
+				"authentication.password.validation.specialCharacterRequired",
+				"true");
+		assertFalse(PasswordUtil.isValid("test"));
+		assertTrue(PasswordUtil.isValid("test-"));
+		assertTrue(PasswordUtil.isValid("testÂ"));
+	}
 
-    @Test
-    public void getValidatorsNull() {
-        List<Validator> validators = PasswordUtil.getValidators();
-        boolean passed = true;
-        for (Validator v : validators) {
-            if (!v.isValid(null)) {
-                passed = false;
-            }
-        }
+	@Test
+	public void getValidatorsNull() {
+		List<Validator> validators = PasswordUtil.getValidators();
+		boolean passed = true;
+		for (Validator v : validators) {
+			try {
+				v.validate(null);
+			} catch (InvalidValueException e) {
+				passed = false;
+			}
+		}
 
-        assertFalse(passed);
-    }
+		assertFalse(passed);
+	}
 
-    @Test
-    public void getValidatorsOnlyLenght() {
-        List<Validator> validators = PasswordUtil.getValidators();
-        boolean passed = true;
-        for (Validator v : validators) {
-            if (!v.isValid("test")) {
-                passed = false;
-            }
-        }
+	@Test
+	public void getValidatorsOnlyLenght() {
+		List<Validator> validators = PasswordUtil.getValidators();
+		boolean passed = true;
+		for (Validator v : validators) {
+			try {
+				v.validate("test");
+			} catch (InvalidValueException e) {
+				passed = false;
+			}
+		}
 
-        assertFalse(passed);
+		assertFalse(passed);
 
-        passed = true;
-        for (Validator v : validators) {
-            if (!v.isValid("test-test-test")) {
-                passed = false;
-            }
-        }
+		passed = true;
+		for (Validator v : validators) {
+			try {
+				v.validate("test-test-test");
+			} catch (InvalidValueException e) {
+				passed = false;
+			}
+		}
 
-        assertTrue(passed);
-    }
+		assertTrue(passed);
+	}
 
-    @Test
-    public void getValidatorsLengthAndLowerCase() {
-        System.setProperty("authentication.password.validation.length", "4");
-        System.setProperty(
-                "authentication.password.validation.lowerCaseRequired", "true");
-        List<Validator> validators = PasswordUtil.getValidators();
-        boolean passed = true;
-        for (Validator v : validators) {
-            if (!v.isValid("TEST")) {
-                passed = false;
-            }
-        }
+	@Test
+	public void getValidatorsLengthAndLowerCase() {
+		System.setProperty("authentication.password.validation.length", "4");
+		System.setProperty(
+				"authentication.password.validation.lowerCaseRequired", "true");
+		List<Validator> validators = PasswordUtil.getValidators();
+		boolean passed = true;
+		for (Validator v : validators) {
+			try {
+				v.validate("TEST");
+			} catch (InvalidValueException e) {
+				passed = false;
+			}
+		}
 
-        assertFalse(passed);
-        passed = true;
+		assertFalse(passed);
+		passed = true;
 
-        for (Validator v : validators) {
-            if (!v.isValid("tes")) {
-                passed = false;
-            }
-        }
+		for (Validator v : validators) {
+			try {
+				v.validate("tes");
+			} catch (InvalidValueException e) {
+				passed = false;
+			}
+		}
 
-        assertFalse(passed);
+		assertFalse(passed);
 
-        passed = true;
-        for (Validator v : validators) {
-            if (!v.isValid("test")) {
-                passed = false;
-            }
-        }
+		passed = true;
+		for (Validator v : validators) {
+			try {
+				v.validate("test");
+			} catch (InvalidValueException e) {
+				passed = false;
+			}
+		}
 
-        assertTrue(passed);
-    }
+		assertTrue(passed);
+	}
 
-    @Test
-    public void getValidatorsLengthAndUpperCase() {
-        System.setProperty("authentication.password.validation.length", "4");
-        System.setProperty(
-                "authentication.password.validation.upperCaseRequired", "true");
+	@Test
+	public void getValidatorsLengthAndUpperCase() {
+		System.setProperty("authentication.password.validation.length", "4");
+		System.setProperty(
+				"authentication.password.validation.upperCaseRequired", "true");
 
-        List<Validator> validators = PasswordUtil.getValidators();
-        boolean passed = true;
-        for (Validator v : validators) {
-            if (!v.isValid("test")) {
-                passed = false;
-            }
-        }
+		List<Validator> validators = PasswordUtil.getValidators();
+		boolean passed = true;
+		for (Validator v : validators) {
+			try {
+				v.validate("tes");
+			} catch (InvalidValueException e) {
+				passed = false;
+			}
+		}
 
-        assertFalse(passed);
-        passed = true;
+		assertFalse(passed);
+		passed = true;
 
-        for (Validator v : validators) {
-            if (!v.isValid("TES")) {
-                passed = false;
-            }
-        }
+		for (Validator v : validators) {
+			try {
+				v.validate("TES");
+			} catch (InvalidValueException e) {
+				passed = false;
+			}
+		}
 
-        assertFalse(passed);
+		assertFalse(passed);
 
-        passed = true;
-        for (Validator v : validators) {
-            if (!v.isValid("TEST")) {
-                passed = false;
-            }
-        }
+		passed = true;
+		for (Validator v : validators) {
+			try {
+				v.validate("TEST");
+			} catch (InvalidValueException e) {
+				passed = false;
+			}
+		}
 
-        assertTrue(passed);
-    }
+		assertTrue(passed);
+	}
 
-    @Test
-    public void getValidatorsNumeric() {
-        System.setProperty("authentication.password.validation.length", "4");
-        System.setProperty(
-                "authentication.password.validation.numericRequired", "true");
-        List<Validator> validators = PasswordUtil.getValidators();
-        boolean passed = true;
-        for (Validator v : validators) {
-            if (!v.isValid("test")) {
-                passed = false;
-            }
-        }
+	@Test
+	public void getValidatorsNumeric() {
+		System.setProperty("authentication.password.validation.length", "4");
+		System.setProperty(
+				"authentication.password.validation.numericRequired", "true");
+		List<Validator> validators = PasswordUtil.getValidators();
+		boolean passed = true;
+		for (Validator v : validators) {
+			try {
+				v.validate("test");
+			} catch (InvalidValueException e) {
+				passed = false;
+			}
+		}
 
-        assertFalse(passed);
+		assertFalse(passed);
 
-        passed = true;
-        for (Validator v : validators) {
-            if (!v.isValid("test1")) {
-                passed = false;
-            }
-        }
+		passed = true;
+		for (Validator v : validators) {
+			try {
+        		v.validate("test1");
+        	} catch(InvalidValueException e) {
+        		passed = false;
+        	}
+		}
 
-        assertTrue(passed);
-    }
+		assertTrue(passed);
+	}
 
-    @Test
-    public void getValidatorsSpecialCharacters() {
-        System.setProperty("authentication.password.validation.length", "4");
-        System.setProperty(
-                "authentication.password.validation.specialCharacterRequired",
-                "true");
-        List<Validator> validators = PasswordUtil.getValidators();
-        boolean passed = true;
-        for (Validator v : validators) {
-            if (!v.isValid("test")) {
-                passed = false;
-            }
-        }
+	@Test
+	public void getValidatorsSpecialCharacters() {
+		System.setProperty("authentication.password.validation.length", "4");
+		System.setProperty(
+				"authentication.password.validation.specialCharacterRequired",
+				"true");
+		List<Validator> validators = PasswordUtil.getValidators();
+		boolean passed = true;
+		for (Validator v : validators) {
+			try {
+        		v.validate("test");
+        	} catch(InvalidValueException e) {
+        		passed = false;
+        	}
+		}
 
-        assertFalse(passed);
-        passed = true;
+		assertFalse(passed);
+		passed = true;
 
-        for (Validator v : validators) {
-            if (!v.isValid("test-")) {
-                passed = false;
-            }
-        }
+		for (Validator v : validators) {
+			try {
+        		v.validate("test-");
+        	} catch(InvalidValueException e) {
+        		passed = false;
+        	}
+		}
 
-        assertTrue(passed);
+		assertTrue(passed);
 
-        passed = true;
-        for (Validator v : validators) {
-            if (!v.isValid("testÂ")) {
-                passed = false;
-            }
-        }
+		passed = true;
+		for (Validator v : validators) {
+			try {
+        		v.validate("testÅ");
+        	} catch(InvalidValueException e) {
+        		passed = false;
+        	}
+		}
 
-        assertTrue(passed);
-    }
+		assertTrue(passed);
+	}
 
 }
