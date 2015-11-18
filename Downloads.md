@@ -1,0 +1,1 @@
+The newest version of the Application Foundation can be downloaded [here](http://vaadin.com/directory#addon/76).
